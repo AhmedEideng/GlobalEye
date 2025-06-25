@@ -1,8 +1,9 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { fetchNews, NewsArticle } from "../utils/fetchNews";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function SearchBar() {
   const [query, setQuery] = useState("");
@@ -55,7 +56,7 @@ export default function SearchBar() {
   };
 
   // Search function with intelligent matching
-  const performSearch = async (searchQuery: string) => {
+  const performSearch = useCallback(async (searchQuery: string) => {
     if (!searchQuery.trim()) {
       setResults([]);
       setShowResults(false);
@@ -98,7 +99,7 @@ export default function SearchBar() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [allArticles]);
 
   // Intelligent search algorithm
   const searchInArticles = (searchQuery: string, articles: NewsArticle[]): NewsArticle[] => {
@@ -168,7 +169,7 @@ export default function SearchBar() {
     }, 200);
 
     return () => clearTimeout(timeoutId);
-  }, [query]);
+  }, [query, performSearch]);
 
   return (
     <form onSubmit={handleSearch} className="search-form">
@@ -194,7 +195,7 @@ export default function SearchBar() {
           {isLoading ? (
             <div className="p-6 text-center text-muted-foreground">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3"></div>
-              <p className="text-sm font-medium">جاري البحث...</p>
+              <p className="text-sm font-medium">Searching...</p>
             </div>
           ) : results.length > 0 ? (
             <div className="py-2">
@@ -208,9 +209,11 @@ export default function SearchBar() {
                   <div className="flex gap-4 items-center">
                     {article.urlToImage && (
                       <div className="flex-shrink-0">
-                        <img
+                        <Image
                           src={article.urlToImage}
                           alt={article.title}
+                          width={48}
+                          height={40}
                           className="w-12 h-10 object-cover rounded-lg"
                         />
                       </div>
@@ -231,7 +234,7 @@ export default function SearchBar() {
                 onClick={() => setShowResults(false)}
                 className="text-sm text-primary hover:text-primary/80 font-semibold flex items-center gap-2 px-4 py-2"
               >
-                عرض كل النتائج عن "{query}"
+                View all results for &quot;{query}&quot;
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
@@ -242,8 +245,8 @@ export default function SearchBar() {
               <svg className="w-12 h-12 mx-auto mb-3 text-muted-foreground/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
-              <p className="text-sm font-medium mb-1">لا توجد نتائج عن "{query}"</p>
-              <p className="text-xs">جرّب كلمات أخرى أو تحقق من الإملاء</p>
+              <p className="text-sm font-medium mb-1">No results found for &quot;{query}&quot;</p>
+              <p className="text-xs">Try different keywords or check your spelling</p>
             </div>
           )}
         </div>

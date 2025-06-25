@@ -17,6 +17,50 @@ const GNEWS_API_KEY = process.env.NEXT_PUBLIC_GNEWS_API_KEY;
 const GUARDIAN_KEY = process.env.NEXT_PUBLIC_GUARDIAN_KEY;
 const MEDIASTACK_KEY = process.env.NEXT_PUBLIC_MEDIASTACK_KEY;
 
+interface NewsAPIArticle {
+  source?: { id?: string; name?: string };
+  author?: string;
+  title?: string;
+  description?: string;
+  url?: string;
+  urlToImage?: string;
+  publishedAt?: string;
+  content?: string;
+}
+
+interface GNewsArticle {
+  source?: { name?: string };
+  author?: string;
+  title?: string;
+  description?: string;
+  url?: string;
+  image?: string;
+  publishedAt?: string;
+  content?: string;
+}
+
+interface GuardianArticle {
+  webTitle?: string;
+  webUrl?: string;
+  webPublicationDate?: string;
+  fields?: {
+    byline?: string;
+    trailText?: string;
+    thumbnail?: string;
+    bodyText?: string;
+  };
+}
+
+interface MediastackArticle {
+  source?: string;
+  author?: string;
+  title?: string;
+  description?: string;
+  url?: string;
+  image?: string;
+  published_at?: string;
+}
+
 async function fetchFromNewsAPI(category: string): Promise<NewsArticle[]> {
   if (!NEWS_API_KEY) return [];
   try {
@@ -24,15 +68,15 @@ async function fetchFromNewsAPI(category: string): Promise<NewsArticle[]> {
     const res = await fetch(url, { next: { revalidate: 300 }, headers: { 'User-Agent': 'GlobalEye-News/1.0' } });
     if (!res.ok) return [];
     const data = await res.json();
-    return (data.articles || []).map((article: any) => ({
+    return (data.articles || []).map((article: NewsAPIArticle) => ({
       source: { id: article.source?.id || null, name: article.source?.name || 'Unknown' },
-      author: article.author,
-      title: article.title,
-      description: article.description,
-      url: article.url,
-      urlToImage: article.urlToImage,
-      publishedAt: article.publishedAt,
-      content: article.content
+      author: article.author || null,
+      title: article.title || '',
+      description: article.description || null,
+      url: article.url || '',
+      urlToImage: article.urlToImage || null,
+      publishedAt: article.publishedAt || '',
+      content: article.content || null
     }));
   } catch { return []; }
 }
@@ -44,15 +88,15 @@ async function fetchFromGNews(category: string): Promise<NewsArticle[]> {
     const res = await fetch(url, { next: { revalidate: 300 }, headers: { 'User-Agent': 'GlobalEye-News/1.0' } });
     if (!res.ok) return [];
     const data = await res.json();
-    return (data.articles || []).map((article: any) => ({
+    return (data.articles || []).map((article: GNewsArticle) => ({
       source: { id: null, name: article.source?.name || 'GNews' },
-      author: article.author,
-      title: article.title,
-      description: article.description,
-      url: article.url,
-      urlToImage: article.image,
-      publishedAt: article.publishedAt,
-      content: article.content
+      author: article.author || null,
+      title: article.title || '',
+      description: article.description || null,
+      url: article.url || '',
+      urlToImage: article.image || null,
+      publishedAt: article.publishedAt || '',
+      content: article.content || null
     }));
   } catch { return []; }
 }
@@ -64,14 +108,14 @@ async function fetchFromGuardian(category: string): Promise<NewsArticle[]> {
     const res = await fetch(url, { next: { revalidate: 300 }, headers: { 'User-Agent': 'GlobalEye-News/1.0' } });
     if (!res.ok) return [];
     const data = await res.json();
-    return (data.response?.results || []).map((article: any) => ({
+    return (data.response?.results || []).map((article: GuardianArticle) => ({
       source: { id: 'guardian', name: 'The Guardian' },
       author: article.fields?.byline || null,
-      title: article.webTitle,
+      title: article.webTitle || '',
       description: article.fields?.trailText || null,
-      url: article.webUrl,
+      url: article.webUrl || '',
       urlToImage: article.fields?.thumbnail || null,
-      publishedAt: article.webPublicationDate,
+      publishedAt: article.webPublicationDate || '',
       content: article.fields?.bodyText || null
     }));
   } catch { return []; }
@@ -84,14 +128,14 @@ async function fetchFromMediastack(category: string): Promise<NewsArticle[]> {
     const res = await fetch(url, { next: { revalidate: 300 }, headers: { 'User-Agent': 'GlobalEye-News/1.0' } });
     if (!res.ok) return [];
     const data = await res.json();
-    return (data.data || []).map((article: any) => ({
+    return (data.data || []).map((article: MediastackArticle) => ({
       source: { id: null, name: article.source || 'Mediastack' },
-      author: article.author,
-      title: article.title,
-      description: article.description,
-      url: article.url,
-      urlToImage: article.image,
-      publishedAt: article.published_at,
+      author: article.author || null,
+      title: article.title || '',
+      description: article.description || null,
+      url: article.url || '',
+      urlToImage: article.image || null,
+      publishedAt: article.published_at || '',
       content: null
     }));
   } catch { return []; }

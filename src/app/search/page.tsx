@@ -1,5 +1,6 @@
 import { fetchNews, NewsArticle } from "../utils/fetchNews";
 import Link from "next/link";
+import Image from 'next/image';
 
 interface SearchPageProps {
   searchParams: {
@@ -45,23 +46,13 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      {/* Breadcrumb */}
-      <nav className="mb-6">
-        <Link 
-          href="/" 
-          className="text-muted-foreground hover:text-foreground transition-colors"
-        >
-          ← Back to Home
-        </Link>
-      </nav>
-
       {/* Search Results Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 text-foreground">
-          Search Results
+      <div className="text-center mb-8">
+        <h1 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
+          Search Results for &quot;{query}&quot;
         </h1>
-        <p className="text-lg text-muted-foreground mb-4">
-          Found {sortedResults.length} results for "{query}"
+        <p className="text-lg text-muted-foreground">
+          Found {sortedResults.length} articles matching your search
         </p>
       </div>
 
@@ -69,49 +60,37 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       {sortedResults.length > 0 ? (
         <div className="space-y-6">
           {sortedResults.map((article, index) => (
-            <Link 
-              key={`${article.url}-${index}`} 
-              href={`/article/${encodeURIComponent(article.url)}`}
-              className="card flex gap-6 p-6 bg-card text-card-foreground rounded-lg shadow-sm border border-border hover:shadow-lg"
-            >
-              {article.urlToImage && (
-                <div className="flex-shrink-0">
-                  <img 
-                    src={article.urlToImage} 
-                    alt={article.title}
-                    className="w-48 h-28 object-cover rounded-lg"
-                  />
-                </div>
-              )}
-              <div className="flex-1 min-w-0">
-                <h2 className="text-xl font-semibold mb-2 text-foreground leading-tight line-clamp-2">
-                  {highlightQuery(article.title, query)}
-                </h2>
-                <p className="text-base text-muted-foreground mb-3 leading-relaxed line-clamp-2">
-                  {highlightQuery(article.description || "", query)}
-                </p>
-                <div className="flex justify-between items-center text-sm text-muted-foreground">
+            <article key={index} className="article-card">
+              <Image 
+                src={article.urlToImage || '/placeholder-news.jpg'} 
+                alt={article.title}
+                width={400}
+                height={200}
+                className="article-image"
+              />
+              <div className="article-content">
+                <div className="article-category">Search Result</div>
+                <h3 className="article-title">
+                  <Link href={`/article/${encodeURIComponent(article.url)}`}>
+                    {article.title}
+                  </Link>
+                </h3>
+                <p className="article-excerpt">{article.description}</p>
+                <div className="article-meta">
                   <span>{article.source.name}</span>
-                  <span>{new Date(article.publishedAt).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric'
-                  })}</span>
+                  <span>{new Date(article.publishedAt).toUTCString()}</span>
                 </div>
               </div>
-            </Link>
+            </article>
           ))}
         </div>
       ) : (
-        <div className="text-center py-16 bg-card rounded-lg border border-border">
-          <h2 className="text-2xl font-semibold mb-4 text-foreground">
-            No results found
+        <div className="text-center py-12">
+          <h2 className="text-2xl font-bold mb-4 text-foreground">
+            No results found for &quot;{query}&quot;
           </h2>
           <p className="text-lg text-muted-foreground mb-6">
-            We couldn't find any articles matching "{query}"
-          </p>
-          <p className="text-sm text-muted-foreground">
-            Try different keywords or browse our categories
+            Try different keywords or check your spelling
           </p>
         </div>
       )}
@@ -177,11 +156,4 @@ function sortByRelevance(articles: NewsArticle[], query: string): NewsArticle[] 
     // More recent articles get higher priority
     return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
   });
-}
-
-function highlightQuery(text: string, query: string): string {
-  if (!query.trim()) return text;
-  
-  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-  return text.replace(regex, '<mark class="bg-yellow-200 dark:bg-yellow-800">$1</mark>');
 } 

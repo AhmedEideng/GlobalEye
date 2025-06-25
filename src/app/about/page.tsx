@@ -1,121 +1,66 @@
-import Link from "next/link";
-
 export default function AboutPage() {
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      {/* Breadcrumb */}
-      <nav className="mb-6">
-        <Link 
-          href="/" 
-          className="text-muted-foreground hover:text-foreground transition-colors"
-        >
-          ← Back to Home
-        </Link>
-      </nav>
-
-      <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
-          About GlobalEye News
-        </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          Your trusted source for comprehensive, accurate, and timely global news coverage
-        </p>
-      </div>
-
-      <div className="space-y-12">
-        {/* Mission Section */}
-        <section>
-          <h2 className="text-3xl font-bold mb-6 text-foreground">
-            Our Mission
-          </h2>
-          <div className="space-y-4 text-lg leading-relaxed text-foreground">
-            <p>
-              At GlobalEye News, we are committed to delivering the most comprehensive and accurate news coverage from around the world. Our mission is to keep you informed with the latest developments in politics, business, technology, sports, entertainment, health, and science.
-            </p>
-            <p>
-              We believe in the power of information to shape perspectives and drive positive change. Through our platform, we strive to provide a balanced, unbiased view of world events, helping our readers make informed decisions about the issues that matter most.
-            </p>
-          </div>
-        </section>
-
-        {/* Values Section */}
-        <section>
-          <h2 className="text-3xl font-bold mb-6 text-foreground">
-            Our Values
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 bg-card text-card-foreground rounded-lg border border-border">
-              <h3 className="text-xl font-semibold mb-3 text-primary">
-                Accuracy & Reliability
-              </h3>
-              <p className="text-base leading-relaxed">
-                We prioritize factual accuracy and verify all information through multiple reliable sources before publishing.
-              </p>
-            </div>
-            <div className="p-6 bg-card text-card-foreground rounded-lg border border-border">
-              <h3 className="text-xl font-semibold mb-3 text-primary">
-                Impartiality
-              </h3>
-              <p className="text-base leading-relaxed">
-                We maintain editorial independence and present news from multiple perspectives without bias or agenda.
-              </p>
-            </div>
-            <div className="p-6 bg-card text-card-foreground rounded-lg border border-border">
-              <h3 className="text-xl font-semibold mb-3 text-primary">
-                Timeliness
-              </h3>
-              <p className="text-base leading-relaxed">
-                We deliver breaking news and updates as they happen, ensuring you stay informed in real-time.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Technology Section */}
-        <section>
-          <h2 className="text-3xl font-bold mb-6 text-foreground">
-            Our Technology
-          </h2>
-          <div className="space-y-4 text-lg leading-relaxed text-foreground">
-            <p>
-              GlobalEye News is powered by cutting-edge technology that ensures fast, reliable, and personalized news delivery. Our platform utilizes advanced algorithms to curate content based on your interests while maintaining editorial standards.
-            </p>
-            <p>
-              We integrate multiple news APIs and sources to provide comprehensive coverage, and our intelligent search system helps you find exactly what you're looking for quickly and efficiently.
-            </p>
-          </div>
-        </section>
-
-        {/* Team Section */}
-        <section>
-          <h2 className="text-3xl font-bold mb-6 text-foreground">
-            Our Commitment
-          </h2>
-          <div className="space-y-4 text-lg leading-relaxed text-foreground">
-            <p>
-              We are committed to continuous improvement and innovation in news delivery. Our team works tirelessly to enhance the user experience, expand our coverage, and maintain the highest standards of journalistic integrity.
-            </p>
-            <p>
-              Thank you for choosing GlobalEye News as your trusted source for global information. We value your trust and are dedicated to serving you with the best possible news experience.
-            </p>
-          </div>
-        </section>
-
-        {/* Contact Section */}
-        <section className="text-center py-8 bg-card rounded-lg border border-border">
-          <h2 className="text-2xl font-bold mb-4 text-foreground">
-            Get in Touch
-          </h2>
-          <p className="text-lg text-muted-foreground mb-4">
-            Have questions or suggestions? We'd love to hear from you.
+    <div className="about-page">
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-4xl font-bold mb-8">About GlobalEye News</h1>
+        
+        <div className="prose max-w-none">
+          <p className="text-lg mb-6">
+            GlobalEye News is your trusted source for comprehensive, accurate, and timely news coverage from around the world. 
+            We are committed to delivering high-quality journalism that keeps you informed about the most important events 
+            shaping our global community.
           </p>
-          <a 
-            href="mailto:contact@globaleye.news" 
-            className="inline-block px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors"
-          >
-            Contact Us
-          </a>
-        </section>
+          
+          <h2 className="text-2xl font-semibold mb-4">Our Mission</h2>
+          <p className="mb-6">
+            Our mission is to provide readers with reliable, unbiased news coverage that promotes understanding and 
+            informed decision-making. We believe in the power of information to connect people across borders and 
+            cultures, fostering a more informed and engaged global citizenry.
+          </p>
+          
+          <h2 className="text-2xl font-semibold mb-4">What We Cover</h2>
+          <ul className="list-disc pl-6 mb-6">
+            <li><strong>World News:</strong> International events and developments</li>
+            <li><strong>Politics:</strong> Political developments and policy changes</li>
+            <li><strong>Business:</strong> Economic news and market updates</li>
+            <li><strong>Technology:</strong> Latest tech innovations and trends</li>
+            <li><strong>Sports:</strong> Sports news and athletic achievements</li>
+            <li><strong>Entertainment:</strong> Entertainment industry updates</li>
+            <li><strong>Health:</strong> Health and medical news</li>
+            <li><strong>Science:</strong> Scientific discoveries and research</li>
+          </ul>
+          
+          <h2 className="text-2xl font-semibold mb-4">Our Commitment to Quality</h2>
+          <p className="mb-6">
+            We are committed to maintaining the highest standards of journalistic integrity. Our team of experienced 
+            journalists and editors work tirelessly to ensure that every story we publish is accurate, well-researched, 
+            and presented in a clear, engaging manner. We believe in transparency and accountability, and we&apos;re 
+            always open to feedback from our readers.
+          </p>
+          
+          <h2 className="text-2xl font-semibold mb-4">Technology and Innovation</h2>
+          <p className="mb-6">
+            GlobalEye News leverages cutting-edge technology to deliver news in the most efficient and user-friendly 
+            way possible. Our platform is designed to provide a seamless reading experience across all devices, 
+            ensuring you can stay informed wherever you are. We&apos;re constantly innovating to improve our service 
+            and meet the evolving needs of our readers.
+          </p>
+          
+          <h2 className="text-2xl font-semibold mb-4">Contact Us</h2>
+          <p className="mb-6">
+            We value your feedback and suggestions. If you have any questions, comments, or would like to report 
+            an issue, please don&apos;t hesitate to reach out to us. Your input helps us improve and better serve 
+            our community of readers.
+          </p>
+          
+          <div className="bg-gray-100 p-6 rounded-lg">
+            <h3 className="text-xl font-semibold mb-3">Stay Connected</h3>
+            <p>
+              Follow us for the latest updates and breaking news. Join our community of informed readers who 
+              trust GlobalEye News for their daily dose of world events.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { fetchNews } from '../utils/fetchNews';
+import Image from 'next/image';
 
 interface Article {
   title: string;
@@ -12,9 +13,9 @@ interface Article {
 }
 
 interface CategoryPageProps {
-  params: {
+  params: Promise<{
     category: string;
-  };
+  }>;
 }
 
 const categoryLabels: { [key: string]: string } = {
@@ -29,7 +30,7 @@ const categoryLabels: { [key: string]: string } = {
 };
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
-  const category = params.category;
+  const { category } = await params;
   const categoryLabel = categoryLabels[category] || category;
 
   let articles: Article[] = [];
@@ -40,7 +41,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     if (!articles || articles.length === 0) {
       error = `No news available in the "${categoryLabel}" category. Please try again.`;
     }
-  } catch (err) {
+  } catch {
     error = 'Failed to load news. Please try again.';
   }
 
@@ -52,11 +53,6 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       <div className="error">
         <h2>Error loading {categoryLabel} news</h2>
         <p>{error}</p>
-        <div style={{ marginTop: '20px' }}>
-          <Link href="/" className="btn btn-primary">
-            Back to Home
-          </Link>
-        </div>
       </div>
     );
   }
@@ -66,11 +62,6 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       <div className="error">
         <h2>No news in {categoryLabel}</h2>
         <p>No news found in this category at the moment.</p>
-        <div style={{ marginTop: '20px' }}>
-          <Link href="/" className="btn btn-primary">
-            Back to Home
-          </Link>
-        </div>
       </div>
     );
   }
@@ -86,10 +77,13 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       {/* Featured Article */}
       {featuredArticle && (
         <article className="featured-article">
-          <img 
+          <Image 
             src={featuredArticle.urlToImage || '/placeholder-news.jpg'} 
             alt={featuredArticle.title}
+            width={800}
+            height={400}
             className="featured-image"
+            priority
           />
           <div className="featured-content">
             <div className="article-category">{categoryLabel.toUpperCase()}</div>
@@ -122,9 +116,11 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
               <div className="news-grid">
                 {restArticles.map((article, index) => (
                   <article key={index} className="article-card">
-                    <img 
+                    <Image 
                       src={article.urlToImage || '/placeholder-news.jpg'} 
                       alt={article.title}
+                      width={400}
+                      height={200}
                       className="article-image"
                     />
                     <div className="article-content">
@@ -169,14 +165,6 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
                 )
               ))}
             </ul>
-          </div>
-
-          {/* Back to Home */}
-          <div className="sidebar-widget">
-            <h3 className="widget-title">Back to Home</h3>
-            <Link href="/" className="btn btn-primary" style={{ width: '100%' }}>
-              Home
-            </Link>
           </div>
         </div>
       </div>

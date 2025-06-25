@@ -1,4 +1,3 @@
-import { ThemeToggle } from "./components/ThemeToggle";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import "./globals.css";

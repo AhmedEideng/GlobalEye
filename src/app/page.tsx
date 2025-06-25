@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { fetchNews } from './utils/fetchNews';
 import SearchBar from './components/SearchBar';
 import ReloadButton from './components/ReloadButton';
+import Image from 'next/image';
 
 interface Article {
   title: string;
@@ -34,7 +35,7 @@ export default async function HomePage() {
     } else {
       error = 'No news available at the moment. Please check your API settings.';
     }
-  } catch (err) {
+  } catch {
     error = 'Failed to load news. Please try again.';
   }
 
@@ -76,10 +77,13 @@ export default async function HomePage() {
       {/* Featured Article */}
       {featuredArticle && (
         <article className="featured-article">
-          <img 
+          <Image 
             src={featuredArticle.urlToImage || '/placeholder-news.jpg'} 
             alt={featuredArticle.title}
+            width={800}
+            height={400}
             className="featured-image"
+            priority
           />
           <div className="featured-content">
             <div className="article-category">Breaking News</div>
@@ -112,9 +116,11 @@ export default async function HomePage() {
               <div className="news-grid">
                 {articles.slice(0, 6).map((article, index) => (
                   <article key={index} className="article-card">
-                    <img 
+                    <Image 
                       src={article.urlToImage || '/placeholder-news.jpg'} 
                       alt={article.title}
+                      width={400}
+                      height={200}
                       className="article-image"
                     />
                     <div className="article-content">
@@ -146,9 +152,11 @@ export default async function HomePage() {
               <div className="news-grid">
                 {articles.slice(6, 12).map((article, index) => (
                   <article key={index} className="article-card">
-                    <img 
+                    <Image 
                       src={article.urlToImage || '/placeholder-news.jpg'} 
                       alt={article.title}
+                      width={400}
+                      height={200}
                       className="article-image"
                     />
                     <div className="article-content">

@@ -1,8 +1,9 @@
-import { getArticleByUrl, fetchRelatedNews, detectCategory, NewsArticle } from "../../utils/fetchNews";
+import { getArticleByUrl, fetchRelatedNews, detectCategory } from "../../utils/fetchNews";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { NewsReactions } from "../../components/NewsReactions";
 import ShareButtons from "../../components/ShareButtons";
+import Image from 'next/image';
 
 interface ArticlePageProps {
   params: Promise<{
@@ -24,16 +25,6 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      {/* Breadcrumb */}
-      <nav className="mb-6">
-        <Link 
-          href="/" 
-          className="text-muted-foreground hover:text-foreground transition-colors"
-        >
-          ← Back to Home
-        </Link>
-      </nav>
-
       {/* Main Article */}
       <article className="mb-12">
         <header className="mb-8">
@@ -57,10 +48,13 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         {/* Featured Image */}
         {article.urlToImage && (
           <div className="mb-8">
-            <img 
+            <Image 
               src={article.urlToImage} 
               alt={article.title}
+              width={800}
+              height={400}
               className="w-full max-h-96 object-cover rounded-lg"
+              priority
             />
           </div>
         )}
@@ -78,7 +72,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               {article.content}
             </div>
           )}
-          {/* أزرار المشاركة */}
+          {/* Share Buttons */}
           <ShareButtons title={article.title} url={`/article/${encodeURIComponent(article.url)}`} />
           {/* User Reactions */}
           <NewsReactions articleUrl={article.url} />
@@ -113,9 +107,11 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               >
                 {relatedArticle.urlToImage && (
                   <div className="relative h-40 overflow-hidden">
-                    <img 
+                    <Image 
                       src={relatedArticle.urlToImage} 
                       alt={relatedArticle.title}
+                      width={400}
+                      height={160}
                       className="w-full h-full object-cover"
                     />
                   </div>
