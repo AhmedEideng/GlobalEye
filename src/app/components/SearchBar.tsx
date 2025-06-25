@@ -165,7 +165,7 @@ export default function SearchBar() {
         setResults([]);
         setShowResults(false);
       }
-    }, 300);
+    }, 200);
 
     return () => clearTimeout(timeoutId);
   }, [query]);
@@ -189,12 +189,12 @@ export default function SearchBar() {
       </div>
 
       {/* Search Results Dropdown */}
-      {showResults && (
+      {showResults && query.trim() && (
         <div className="absolute top-full left-0 right-0 mt-2 glass rounded-xl shadow-2xl z-50 max-h-96 overflow-y-auto border border-border/50">
           {isLoading ? (
             <div className="p-6 text-center text-muted-foreground">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3"></div>
-              <p className="text-sm font-medium">Searching...</p>
+              <p className="text-sm font-medium">جاري البحث...</p>
             </div>
           ) : results.length > 0 ? (
             <div className="py-2">
@@ -203,15 +203,15 @@ export default function SearchBar() {
                   key={`${article.url}-${index}`}
                   href={`/article/${encodeURIComponent(article.url)}`}
                   onClick={() => setShowResults(false)}
-                  className="block px-4 py-4 hover:bg-muted/50 transition-colors border-b border-border/50 last:border-b-0 group"
+                  className="block px-4 py-3 hover:bg-muted/50 transition-colors border-b border-border/50 last:border-b-0 group"
                 >
-                  <div className="flex gap-4">
+                  <div className="flex gap-4 items-center">
                     {article.urlToImage && (
                       <div className="flex-shrink-0">
                         <img
                           src={article.urlToImage}
                           alt={article.title}
-                          className="w-16 h-12 object-cover rounded-lg"
+                          className="w-12 h-10 object-cover rounded-lg"
                         />
                       </div>
                     )}
@@ -226,28 +226,26 @@ export default function SearchBar() {
                   </div>
                 </Link>
               ))}
-              <div className="px-4 py-3 border-t border-border/50">
-                <Link
-                  href={`/search?q=${encodeURIComponent(query)}`}
-                  onClick={() => setShowResults(false)}
-                  className="text-sm text-primary hover:text-primary/80 font-semibold flex items-center gap-2"
-                >
-                  View all results for "{query}"
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </Link>
-              </div>
+              <Link
+                href={`/search?q=${encodeURIComponent(query)}`}
+                onClick={() => setShowResults(false)}
+                className="text-sm text-primary hover:text-primary/80 font-semibold flex items-center gap-2 px-4 py-2"
+              >
+                عرض كل النتائج عن "{query}"
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </Link>
             </div>
-          ) : query.trim() ? (
+          ) : (
             <div className="p-6 text-center text-muted-foreground">
               <svg className="w-12 h-12 mx-auto mb-3 text-muted-foreground/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
-              <p className="text-sm font-medium mb-1">No results found for "{query}"</p>
-              <p className="text-xs">Try different keywords or check spelling</p>
+              <p className="text-sm font-medium mb-1">لا توجد نتائج عن "{query}"</p>
+              <p className="text-xs">جرّب كلمات أخرى أو تحقق من الإملاء</p>
             </div>
-          ) : null}
+          )}
         </div>
       )}
     </form>

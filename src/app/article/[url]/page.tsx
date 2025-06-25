@@ -2,6 +2,7 @@ import { getArticleByUrl, fetchRelatedNews, detectCategory, NewsArticle } from "
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { NewsReactions } from "../../components/NewsReactions";
+import ShareButtons from "../../components/ShareButtons";
 
 interface ArticlePageProps {
   params: Promise<{
@@ -77,10 +78,11 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               {article.content}
             </div>
           )}
+          {/* أزرار المشاركة */}
+          <ShareButtons title={article.title} url={`/article/${encodeURIComponent(article.url)}`} />
+          {/* User Reactions */}
+          <NewsReactions articleUrl={article.url} />
         </div>
-
-        {/* User Reactions */}
-        <NewsReactions articleUrl={article.url} />
 
         {/* Read Full Article Button */}
         <div className="mb-8">
