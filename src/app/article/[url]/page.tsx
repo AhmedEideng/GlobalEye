@@ -75,7 +75,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           {/* Share Buttons */}
           <ShareButtons title={article.title} url={`/article/${encodeURIComponent(article.url)}`} />
           {/* User Reactions */}
-          <NewsReactions articleUrl={article.url} />
+          <NewsReactions />
         </div>
 
         {/* Read Full Article Button */}

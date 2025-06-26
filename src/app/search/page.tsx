@@ -2,14 +2,13 @@ import { fetchNews, NewsArticle } from "../utils/fetchNews";
 import Link from "next/link";
 import Image from 'next/image';
 
-interface SearchPageProps {
-  searchParams: {
-    q?: string;
-  };
-}
-
-export default async function SearchPage({ searchParams }: SearchPageProps) {
-  const query = searchParams.q || "";
+export default async function SearchPage({ 
+  searchParams 
+}: { 
+  searchParams: Promise<{ q?: string }> 
+}) {
+  const params = await searchParams;
+  const query = params.q || "";
   
   if (!query.trim()) {
     return (
