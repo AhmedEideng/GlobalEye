@@ -3,7 +3,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { fetchNews, NewsArticle } from "../utils/fetchNews";
 import Link from "next/link";
-import Image from "next/image";
+import OptimizedImage from './OptimizedImage';
 
 export default function SearchBar() {
   const [query, setQuery] = useState("");
@@ -209,7 +209,7 @@ export default function SearchBar() {
                   <div className="flex gap-4 items-center">
                     {article.urlToImage && (
                       <div className="flex-shrink-0">
-                        <Image
+                        <OptimizedImage
                           src={article.urlToImage}
                           alt={article.title}
                           width={48}

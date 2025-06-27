@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { NewsReactions } from "../../components/NewsReactions";
 import ShareButtons from "../../components/ShareButtons";
-import Image from 'next/image';
+import OptimizedImage from '../../components/OptimizedImage';
 
 interface ArticlePageProps {
   params: Promise<{
@@ -48,7 +48,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         {/* Featured Image */}
         {article.urlToImage && (
           <div className="mb-8">
-            <Image 
+            <OptimizedImage 
               src={article.urlToImage} 
               alt={article.title}
               width={800}
@@ -75,7 +75,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           {/* Share Buttons */}
           <ShareButtons title={article.title} url={`/article/${encodeURIComponent(article.url)}`} />
           {/* User Reactions */}
-          <NewsReactions />
+          <NewsReactions articleUrl={article.url} />
         </div>
 
         {/* Read Full Article Button */}
@@ -107,7 +107,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               >
                 {relatedArticle.urlToImage && (
                   <div className="relative h-40 overflow-hidden">
-                    <Image 
+                    <OptimizedImage 
                       src={relatedArticle.urlToImage} 
                       alt={relatedArticle.title}
                       width={400}

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { fetchNews } from './utils/fetchNews';
 import SearchBar from './components/SearchBar';
 import ReloadButton from './components/ReloadButton';
-import Image from 'next/image';
+import OptimizedImage from './components/OptimizedImage';
 
 interface Article {
   title: string;
@@ -77,7 +77,7 @@ export default async function HomePage() {
       {/* Featured Article */}
       {featuredArticle && (
         <article className="featured-article">
-          <Image 
+          <OptimizedImage 
             src={featuredArticle.urlToImage || '/placeholder-news.jpg'} 
             alt={featuredArticle.title}
             width={800}
@@ -116,7 +116,7 @@ export default async function HomePage() {
               <div className="news-grid">
                 {articles.slice(0, 6).map((article, index) => (
                   <article key={index} className="article-card">
-                    <Image 
+                    <OptimizedImage 
                       src={article.urlToImage || '/placeholder-news.jpg'} 
                       alt={article.title}
                       width={400}
@@ -152,7 +152,7 @@ export default async function HomePage() {
               <div className="news-grid">
                 {articles.slice(6, 12).map((article, index) => (
                   <article key={index} className="article-card">
-                    <Image 
+                    <OptimizedImage 
                       src={article.urlToImage || '/placeholder-news.jpg'} 
                       alt={article.title}
                       width={400}

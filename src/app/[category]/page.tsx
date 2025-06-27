@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { fetchNews } from '../utils/fetchNews';
-import Image from 'next/image';
+import OptimizedImage from '../components/OptimizedImage';
 
 interface Article {
   title: string;
@@ -77,7 +77,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       {/* Featured Article */}
       {featuredArticle && (
         <article className="featured-article">
-          <Image 
+          <OptimizedImage 
             src={featuredArticle.urlToImage || '/placeholder-news.jpg'} 
             alt={featuredArticle.title}
             width={800}
@@ -116,7 +116,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
               <div className="news-grid">
                 {restArticles.map((article, index) => (
                   <article key={index} className="article-card">
-                    <Image 
+                    <OptimizedImage 
                       src={article.urlToImage || '/placeholder-news.jpg'} 
                       alt={article.title}
                       width={400}

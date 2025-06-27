@@ -3,6 +3,7 @@ import Footer from "./components/Footer";
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import HeaderAuthButtons from "./components/HeaderAuthButtons";
+import PwaInstallToast from "./components/PwaInstallToast";
 
 export const metadata: Metadata = {
   title: "GlobalEye News - Your Trusted Source for Global News",
@@ -32,15 +33,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
+        <PwaInstallToast />
         {/* CNN Style Header */}
         <header className="cnn-header">
           {/* Top Bar */}
           <div className="header-top">
             <div className="header-top-content">
               <div>Breaking News: Stay informed with the latest global updates</div>
-              <div className="header-controls">
-                {/* <ThemeToggle /> */}
-              </div>
             </div>
           </div>
           {/* Main Header */}

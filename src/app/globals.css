@@ -125,10 +125,13 @@
   /* Navigation styles */
   .nav-link {
     @apply px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 hover:scale-105;
+    border-bottom: none;
+    text-decoration: none;
   }
 
   .nav-link.active {
     @apply bg-foreground text-background shadow-lg;
+    border-bottom: none;
   }
 
   .nav-link:not(.active) {
@@ -239,7 +242,7 @@
 /* CNN Header Style */
 .cnn-header {
   background: var(--cnn-white);
-  border-bottom: 1px solid var(--cnn-border);
+  border-bottom: none;
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -293,7 +296,7 @@
 /* CNN Navigation */
 .cnn-nav {
   background: var(--cnn-white);
-  border-bottom: 1px solid var(--cnn-border);
+  border-bottom: none;
   position: sticky;
   top: 120px;
   z-index: 999;
@@ -344,22 +347,23 @@
   font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  border-bottom: 3px solid transparent;
+  border-bottom: none;
   transition: all 0.3s ease;
   white-space: nowrap;
   transform: translateZ(0);
   backface-visibility: hidden;
+  text-decoration: none;
 }
 
 .nav-link:hover {
   color: var(--cnn-red);
-  border-bottom-color: var(--cnn-red);
   background: var(--cnn-hover);
+  border-bottom: none;
 }
 
 .nav-link.active {
   color: var(--cnn-red);
-  border-bottom-color: var(--cnn-red);
+  border-bottom: none;
 }
 
 /* Mobile Menu */
@@ -400,7 +404,7 @@
 }
 
 .mobile-nav-item {
-  border-bottom: 1px solid var(--cnn-border);
+  border-bottom: none;
 }
 
 .mobile-nav-item:last-child {
@@ -617,8 +621,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 2px solid var(--cnn-red);
+  padding-bottom: none;
 }
 
 .section-title {
@@ -661,7 +664,7 @@
 
 .trending-item {
   padding: 12px 0;
-  border-bottom: 1px solid var(--cnn-border);
+  border-bottom: none;
 }
 
 .trending-item:last-child {
@@ -775,7 +778,7 @@
 }
 
 .footer-section a:hover {
-  color: var(--cnn-white);
+  text-decoration: none;
 }
 
 /* Responsive Design */
@@ -907,6 +910,7 @@
   padding: 30px 0;
   background: var(--cnn-gray);
   border-radius: 8px;
+  border-bottom: none;
 }
 
 .category-title {
@@ -1004,4 +1008,14 @@ img {
   .article-image {
     height: 250px;
   }
+}
+
+a, a:hover, a:active, a:visited {
+  text-decoration: none !important;
+  border-bottom: none !important;
+}
+
+.section-header, .trending-link, .trending-item, .category-header, .footer-section a, .footer-section a:hover, .nav-link, .nav-link.active, .nav-link:hover, .mobile-nav-link, .mobile-nav-link.active, .mobile-nav-link:hover {
+  border-bottom: none !important;
+  text-decoration: none !important;
 } 

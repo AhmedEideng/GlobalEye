@@ -218,13 +218,4 @@ export function detectCategory(article: NewsArticle): string {
   }
   
   return 'general';
-}
-
-// كود اختبار مؤقت للطرفية فقط
-if (require.main === module) {
-  (async () => {
-    const news = await fetchNews('general');
-    console.log('عدد الأخبار:', news.length);
-    console.log('أول 5 أخبار:', news.slice(0, 5));
-  })();
 } 

@@ -22,6 +22,14 @@ export default function Navbar() {
   return (
     <div className="navbar-container">
       <ul className="nav-menu flex gap-4 items-center">
+        <li key="Home" className="nav-item">
+          <Link
+            href="/"
+            className={`nav-link ${pathname === '/' ? 'active' : ''}`}
+          >
+            Home
+          </Link>
+        </li>
         {categories.filter(c => c.name !== 'Home').map((category) => (
           <li key={category.name} className="nav-item">
             <Link
