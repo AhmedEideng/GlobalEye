@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { fetchNews } from './utils/fetchNews';
 import SearchBar from './components/SearchBar';
-import ReloadButton from './components/ReloadButton';
 import OptimizedImage from './components/OptimizedImage';
+import { Metadata } from 'next';
 
 interface Article {
   title: string;
@@ -14,7 +14,42 @@ interface Article {
   category?: string;
 }
 
-export const revalidate = 600;
+export const revalidate = 300;
+
+export async function generateMetadata(): Promise<Metadata> {
+  const title = 'GlobalEye News | Latest World News, Business, Tech, Sports, Entertainment';
+  const description = 'Stay updated with the latest breaking news, business, technology, sports, entertainment, and more from around the world. Your trusted source for global news.';
+  const url = 'https://globaleye.news/'; // عدل هذا للرابط النهائي لموقعك
+  const image = '/placeholder-news.jpg'; // يمكنك استبدالها بصورة شعار الموقع أو صورة مميزة
+  return {
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: 'GlobalEye News',
+      images: [
+        { url: image, width: 1200, height: 630, alt: 'GlobalEye News' }
+      ],
+      locale: 'en_US',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [image],
+      site: '@globaleyenews',
+    },
+    icons: {
+      icon: '/favicon.ico',
+      shortcut: '/favicon.ico',
+      apple: '/apple-touch-icon.png',
+    },
+  };
+}
 
 export default async function HomePage() {
   let articles: Article[] = [];
@@ -54,7 +89,9 @@ export default async function HomePage() {
             <li>Check your internet connection</li>
           </ul>
         </div>
-        <ReloadButton>Retry</ReloadButton>
+        <button className="btn btn-primary" style={{ marginTop: '20px' }} onClick={() => window.location.reload()}>
+          Retry
+        </button>
       </div>
     );
   }
@@ -64,7 +101,9 @@ export default async function HomePage() {
       <div className="error">
         <h2>No news available</h2>
         <p>No news articles found at the moment. Please check your API settings.</p>
-        <ReloadButton>Retry</ReloadButton>
+        <button className="btn btn-primary" style={{ marginTop: '20px' }} onClick={() => window.location.reload()}>
+          Retry
+        </button>
       </div>
     );
   }

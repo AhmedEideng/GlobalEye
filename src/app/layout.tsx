@@ -2,10 +2,11 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
-import HeaderAuthButtons from "./components/HeaderAuthButtons";
+import AuthButtons from "./components/AuthButtons";
 import PwaInstallToast from "./components/PwaInstallToast";
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://globaleye.news'),
   title: "GlobalEye News - Your Trusted Source for Global News",
   description: "Stay informed with the latest breaking news, business updates, technology trends, sports coverage, and more from around the world.",
   keywords: "news, global news, breaking news, business news, technology news, sports news, world news",
@@ -47,7 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="cnn-logo">
               <span>Global</span>Eye
             </div>
-            <HeaderAuthButtons />
+            <AuthButtons />
           </div>
         </header>
         {/* Navigation */}

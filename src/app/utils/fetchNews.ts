@@ -141,14 +141,38 @@ async function fetchFromMediastack(category: string): Promise<NewsArticle[]> {
   } catch { return []; }
 }
 
-export async function fetchNews(category: string = 'general'): Promise<NewsArticle[]> {
-  const [newsapi, gnews, guardian, mediastack] = await Promise.all([
-    fetchFromNewsAPI(category),
-    fetchFromGNews(category),
-    fetchFromGuardian(category),
-    fetchFromMediastack(category)
+// دالة تساعد على تنفيذ promise مع timeout
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T | null> {
+  return Promise.race([
+    promise,
+    new Promise<null>((resolve) => setTimeout(() => {
+      /* تم التعليق بناءً على طلب المستخدم: console.error(`[Timeout] ${label} took more than ${ms}ms`); */
+      resolve(null);
+    }, ms))
   ]);
-  const all = [...newsapi, ...gnews, ...guardian, ...mediastack];
+}
+
+export async function fetchNews(category: string = 'general'): Promise<NewsArticle[]> {
+  // كل مصدر يُجلب مع timeout 3 ثواني
+  const sources = [
+    { fn: fetchFromNewsAPI, label: 'NewsAPI' },
+    { fn: fetchFromGNews, label: 'GNews' },
+    { fn: fetchFromGuardian, label: 'Guardian' },
+    { fn: fetchFromMediastack, label: 'Mediastack' },
+  ];
+  const promises = sources.map(({ fn, label }) =>
+    withTimeout(
+      fn(category).catch((err) => {
+        /* تم التعليق بناءً على طلب المستخدم: console.error(`[Error] ${label} failed for category '${category}':`, err); */
+        return [];
+      }),
+      3000,
+      `${label} (${category})`
+    )
+  );
+  const results = await Promise.all(promises);
+  // تجاهل المصادر التي فشلت أو انتهت بالtimeout
+  const all = results.filter(Boolean).flat() as NewsArticle[];
   const unique = all.filter((item, idx, arr) => arr.findIndex(a => a.url === item.url) === idx);
   unique.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
   return unique;

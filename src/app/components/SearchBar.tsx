@@ -13,6 +13,7 @@ export default function SearchBar() {
   const [allArticles, setAllArticles] = useState<NewsArticle[]>([]);
   const searchRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const cacheRef = useRef<{ [q: string]: NewsArticle[] }>({});
 
   // Load all articles for search
   useEffect(() => {
@@ -55,51 +56,44 @@ export default function SearchBar() {
     }
   };
 
-  // Search function with intelligent matching
+  // Search function with intelligent matching (on demand)
   const performSearch = useCallback(async (searchQuery: string) => {
-    if (!searchQuery.trim()) {
+    const trimmedQuery = searchQuery.trim();
+    if (!trimmedQuery) {
       setResults([]);
       setShowResults(false);
       return;
     }
-
     setIsLoading(true);
     setShowResults(true);
-
+    if (cacheRef.current[trimmedQuery]) {
+      setResults(cacheRef.current[trimmedQuery]);
+      setIsLoading(false);
+      return;
+    }
     try {
-      // First, search in loaded articles
-      const localResults = searchInArticles(searchQuery, allArticles);
-      
-      if (localResults.length > 0) {
-        setResults(localResults.slice(0, 8));
-        setIsLoading(false);
-        return;
-      }
-
-      // If no local results, try to fetch from APIs
       const categories = ['general', 'business', 'technology', 'sports', 'entertainment', 'health', 'science', 'politics'];
       let searchResults: NewsArticle[] = [];
-
       for (const category of categories) {
         try {
           const articles = await fetchNews(category);
-          const categoryResults = searchInArticles(searchQuery, articles);
+          const categoryResults = searchInArticles(trimmedQuery, articles);
           searchResults = [...searchResults, ...categoryResults];
-          
           if (searchResults.length >= 8) break;
         } catch (error) {
           console.error(`Search failed for ${category}:`, error);
         }
       }
-
-      setResults(searchResults.slice(0, 8));
+      const finalResults = searchResults.slice(0, 8);
+      cacheRef.current[trimmedQuery] = finalResults;
+      setResults(finalResults);
     } catch (error) {
       console.error('Search failed:', error);
       setResults([]);
     } finally {
       setIsLoading(false);
     }
-  }, [allArticles]);
+  }, []);
 
   // Intelligent search algorithm
   const searchInArticles = (searchQuery: string, articles: NewsArticle[]): NewsArticle[] => {

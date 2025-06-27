@@ -1,3 +1,34 @@
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'About | GlobalEye News',
+  description: 'Learn more about GlobalEye News, our mission, and our team. Your trusted source for global news and insights.',
+  alternates: { canonical: 'https://globaleye.news/about' },
+  openGraph: {
+    title: 'About | GlobalEye News',
+    description: 'Learn more about GlobalEye News, our mission, and our team. Your trusted source for global news and insights.',
+    url: 'https://globaleye.news/about',
+    siteName: 'GlobalEye News',
+    images: [
+      { url: '/placeholder-news.jpg', width: 1200, height: 630, alt: 'GlobalEye News' }
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'About | GlobalEye News',
+    description: 'Learn more about GlobalEye News, our mission, and our team. Your trusted source for global news and insights.',
+    images: ['/placeholder-news.jpg'],
+    site: '@globaleyenews',
+  },
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
+};
+
 export default function AboutPage() {
   return (
     <div className="about-page">

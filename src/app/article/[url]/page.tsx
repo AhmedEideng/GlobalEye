@@ -6,11 +6,54 @@ import ShareButtons from "../../components/ShareButtons";
 import OptimizedImage from '../../components/OptimizedImage';
 import ArticleImage from './ArticleImage';
 import Image from "next/image";
+import { Metadata } from 'next';
 
 interface ArticlePageProps {
   params: Promise<{
     url: string;
   }>;
+}
+
+export const revalidate = 300;
+
+export async function generateMetadata({ params }: { params: { url: string } }): Promise<Metadata> {
+  const decodedUrl = decodeURIComponent(params.url);
+  let article = null;
+  try {
+    article = await getArticleByUrl(params.url);
+  } catch {}
+  const title = article?.title ? `${article.title} | GlobalEye News` : 'Article | GlobalEye News';
+  const description = article?.description || 'Read the full article and related news on GlobalEye News.';
+  const url = `https://globaleye.news/article/${params.url}`; // عدل هذا للرابط النهائي لموقعك
+  const image = article?.urlToImage || '/placeholder-news.jpg';
+  return {
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: 'GlobalEye News',
+      images: [
+        { url: image, width: 1200, height: 630, alt: article?.title || 'GlobalEye News' }
+      ],
+      locale: 'en_US',
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [image],
+      site: '@globaleyenews',
+    },
+    icons: {
+      icon: '/favicon.ico',
+      shortcut: '/favicon.ico',
+      apple: '/apple-touch-icon.png',
+    },
+  };
 }
 
 export default async function ArticlePage({ params }: ArticlePageProps) {

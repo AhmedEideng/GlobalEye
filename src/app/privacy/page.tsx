@@ -1,3 +1,34 @@
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Privacy Policy | GlobalEye News',
+  description: 'Read the privacy policy of GlobalEye News. Learn how we protect your data and privacy as you use our global news platform.',
+  alternates: { canonical: 'https://globaleye.news/privacy' },
+  openGraph: {
+    title: 'Privacy Policy | GlobalEye News',
+    description: 'Read the privacy policy of GlobalEye News. Learn how we protect your data and privacy as you use our global news platform.',
+    url: 'https://globaleye.news/privacy',
+    siteName: 'GlobalEye News',
+    images: [
+      { url: '/placeholder-news.jpg', width: 1200, height: 630, alt: 'GlobalEye News' }
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Privacy Policy | GlobalEye News',
+    description: 'Read the privacy policy of GlobalEye News. Learn how we protect your data and privacy as you use our global news platform.',
+    images: ['/placeholder-news.jpg'],
+    site: '@globaleyenews',
+  },
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
+};
+
 export default function PrivacyPage() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
