@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 interface OptimizedImageProps {
   src: string;
@@ -38,7 +38,14 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
     setIsLoading(false);
   };
 
-  const imageSrc = hasError ? placeholder : src;
+  const isExternal = /^https?:\/\//.test(src);
+  const proxiedSrc = useMemo(() => {
+    if (isExternal) {
+      return `/api/image-proxy?url=${encodeURIComponent(src)}`;
+    }
+    return src;
+  }, [src, isExternal]);
+  const imageSrc = hasError ? placeholder : proxiedSrc;
 
   if (fill) {
     return (
