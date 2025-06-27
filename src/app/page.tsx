@@ -14,6 +14,8 @@ interface Article {
   category?: string;
 }
 
+export const revalidate = 600;
+
 export default async function HomePage() {
   let articles: Article[] = [];
   let featuredArticle: Article | null = null;
@@ -27,7 +29,7 @@ export default async function HomePage() {
         description: newsData[0].description || '',
         urlToImage: newsData[0].urlToImage || '',
       } as Article;
-      articles = newsData.slice(1, 13).map((a) => ({
+      articles = newsData.slice(1, 31).map((a) => ({
         ...a,
         description: a.description || '',
         urlToImage: a.urlToImage || '',
@@ -112,45 +114,8 @@ export default async function HomePage() {
                 <h2 className="section-title">Latest News</h2>
                 <Link href="/world" className="btn btn-secondary">View All</Link>
               </div>
-              
               <div className="news-grid">
-                {articles.slice(0, 6).map((article, index) => (
-                  <article key={index} className="article-card">
-                    <OptimizedImage 
-                      src={article.urlToImage || '/placeholder-news.jpg'} 
-                      alt={article.title}
-                      width={400}
-                      height={200}
-                      className="article-image"
-                    />
-                    <div className="article-content">
-                      <div className="article-category">World News</div>
-                      <h3 className="article-title">
-                        <Link href={`/article/${encodeURIComponent(article.url)}`}>
-                          {article.title}
-                        </Link>
-                      </h3>
-                      <p className="article-excerpt">{article.description}</p>
-                      <div className="article-meta">
-                        <span>{article.source.name}</span>
-                        <span>{new Date(article.publishedAt).toUTCString()}</span>
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* More News Section */}
-          {articles.length > 6 && (
-            <section>
-              <div className="section-header">
-                <h2 className="section-title">More News</h2>
-              </div>
-              
-              <div className="news-grid">
-                {articles.slice(6, 12).map((article, index) => (
+                {articles.map((article, index) => (
                   <article key={index} className="article-card">
                     <OptimizedImage 
                       src={article.urlToImage || '/placeholder-news.jpg'} 

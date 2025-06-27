@@ -5,6 +5,7 @@ import { NewsReactions } from "../../components/NewsReactions";
 import ShareButtons from "../../components/ShareButtons";
 import OptimizedImage from '../../components/OptimizedImage';
 import ArticleImage from './ArticleImage';
+import Image from "next/image";
 
 interface ArticlePageProps {
   params: Promise<{
@@ -25,7 +26,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const relatedArticles = await fetchRelatedNews(article, category);
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="w-full px-0 py-8">
       {/* Main Article */}
       <article className="mb-12">
         <header className="mb-8">
@@ -48,14 +49,22 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
         {/* Featured Image */}
         {article.urlToImage && (
-          <div className="mb-8">
-            <ArticleImage 
-              src={article.urlToImage} 
+          <div
+            className="mb-8 relative w-full rounded-lg overflow-hidden"
+            style={{
+              height: "clamp(250px, 40vw, 450px)",
+              background: "#eee"
+            }}
+          >
+            <Image
+              src={article.urlToImage}
               alt={article.title}
-              width={800}
-              height={400}
-              className="w-full max-h-96 object-cover rounded-lg"
+              fill
+              style={{
+                objectFit: "cover"
+              }}
               priority
+              sizes="100vw"
             />
           </div>
         )}
@@ -75,8 +84,6 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           )}
           {/* Share Buttons */}
           <ShareButtons title={article.title} url={`/article/${encodeURIComponent(article.url)}`} />
-          {/* User Reactions */}
-          <NewsReactions articleUrl={article.url} />
         </div>
 
         {/* Read Full Article Button */}
@@ -85,10 +92,9 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             href={article.url} 
             target="_blank" 
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-black to-gray-800 text-white rounded-full font-bold shadow-lg hover:from-gray-900 hover:to-black transition-all duration-200 text-lg group"
+            className="px-6 py-2 bg-primary text-white rounded-md font-semibold shadow-md hover:bg-primary/90 transition-all duration-200 text-base border-0 no-underline"
           >
-            <svg className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-            اقرأ المقال كاملا
+            Read Full Article
           </a>
         </div>
       </article>
@@ -105,7 +111,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               <Link 
                 key={relatedArticle.url} 
                 href={`/article/${encodeURIComponent(relatedArticle.url)}`}
-                className="card bg-card rounded-lg shadow-sm overflow-hidden hover:shadow-lg no-underline"
+                className="card bg-card rounded-lg shadow-sm overflow-hidden hover:shadow-lg no-underline related-articles-link"
               >
                 {relatedArticle.urlToImage && (
                   <div className="relative h-40 overflow-hidden">

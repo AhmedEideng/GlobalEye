@@ -1,5 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+import sharp from 'sharp';
 
 // أنواع الصور المسموحة
 const ALLOWED_TYPES = [
@@ -49,10 +50,7 @@ export async function GET(req: NextRequest) {
     // تأكيد وجود Accept وUser-Agent
     if (!headers['Accept']) headers['Accept'] = 'image/*,*/*;q=0.8';
     if (!headers['User-Agent']) headers['User-Agent'] = incomingHeaders.get('user-agent') || '';
-    const response = await fetch(url, {
-      headers,
-      // You may want to set a timeout here in production
-    });
+    const response = await fetch(url, { headers });
     if (!response.ok) {
       return fallbackImageResponse();
     }
@@ -66,14 +64,30 @@ export async function GET(req: NextRequest) {
       return fallbackImageResponse();
     }
     // إذا لم تتوفر content-length، نقرأ buffer ونقيس الحجم
-    const imageBuffer = Buffer.from(await response.arrayBuffer());
+    const imageBuffer = Buffer.from(new Uint8Array(await response.arrayBuffer()));
     if (imageBuffer.length > MAX_IMAGE_SIZE) {
       return fallbackImageResponse();
     }
-    const res = new NextResponse(imageBuffer, {
+
+    // ضغط الصور (jpeg/png/webp فقط)
+    let optimizedBuffer = imageBuffer;
+    let outContentType = contentType;
+    if (
+      contentType === 'image/jpeg' ||
+      contentType === 'image/png' ||
+      contentType === 'image/webp'
+    ) {
+      optimizedBuffer = await sharp(imageBuffer)
+        .resize({ width: 1200, withoutEnlargement: true })
+        .jpeg({ quality: 70 })
+        .toBuffer();
+      outContentType = 'image/jpeg';
+    }
+
+    const res = new NextResponse(optimizedBuffer, {
       status: 200,
       headers: {
-        'Content-Type': contentType,
+        'Content-Type': outContentType,
         // Cache for 1 day (adjust as needed)
         'Cache-Control': 'public, max-age=86400',
       },
