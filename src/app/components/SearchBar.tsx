@@ -1,9 +1,9 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { fetchNews, NewsArticle } from "../utils/fetchNews";
 import Link from "next/link";
 import OptimizedImage from './OptimizedImage';
+import { NewsArticle } from '../utils/fetchNews';
 
 export default function SearchBar() {
   const [query, setQuery] = useState("");
@@ -23,7 +23,8 @@ export default function SearchBar() {
       
       for (const category of categories) {
         try {
-          const articles = await fetchNews(category);
+          const res = await fetch(`/api/news?category=${category}`);
+          const articles = await res.json();
           allArticles = [...allArticles, ...articles];
         } catch (error) {
           console.error(`Failed to load ${category} articles:`, error);
@@ -76,7 +77,8 @@ export default function SearchBar() {
       let searchResults: NewsArticle[] = [];
       for (const category of categories) {
         try {
-          const articles = await fetchNews(category);
+          const res = await fetch(`/api/news?category=${category}`);
+          const articles = await res.json();
           const categoryResults = searchInArticles(trimmedQuery, articles);
           searchResults = [...searchResults, ...categoryResults];
           if (searchResults.length >= 8) break;
@@ -170,7 +172,7 @@ export default function SearchBar() {
       <div className="search-wrapper">
         <input
           type="text"
-          placeholder="Search for news, topics, or keywords..."
+          placeholder="Search for news..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="search-input"
@@ -240,7 +242,7 @@ export default function SearchBar() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               <p className="text-sm font-medium mb-1">No results found for &quot;{query}&quot;</p>
-              <p className="text-xs">Try different keywords or check your spelling</p>
+              <p className="text-xs">Try different keywords</p>
             </div>
           )}
         </div>

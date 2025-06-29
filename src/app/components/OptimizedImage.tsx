@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useState, useMemo } from 'react';
 
-// Next.js Image يدعم WebP وLazy Loading تلقائيًا حسب المتصفح
+// Next.js Image supports WebP and Lazy Loading automatically based on the browser
 
 interface OptimizedImageProps {
   src: string;

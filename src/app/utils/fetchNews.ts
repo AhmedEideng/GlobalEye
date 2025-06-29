@@ -65,7 +65,7 @@ async function fetchFromNewsAPI(category: string): Promise<NewsArticle[]> {
   if (!NEWS_API_KEY) return [];
   try {
     const url = `https://newsapi.org/v2/top-headlines?country=us&category=${category}&pageSize=20&apiKey=${NEWS_API_KEY}`;
-    const res = await fetch(url, { next: { revalidate: 300 }, headers: { 'User-Agent': 'GlobalEye-News/1.0' } });
+    const res = await fetch(url, { next: { revalidate: 900 }, headers: { 'User-Agent': 'GlobalEye-News/1.0' } });
     if (!res.ok) return [];
     const data = await res.json();
     return (data.articles || []).map((article: NewsAPIArticle) => ({
@@ -85,7 +85,7 @@ async function fetchFromGNews(category: string): Promise<NewsArticle[]> {
   if (!GNEWS_API_KEY) return [];
   try {
     const url = `https://gnews.io/api/v4/top-headlines?category=${category}&lang=en&country=us&max=20&apikey=${GNEWS_API_KEY}`;
-    const res = await fetch(url, { next: { revalidate: 300 }, headers: { 'User-Agent': 'GlobalEye-News/1.0' } });
+    const res = await fetch(url, { next: { revalidate: 900 }, headers: { 'User-Agent': 'GlobalEye-News/1.0' } });
     if (!res.ok) return [];
     const data = await res.json();
     return (data.articles || []).map((article: GNewsArticle) => ({
@@ -105,7 +105,7 @@ async function fetchFromGuardian(category: string): Promise<NewsArticle[]> {
   if (!GUARDIAN_KEY) return [];
   try {
     const url = `https://content.guardianapis.com/search?section=${category}&show-fields=all&page-size=20&api-key=${GUARDIAN_KEY}`;
-    const res = await fetch(url, { next: { revalidate: 300 }, headers: { 'User-Agent': 'GlobalEye-News/1.0' } });
+    const res = await fetch(url, { next: { revalidate: 900 }, headers: { 'User-Agent': 'GlobalEye-News/1.0' } });
     if (!res.ok) return [];
     const data = await res.json();
     return (data.response?.results || []).map((article: GuardianArticle) => ({
@@ -125,7 +125,7 @@ async function fetchFromMediastack(category: string): Promise<NewsArticle[]> {
   if (!MEDIASTACK_KEY) return [];
   try {
     const url = `http://api.mediastack.com/v1/news?access_key=${MEDIASTACK_KEY}&categories=${category}&languages=en&countries=us&limit=20`;
-    const res = await fetch(url, { next: { revalidate: 300 }, headers: { 'User-Agent': 'GlobalEye-News/1.0' } });
+    const res = await fetch(url, { next: { revalidate: 900 }, headers: { 'User-Agent': 'GlobalEye-News/1.0' } });
     if (!res.ok) return [];
     const data = await res.json();
     return (data.data || []).map((article: MediastackArticle) => ({
@@ -141,19 +141,20 @@ async function fetchFromMediastack(category: string): Promise<NewsArticle[]> {
   } catch { return []; }
 }
 
-// دالة تساعد على تنفيذ promise مع timeout
+// Helper function to execute a promise with a timeout
 function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T | null> {
   return Promise.race([
     promise,
     new Promise<null>((resolve) => setTimeout(() => {
-      /* تم التعليق بناءً على طلب المستخدم: console.error(`[Timeout] ${label} took more than ${ms}ms`); */
+      /* Commented out as per user request: console.error(`[Timeout] ${label} took more than ${ms}ms`); */
       resolve(null);
     }, ms))
   ]);
 }
 
 export async function fetchNews(category: string = 'general'): Promise<NewsArticle[]> {
-  // كل مصدر يُجلب مع timeout 3 ثواني
+  // Only fetch directly from APIs
+  // Each source is fetched with a 3-second timeout
   const sources = [
     { fn: fetchFromNewsAPI, label: 'NewsAPI' },
     { fn: fetchFromGNews, label: 'GNews' },
@@ -163,7 +164,7 @@ export async function fetchNews(category: string = 'general'): Promise<NewsArtic
   const promises = sources.map(({ fn, label }) =>
     withTimeout(
       fn(category).catch((err) => {
-        /* تم التعليق بناءً على طلب المستخدم: console.error(`[Error] ${label} failed for category '${category}':`, err); */
+        /* Commented out as per user request: console.error(`[Error] ${label} failed for category '${category}':`, err); */
         return [];
       }),
       3000,
@@ -171,7 +172,7 @@ export async function fetchNews(category: string = 'general'): Promise<NewsArtic
     )
   );
   const results = await Promise.all(promises);
-  // تجاهل المصادر التي فشلت أو انتهت بالtimeout
+  // Ignore sources that failed or timed out
   const all = results.filter(Boolean).flat() as NewsArticle[];
   const unique = all.filter((item, idx, arr) => arr.findIndex(a => a.url === item.url) === idx);
   unique.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());

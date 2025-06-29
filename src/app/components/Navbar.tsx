@@ -4,15 +4,15 @@ import { usePathname } from "next/navigation";
 import { useState } from 'react';
 
 const categories = [
-  { name: 'Home', path: '/' },
-  { name: 'World', path: '/world' },
-  { name: 'Politics', path: '/politics' },
-  { name: 'Business', path: '/business' },
-  { name: 'Technology', path: '/technology' },
-  { name: 'Sports', path: '/sports' },
-  { name: 'Entertainment', path: '/entertainment' },
-  { name: 'Health', path: '/health' },
-  { name: 'Science', path: '/science' }
+  { name: 'home', path: '/', label: 'Home' },
+  { name: 'world', path: '/world', label: 'World' },
+  { name: 'politics', path: '/politics', label: 'Politics' },
+  { name: 'business', path: '/business', label: 'Business' },
+  { name: 'technology', path: '/technology', label: 'Technology' },
+  { name: 'sports', path: '/sports', label: 'Sports' },
+  { name: 'entertainment', path: '/entertainment', label: 'Entertainment' },
+  { name: 'health', path: '/health', label: 'Health' },
+  { name: 'science', path: '/science', label: 'Science' }
 ];
 
 export default function Navbar() {
@@ -22,7 +22,7 @@ export default function Navbar() {
   return (
     <div className="navbar-container">
       <ul className="nav-menu flex gap-4 items-center">
-        <li key="Home" className="nav-item">
+        <li key="home" className="nav-item">
           <Link
             href="/"
             className={`nav-link ${pathname === '/' ? 'active' : ''}`}
@@ -30,13 +30,13 @@ export default function Navbar() {
             Home
           </Link>
         </li>
-        {categories.filter(c => c.name !== 'Home').map((category) => (
+        {categories.filter(c => c.name !== 'home').map((category) => (
           <li key={category.name} className="nav-item">
             <Link
               href={category.path}
               className={`nav-link ${pathname === category.path ? 'active' : ''}`}
             >
-              {category.name}
+              {category.label}
             </Link>
           </li>
         ))}
@@ -56,14 +56,14 @@ export default function Navbar() {
         <div className="mobile-nav">
           <div className="flex flex-col gap-4 p-4">
             <ul className="mobile-nav-menu flex flex-col gap-2">
-              {categories.filter(c => c.name !== 'Home').map((category) => (
+              {categories.filter(c => c.name !== 'home').map((category) => (
                 <li key={category.name} className="mobile-nav-item">
                   <Link
                     href={category.path}
                     className={`mobile-nav-link ${pathname === category.path ? 'active' : ''}`}
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    {category.name}
+                    {category.label}
                   </Link>
                 </li>
               ))}

@@ -12,7 +12,7 @@ export default function Footer() {
 
         <div className="footer-section">
           <h3>News Categories</h3>
-          <Link href="/world">World News</Link>
+          <Link href="/world">World</Link>
           <Link href="/politics">Politics</Link>
           <Link href="/business">Business</Link>
           <Link href="/technology">Technology</Link>

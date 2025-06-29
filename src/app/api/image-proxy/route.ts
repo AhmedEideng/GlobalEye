@@ -2,7 +2,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import sharp from 'sharp';
 
-// أنواع الصور المسموحة
+// Allowed image types
 const ALLOWED_TYPES = [
   'image/jpeg',
   'image/png',
@@ -10,9 +10,9 @@ const ALLOWED_TYPES = [
   'image/gif',
   'image/svg+xml',
 ];
-// حجم أقصى للصورة (5MB)
+// Maximum image size (5MB)
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
-// صورة افتراضية (Base64 صغيرة)
+// Default image (small Base64)
 const FALLBACK_IMAGE =
   'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect width="100%" height="100%" fill="#eee"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#888" font-size="24">Image not available</text></svg>';
 
@@ -23,31 +23,31 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // السماح فقط بروابط http/https
+    // Allow only http/https URLs
     if (!/^https?:\/\//.test(url)) {
       return fallbackImageResponse();
     }
-    // استخراج الدومين من الرابط لإضافته كـ Referer
+    // Extract domain from URL to add as Referer
     let referer = '';
     try {
       const u = new URL(url);
       referer = u.origin;
     } catch {}
-    // تمرير جميع الهيدرات الممكنة من الطلب الأصلي
+    // Pass all possible headers from the original request
     const incomingHeaders = req.headers;
     const headers: Record<string, string> = {};
-    // قائمة الهيدرات التي لا يجب تمريرها
+    // List of headers that should not be passed
     const excluded = ['host', 'connection', 'content-length', 'content-type', 'accept-encoding', 'transfer-encoding', 'keep-alive', 'proxy-authenticate', 'proxy-authorization', 'te', 'trailer', 'upgrade'];
     for (const [key, value] of incomingHeaders.entries()) {
       if (!excluded.includes(key.toLowerCase())) {
         headers[key] = value;
       }
     }
-    // إضافة Referer إذا كان متوفرًا
+    // Add Referer if available
     if (referer) {
       headers['Referer'] = referer;
     }
-    // تأكيد وجود Accept وUser-Agent
+    // Ensure Accept and User-Agent are present
     if (!headers['Accept']) headers['Accept'] = 'image/*,*/*;q=0.8';
     if (!headers['User-Agent']) headers['User-Agent'] = incomingHeaders.get('user-agent') || '';
     const response = await fetch(url, { headers });
@@ -58,18 +58,20 @@ export async function GET(req: NextRequest) {
     if (!contentType.startsWith('image/')) {
       return fallbackImageResponse();
     }
-    // تحقق من الحجم
+    // Check size
     const contentLength = response.headers.has('content-length') ? response.headers.get('content-length') : null;
     if (contentLength && parseInt(contentLength) > MAX_IMAGE_SIZE) {
       return fallbackImageResponse();
     }
-    // إذا لم تتوفر content-length، نقرأ buffer ونقيس الحجم
-    const imageBuffer = Buffer.from(new Uint8Array(await response.arrayBuffer()));
+    // If content-length is not available, read buffer and measure size
+    const arrayBuffer = await response.arrayBuffer();
+    const uint8Array = new Uint8Array(arrayBuffer);
+    const imageBuffer = Buffer.from(uint8Array) as any;
     if (imageBuffer.length > MAX_IMAGE_SIZE) {
       return fallbackImageResponse();
     }
 
-    // ضغط الصور (jpeg/png/webp فقط)
+    // Compress images (jpeg/png/webp only)
     let optimizedBuffer = imageBuffer;
     let outContentType = contentType;
     if (

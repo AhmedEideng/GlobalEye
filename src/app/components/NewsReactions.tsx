@@ -105,7 +105,7 @@ export function NewsReactions({ articleUrl }: NewsReactionsProps) {
     setLoading(false);
   };
 
-  // دمج بيانات الأيقونة والنص مع العدادات
+  // Merge icon, label, and count data
   const reactionMeta = {
     like: {
       icon: <ThumbUpAltOutlinedIcon sx={{ fontSize: 28, color: '#1976d2' }} />, label: 'Like'

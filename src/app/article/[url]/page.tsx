@@ -14,26 +14,27 @@ interface ArticlePageProps {
   }>;
 }
 
-export const revalidate = 300;
+export const revalidate = 900;
 
-export async function generateMetadata({ params }: { params: { url: string } }): Promise<Metadata> {
-  const decodedUrl = decodeURIComponent(params.url);
+export async function generateMetadata({ params }: { params: Promise<{ url: string }> }): Promise<Metadata> {
+  const { url } = await params;
+  const decodedUrl = decodeURIComponent(url);
   let article = null;
   try {
-    article = await getArticleByUrl(params.url);
+    article = await getArticleByUrl(url);
   } catch {}
   const title = article?.title ? `${article.title} | GlobalEye News` : 'Article | GlobalEye News';
   const description = article?.description || 'Read the full article and related news on GlobalEye News.';
-  const url = `https://globaleye.news/article/${params.url}`; // عدل هذا للرابط النهائي لموقعك
+  const pageUrl = `https://globaleye.news/article/${url}`; // Edit this to your final site URL
   const image = article?.urlToImage || '/placeholder-news.jpg';
   return {
     title,
     description,
-    alternates: { canonical: url },
+    alternates: { canonical: pageUrl },
     openGraph: {
       title,
       description,
-      url,
+      url: pageUrl,
       siteName: 'GlobalEye News',
       images: [
         { url: image, width: 1200, height: 630, alt: article?.title || 'GlobalEye News' }
@@ -59,11 +60,9 @@ export async function generateMetadata({ params }: { params: { url: string } }):
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const { url } = await params;
   const article = await getArticleByUrl(url);
-  
   if (!article) {
     notFound();
   }
-
   // Detect category based on article content
   const category = detectCategory(article);
   const relatedArticles = await fetchRelatedNews(article, category);
@@ -76,7 +75,6 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4 text-foreground">
             {article.title}
           </h1>
-          
           <div className="flex items-center gap-4 mb-6 text-sm text-muted-foreground">
             <span>By {article.author || 'Unknown Author'}</span>
             <span>•</span>
@@ -89,7 +87,6 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             })}</span>
           </div>
         </header>
-
         {/* Featured Image */}
         {article.urlToImage && (
           <div
@@ -111,7 +108,6 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             />
           </div>
         )}
-
         {/* Article Content */}
         <div className="text-lg leading-relaxed text-foreground mb-8">
           {article.description && (
@@ -119,7 +115,6 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               {article.description}
             </p>
           )}
-          
           {article.content && (
             <div className="whitespace-pre-wrap">
               {article.content}
@@ -128,7 +123,6 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           {/* Share Buttons */}
           <ShareButtons title={article.title} url={`/article/${encodeURIComponent(article.url)}`} />
         </div>
-
         {/* Read Full Article Button */}
         <div className="mb-8 flex justify-center">
           <a 
@@ -141,14 +135,12 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           </a>
         </div>
       </article>
-
       {/* Related Articles */}
       {relatedArticles.length > 0 && (
         <section>
           <h2 className="text-2xl md:text-3xl font-bold mb-6 text-foreground">
             Related Articles
           </h2>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {relatedArticles.map(relatedArticle => (
               <Link 
@@ -174,10 +166,6 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                   <p className="text-sm mb-3 line-clamp-2 leading-relaxed text-black dark:text-white">
                     {relatedArticle.description}
                   </p>
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-black dark:text-white">{relatedArticle.source.name}</span>
-                    <span className="text-black dark:text-white">{new Date(relatedArticle.publishedAt).toLocaleDateString()}</span>
-                  </div>
                 </div>
               </Link>
             ))}
