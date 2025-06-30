@@ -24,7 +24,9 @@ export async function GET(req: NextRequest) {
     try {
       const u = new URL(url);
       referer = u.origin;
-    } catch {}
+    } catch {
+      return fallbackImageResponse();
+    }
     // Pass all possible headers from the original request
     const incomingHeaders = req.headers;
     const headers: Record<string, string> = {};
@@ -57,8 +59,8 @@ export async function GET(req: NextRequest) {
     }
     // If content-length is not available, read buffer and measure size
     const arrayBuffer = await response.arrayBuffer();
-    const uint8Array = new Uint8Array(arrayBuffer);
-    const imageBuffer = Buffer.from(uint8Array) as any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const imageBuffer = Buffer.from(new Uint8Array(arrayBuffer) as any);
     if (imageBuffer.length > MAX_IMAGE_SIZE) {
       return fallbackImageResponse();
     }
@@ -87,7 +89,7 @@ export async function GET(req: NextRequest) {
       },
     });
     return res;
-  } catch (err) {
+  } catch {
     return fallbackImageResponse();
   }
 }
