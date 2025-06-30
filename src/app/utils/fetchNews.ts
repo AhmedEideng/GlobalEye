@@ -1,4 +1,4 @@
-export interface NewsArticle {
+export type NewsArticle = {
   source: {
     id: string | null;
     name: string;
@@ -10,7 +10,7 @@ export interface NewsArticle {
   urlToImage: string | null;
   publishedAt: string;
   content: string | null;
-}
+};
 
 const NEWS_API_KEY = process.env.NEXT_PUBLIC_NEWS_API_KEY;
 const GNEWS_API_KEY = process.env.NEXT_PUBLIC_GNEWS_API_KEY;
