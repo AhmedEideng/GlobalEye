@@ -4,6 +4,7 @@ import ThumbUpAltOutlinedIcon from '@mui/icons-material/ThumbUpAltOutlined';
 import ThumbDownAltOutlinedIcon from '@mui/icons-material/ThumbDownAltOutlined';
 import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
 import { supabase } from "../utils/supabaseClient";
+import { User } from '@supabase/supabase-js';
 
 interface NewsReactionsProps {
   articleUrl: string;
