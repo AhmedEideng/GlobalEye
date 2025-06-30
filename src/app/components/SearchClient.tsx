@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import OptimizedImage from './OptimizedImage';
 import { searchInArticles, removeDuplicates, sortByRelevance } from '../utils/searchUtils';
+import { NewsArticle } from '../utils/fetchNews';
 
 interface SearchClientProps {
   query: string;
