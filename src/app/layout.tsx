@@ -2,7 +2,6 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
-import AuthButtons from "./components/AuthButtons";
 import PwaInstallToast from "./components/PwaInstallToast";
 import DynamicHeader from "./components/DynamicHeader";
 
