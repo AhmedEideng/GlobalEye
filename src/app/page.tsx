@@ -72,4 +72,6 @@ export default async function HomePage() {
     error = 'Failed to load news. Please try again.';
   }
   return <HomeClient articles={articles} featuredArticle={featuredArticle} error={error} />;
+  // Debug log for troubleshooting
+  console.log("DEBUG: Rendering articles", articles);
 } 

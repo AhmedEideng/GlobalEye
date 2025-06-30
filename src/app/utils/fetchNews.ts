@@ -172,6 +172,7 @@ export async function fetchNews(category: string = 'general'): Promise<NewsArtic
   const all = results.filter(Boolean).flat() as NewsArticle[];
   const unique = all.filter((item, idx, arr) => arr.findIndex(a => a.url === item.url) === idx);
   unique.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+  console.log("DEBUG: fetchNews result", unique);
   return unique;
 }
 
