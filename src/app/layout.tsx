@@ -4,6 +4,7 @@ import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import AuthButtons from "./components/AuthButtons";
 import PwaInstallToast from "./components/PwaInstallToast";
+import DynamicHeader from "./components/DynamicHeader";
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://globaleye.news'),
@@ -45,14 +46,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <div>Breaking News: Stay informed with the latest global updates</div>
             </div>
           </div>
-          {/* Main Header */}
-          <div className="header-main">
+          {/* Main Header - Hidden to avoid duplication with DynamicHeader */}
+          {/* <div className="header-main">
             <div className="cnn-logo">
               <span>Global</span>Eye
             </div>
             <AuthButtons />
-          </div>
+          </div> */}
         </header>
+        {/* Dynamic Header - disappears on scroll down, appears on scroll up */}
+        <DynamicHeader />
         {/* Navigation */}
         <nav className="cnn-nav">
           <div className="nav-container">

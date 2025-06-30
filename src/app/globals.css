@@ -300,18 +300,45 @@
 /* CNN Navigation */
 .cnn-nav {
   background: var(--cnn-white);
-  border-bottom: none;
+  border-bottom: 1px solid var(--cnn-border);
   position: sticky;
-  top: 120px;
-  z-index: 999;
+  top: 0;
+  z-index: 30;
   transform: translateZ(0);
   will-change: transform;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Dynamic Header Styles */
+.dynamic-header {
+  background: var(--cnn-white);
+  border-bottom: 1px solid var(--cnn-border);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: 60px;
+}
+
+.dynamic-header .header-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.dynamic-header .cnn-logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--cnn-text);
+}
+
+.dynamic-header .cnn-logo span:first-child {
+  color: var(--cnn-red);
 }
 
 .nav-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
 .navbar-container {
@@ -484,6 +511,7 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  padding-top: 20px;
   min-height: calc(100vh - 200px);
 }
 
