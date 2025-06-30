@@ -1,19 +1,29 @@
 "use client";
 import { useEffect, useState } from "react";
 
+// تعريف مؤقت لنوع BeforeInstallPromptEvent إذا لم يكن معرفًا في TypeScript
+// يمكنك نقله لاحقًا إلى ملف types عام إذا احتجت
+
+type BeforeInstallPromptEvent = Event & {
+  readonly platforms: string[];
+  readonly userChoice: Promise<{ outcome: 'accepted' | 'dismissed', platform: string }>;
+  prompt(): Promise<void>;
+};
+
 export default function PwaInstallToast() {
   const [showInstall, setShowInstall] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const handler = (e: BeforeInstallPromptEvent) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
+    const handler = (e: Event) => {
+      const event = e as BeforeInstallPromptEvent;
+      event.preventDefault();
+      setDeferredPrompt(event);
       setShowInstall(true);
     };
-    window.addEventListener("beforeinstallprompt", handler);
-    return () => window.removeEventListener("beforeinstallprompt", handler);
+    window.addEventListener("beforeinstallprompt", handler as EventListener);
+    return () => window.removeEventListener("beforeinstallprompt", handler as EventListener);
   }, []);
 
   const handleInstall = async () => {
