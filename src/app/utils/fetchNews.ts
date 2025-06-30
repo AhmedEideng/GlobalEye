@@ -1,3 +1,5 @@
+import { supabase } from './supabaseClient';
+
 export type NewsArticle = {
   source: {
     id: string | null;
@@ -13,10 +15,10 @@ export type NewsArticle = {
 };
 
 // DEBUG: Hardcoded API keys for production troubleshooting
-const NEWS_API_KEY = "7d0558972f474651bd6e8caf39ed7690";
-const GNEWS_API_KEY = "0ca8e593409a10ac2edf9b4926be9896";
-const GUARDIAN_KEY = "dfb1dd37-68b1-4d85-9837-62d1fe12c62d";
-const MEDIASTACK_KEY = "b20e48f1cd7e3cd2ea218f4532c7fd31";
+const NEWS_API_KEY = process.env.NEWS_API_KEY!;
+const GNEWS_API_KEY = process.env.GNEWS_API_KEY!;
+const GUARDIAN_KEY = process.env.GUARDIAN_KEY!;
+const MEDIASTACK_KEY = process.env.MEDIASTACK_KEY!;
 
 interface NewsAPIArticle {
   source?: { id?: string; name?: string };
@@ -152,6 +154,25 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | null> {
   ]);
 }
 
+// دالة لحفظ الأخبار في Supabase
+async function saveArticlesToSupabase(articles: NewsArticle[]) {
+  if (!articles.length) return;
+  // تجهيز البيانات لتتوافق مع الجدول
+  const mapped = articles.map(article => ({
+    title: article.title,
+    description: article.description,
+    url: article.url,
+    url_to_image: article.urlToImage,
+    published_at: article.publishedAt ? new Date(article.publishedAt) : null,
+    content: article.content,
+    source_name: article.source.name,
+    source_id: article.source.id,
+    author: article.author,
+  }));
+  // إدخال الأخبار مع تجاهل المكررات بناءً على url
+  await supabase.from('news').upsert(mapped, { onConflict: 'url' });
+}
+
 export async function fetchNews(category: string = 'general'): Promise<NewsArticle[]> {
   // Only fetch directly from APIs
   // Each source is fetched with a 3-second timeout
@@ -172,6 +193,8 @@ export async function fetchNews(category: string = 'general'): Promise<NewsArtic
   const all = results.filter(Boolean).flat() as NewsArticle[];
   const unique = all.filter((item, idx, arr) => arr.findIndex(a => a.url === item.url) === idx);
   unique.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+  // حفظ الأخبار في Supabase
+  await saveArticlesToSupabase(unique);
   console.log("DEBUG: fetchNews result", unique);
   return unique;
 }
