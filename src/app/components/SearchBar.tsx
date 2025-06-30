@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import OptimizedImage from './OptimizedImage';
 import { searchInArticles } from '../utils/searchUtils';
+import { NewsArticle } from '../utils/fetchNews';
 
 export default function SearchBar() {
   const [query, setQuery] = useState("");
