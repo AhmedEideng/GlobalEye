@@ -14,11 +14,11 @@ export type NewsArticle = {
   content: string | null;
 };
 
-// DEBUG: Hardcoded API keys for production troubleshooting
-const NEWS_API_KEY = process.env.NEWS_API_KEY!;
-const GNEWS_API_KEY = process.env.GNEWS_API_KEY!;
-const GUARDIAN_KEY = process.env.GUARDIAN_KEY!;
-const MEDIASTACK_KEY = process.env.MEDIASTACK_KEY!;
+// TODO: Move these to environment variables after creating .env.local file
+const NEWS_API_KEY = "7d0558972f474651bd6e8caf39ed7690";
+const GNEWS_API_KEY = "0ca8e593409a10ac2edf9b4926be9896";
+const GUARDIAN_KEY = "dfb1dd37-68b1-4d85-9837-62d1fe12c62d";
+const MEDIASTACK_KEY = "b20e48f1cd7e3cd2ea218f4532c7fd31";
 
 interface NewsAPIArticle {
   source?: { id?: string; name?: string };
