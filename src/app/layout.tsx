@@ -31,8 +31,8 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  let lang = 'en';
-  let dir = 'ltr';
+  const lang = 'en';
+  const dir = 'ltr';
   return (
     <html lang={lang} dir={dir} suppressHydrationWarning>
       <body suppressHydrationWarning>

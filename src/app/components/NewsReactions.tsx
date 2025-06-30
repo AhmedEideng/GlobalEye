@@ -5,19 +5,12 @@ import ThumbDownAltOutlinedIcon from '@mui/icons-material/ThumbDownAltOutlined';
 import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
 import { supabase } from "../utils/supabaseClient";
 
-interface Reaction {
-  id: string;
-  type: 'like' | 'dislike' | 'share';
-  count: number;
-  userReacted: boolean;
-}
-
 interface NewsReactionsProps {
   articleUrl: string;
 }
 
 export function NewsReactions({ articleUrl }: NewsReactionsProps) {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [reactions, setReactions] = useState([
     { id: 'like', type: 'like', count: 0, userReacted: false },
     { id: 'dislike', type: 'dislike', count: 0, userReacted: false },
@@ -40,7 +33,7 @@ export function NewsReactions({ articleUrl }: NewsReactionsProps) {
         .eq('article_url', articleUrl);
       if (!error && data) {
         const counts = { like: 0, dislike: 0, share: 0 };
-        let userReactions: Record<string, boolean> = {};
+        const userReactions: Record<string, boolean> = {};
         data.forEach((r: { type: 'like'|'dislike'|'share', user_id: string }) => {
           if (r.type in counts) counts[r.type as keyof typeof counts]++;
           if (user && r.user_id === user.id) userReactions[r.type] = true;
@@ -91,7 +84,7 @@ export function NewsReactions({ articleUrl }: NewsReactionsProps) {
       .eq('article_url', articleUrl);
     if (!error && data) {
       const counts = { like: 0, dislike: 0, share: 0 };
-      let userReactions: Record<string, boolean> = {};
+      const userReactions: Record<string, boolean> = {};
       data.forEach((r: { type: 'like'|'dislike'|'share', user_id: string }) => {
         if (r.type in counts) counts[r.type as keyof typeof counts]++;
         if (user && r.user_id === user.id) userReactions[r.type] = true;

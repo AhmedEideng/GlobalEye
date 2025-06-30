@@ -3,11 +3,11 @@ import { useEffect, useState } from "react";
 
 export default function PwaInstallToast() {
   const [showInstall, setShowInstall] = useState(false);
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const handler = (e: any) => {
+    const handler = (e: BeforeInstallPromptEvent) => {
       e.preventDefault();
       setDeferredPrompt(e);
       setShowInstall(true);

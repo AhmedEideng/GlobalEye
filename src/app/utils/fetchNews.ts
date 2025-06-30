@@ -142,11 +142,10 @@ async function fetchFromMediastack(category: string): Promise<NewsArticle[]> {
 }
 
 // Helper function to execute a promise with a timeout
-function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T | null> {
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | null> {
   return Promise.race([
     promise,
     new Promise<null>((resolve) => setTimeout(() => {
-      /* Commented out as per user request: console.error(`[Timeout] ${label} took more than ${ms}ms`); */
       resolve(null);
     }, ms))
   ]);
@@ -156,19 +155,15 @@ export async function fetchNews(category: string = 'general'): Promise<NewsArtic
   // Only fetch directly from APIs
   // Each source is fetched with a 3-second timeout
   const sources = [
-    { fn: fetchFromNewsAPI, label: 'NewsAPI' },
-    { fn: fetchFromGNews, label: 'GNews' },
-    { fn: fetchFromGuardian, label: 'Guardian' },
-    { fn: fetchFromMediastack, label: 'Mediastack' },
+    { fn: fetchFromNewsAPI },
+    { fn: fetchFromGNews },
+    { fn: fetchFromGuardian },
+    { fn: fetchFromMediastack },
   ];
-  const promises = sources.map(({ fn, label }) =>
+  const promises = sources.map(({ fn }) =>
     withTimeout(
-      fn(category).catch((err) => {
-        /* Commented out as per user request: console.error(`[Error] ${label} failed for category '${category}':`, err); */
-        return [];
-      }),
-      3000,
-      `${label} (${category})`
+      fn(category),
+      3000
     )
   );
   const results = await Promise.all(promises);

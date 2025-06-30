@@ -2,14 +2,6 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import sharp from 'sharp';
 
-// Allowed image types
-const ALLOWED_TYPES = [
-  'image/jpeg',
-  'image/png',
-  'image/webp',
-  'image/gif',
-  'image/svg+xml',
-];
 // Maximum image size (5MB)
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 // Default image (small Base64)

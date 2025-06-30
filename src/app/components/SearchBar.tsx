@@ -3,39 +3,16 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import OptimizedImage from './OptimizedImage';
-import { NewsArticle } from '../utils/fetchNews';
+import { searchInArticles } from '../utils/searchUtils';
 
 export default function SearchBar() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<NewsArticle[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
-  const [allArticles, setAllArticles] = useState<NewsArticle[]>([]);
   const searchRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const cacheRef = useRef<{ [q: string]: NewsArticle[] }>({});
-
-  // Load all articles for search
-  useEffect(() => {
-    const loadArticles = async () => {
-      const categories = ['general', 'business', 'technology', 'sports', 'entertainment', 'health', 'science', 'politics'];
-      let allArticles: NewsArticle[] = [];
-      
-      for (const category of categories) {
-        try {
-          const res = await fetch(`/api/news?category=${category}`);
-          const articles = await res.json();
-          allArticles = [...allArticles, ...articles];
-        } catch (error) {
-          console.error(`Failed to load ${category} articles:`, error);
-        }
-      }
-      
-      setAllArticles(allArticles);
-    };
-    
-    loadArticles();
-  }, []);
 
   // Handle click outside to close results
   useEffect(() => {
@@ -96,62 +73,6 @@ export default function SearchBar() {
       setIsLoading(false);
     }
   }, []);
-
-  // Intelligent search algorithm
-  const searchInArticles = (searchQuery: string, articles: NewsArticle[]): NewsArticle[] => {
-    const query = searchQuery.toLowerCase().trim();
-    const keywords = query.split(' ').filter(word => word.length > 2);
-    
-    return articles
-      .filter(article => {
-        const title = (article.title || '').toLowerCase();
-        const description = (article.description || '').toLowerCase();
-        const content = (article.content || '').toLowerCase();
-        const author = (article.author || '').toLowerCase();
-        const source = (article.source?.name || '').toLowerCase();
-        
-        const text = `${title} ${description} ${content} ${author} ${source}`;
-        
-        // Exact phrase match (highest priority)
-        if (text.includes(query)) {
-          return true;
-        }
-        
-        // All keywords match (high priority)
-        if (keywords.every(keyword => text.includes(keyword))) {
-          return true;
-        }
-        
-        // Most keywords match (medium priority)
-        const matchingKeywords = keywords.filter(keyword => text.includes(keyword));
-        if (matchingKeywords.length >= Math.ceil(keywords.length * 0.7)) {
-          return true;
-        }
-        
-        // Title contains any keyword (lower priority)
-        if (keywords.some(keyword => title.includes(keyword))) {
-          return true;
-        }
-        
-        return false;
-      })
-      .sort((a, b) => {
-        // Sort by relevance
-        const aTitle = (a.title || '').toLowerCase();
-        const bTitle = (b.title || '').toLowerCase();
-        
-        // Exact title match gets highest priority
-        if (aTitle === query && bTitle !== query) return -1;
-        if (bTitle === query && aTitle !== query) return 1;
-        
-        // Title starts with query gets high priority
-        if (aTitle.startsWith(query) && !bTitle.startsWith(query)) return -1;
-        if (bTitle.startsWith(query) && !aTitle.startsWith(query)) return 1;
-        
-        // More recent articles get higher priority
-        return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
-      });
-  };
 
   // Debounced search
   useEffect(() => {

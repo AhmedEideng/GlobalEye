@@ -1,9 +1,7 @@
 import { getArticleByUrl, fetchRelatedNews, detectCategory } from "../../utils/fetchNews";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { NewsReactions } from "../../components/NewsReactions";
 import ShareButtons from "../../components/ShareButtons";
-import OptimizedImage from '../../components/OptimizedImage';
 import ArticleImage from './ArticleImage';
 import Image from "next/image";
 import { Metadata } from 'next';
@@ -18,7 +16,6 @@ export const revalidate = 900;
 
 export async function generateMetadata({ params }: { params: Promise<{ url: string }> }): Promise<Metadata> {
   const { url } = await params;
-  const decodedUrl = decodeURIComponent(url);
   let article = null;
   try {
     article = await getArticleByUrl(url);
