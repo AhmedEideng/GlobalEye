@@ -8,6 +8,7 @@ interface Article {
   publishedAt: string;
   source: { name: string };
   category?: string;
+  slug: string;
 }
 
 export const revalidate = 120;
@@ -59,11 +60,13 @@ export default async function HomePage() {
         ...data.articles[0],
         description: data.articles[0].description || '',
         urlToImage: data.articles[0].urlToImage || '',
+        slug: data.articles[0].slug || encodeURIComponent(data.articles[0].title || data.articles[0].url),
       } as Article;
       articles = data.articles.slice(1, 31).map((a: Article) => ({
         ...a,
         description: a.description || '',
         urlToImage: a.urlToImage || '',
+        slug: a.slug || encodeURIComponent(a.title || a.url),
       })) as Article[];
     } else {
       error = 'No news available at the moment. Please check your API settings.';
