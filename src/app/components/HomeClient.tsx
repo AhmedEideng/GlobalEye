@@ -1,19 +1,9 @@
 "use client";
 import OptimizedImage from './OptimizedImage';
 import Link from 'next/link';
+import { NewsArticle } from '../utils/fetchNews';
 
-interface Article {
-  title: string;
-  description: string;
-  url: string;
-  urlToImage: string;
-  publishedAt: string;
-  source: { name: string };
-  category?: string;
-  slug: string;
-}
-
-export default function HomeClient({ articles, featuredArticle, error }: { articles: Article[]; featuredArticle: Article | null; error: string | null }) {
+export default function HomeClient({ articles, featuredArticle, error }: { articles: NewsArticle[]; featuredArticle: NewsArticle | null; error: string | null }) {
   if (error) {
     return (
       <div className="error">
