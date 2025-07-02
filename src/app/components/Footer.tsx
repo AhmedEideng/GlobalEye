@@ -36,7 +36,7 @@ export default function Footer() {
 
         <div className="footer-section">
           <h3 className="text-xl font-bold mb-2">Contact</h3>
-          <a href="mailto:info@globaleye.live" className="hover:text-red-500 transition-colors">info@globaleye.live</a>
+          <Link href="/contact-us" className="hover:text-red-500 transition-colors">info@globaleye.live</Link>
         </div>
       </div>
       <div style={{ 
