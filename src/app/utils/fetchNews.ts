@@ -65,6 +65,21 @@ interface MediastackArticle {
   published_at?: string;
 }
 
+// نوع يمثل صف الأخبار من قاعدة البيانات
+interface NewsRow {
+  source_id: string | null;
+  source_name: string;
+  author: string | null;
+  title: string;
+  description: string | null;
+  url: string;
+  url_to_image: string | null;
+  published_at: string;
+  content: string | null;
+  slug: string;
+  category: string;
+}
+
 async function fetchFromNewsAPI(category: string): Promise<NewsArticle[]> {
   if (!NEWS_API_KEY) return [];
   try {
@@ -212,7 +227,7 @@ export async function fetchNews(category: string = 'general'): Promise<NewsArtic
 
   // If we have recent news in the DB, return it
   if (!error && dbArticles && dbArticles.length > 0) {
-    return dbArticles.map((article: any) => ({
+    return dbArticles.map((article: NewsRow) => ({
       source: { id: article.source_id, name: article.source_name },
       author: article.author,
       title: article.title,

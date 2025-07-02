@@ -1,6 +1,5 @@
 'use client';
 import { useState } from 'react';
-import { Metadata } from 'next';
 import { FaEnvelope, FaUser, FaRegCommentDots } from 'react-icons/fa';
 
 export default function ContactUsPage() {

@@ -1,5 +1,4 @@
 "use client";
-import SearchBar from './SearchBar';
 import OptimizedImage from './OptimizedImage';
 import Link from 'next/link';
 

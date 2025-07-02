@@ -1,5 +1,4 @@
 "use client";
-import AuthButtons from './AuthButtons';
 
 export default function DynamicHeader() {
   return (
