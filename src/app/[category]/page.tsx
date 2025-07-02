@@ -8,6 +8,7 @@ interface Article {
   publishedAt: string;
   source: { name: string };
   category?: string;
+  slug: string;
 }
 
 interface CategoryPageProps {
@@ -144,7 +145,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
               </div>
               <div className="news-grid">
                 {restArticles.map((article, index) => (
-                  <article key={index} className="article-card">
+                  <a key={index} href={`/article/${article.slug}`} className="block article-card transition-transform duration-200 hover:scale-105 focus:outline-none">
                     <img 
                       src={article.urlToImage || '/placeholder-news.jpg'} 
                       alt={article.title}
@@ -154,16 +155,14 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
                       style={{ width: '100%', height: 'auto' }}
                     />
                     <div className="article-content">
-                      <h2 className="article-title">
-                        <a href={`/article/${encodeURIComponent(article.url)}`}>{article.title}</a>
-                      </h2>
+                      <h2 className="article-title">{article.title}</h2>
                       <p className="article-excerpt">{article.description}</p>
                       <div className="article-meta">
                         <span>{article.source.name}</span>
                         <span>{new Date(article.publishedAt).toUTCString()}</span>
                       </div>
                     </div>
-                  </article>
+                  </a>
                 ))}
               </div>
             </section>

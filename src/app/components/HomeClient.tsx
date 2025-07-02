@@ -11,6 +11,7 @@ interface Article {
   publishedAt: string;
   source: { name: string };
   category?: string;
+  slug: string;
 }
 
 export default function HomeClient({ articles, featuredArticle, error }: { articles: Article[]; featuredArticle: Article | null; error: string | null }) {
@@ -48,11 +49,6 @@ export default function HomeClient({ articles, featuredArticle, error }: { artic
 
   return (
     <div className="home-page">
-      {/* Search Section */}
-      <div className="search-container">
-        <SearchBar />
-      </div>
-
       {/* Featured Article */}
       {featuredArticle && (
         <article className="featured-article">
@@ -67,7 +63,7 @@ export default function HomeClient({ articles, featuredArticle, error }: { artic
           <div className="featured-content">
             <div className="article-category">Breaking News</div>
             <h1 className="featured-title">
-              <Link href={`/article/${encodeURIComponent(featuredArticle.url)}`}>
+              <Link href={`/article/${featuredArticle.slug}`}>
                 {featuredArticle.title}
               </Link>
             </h1>
@@ -93,7 +89,7 @@ export default function HomeClient({ articles, featuredArticle, error }: { artic
               </div>
               <div className="news-grid">
                 {articles.map((article, index) => (
-                  <article key={index} className="article-card">
+                  <Link key={index} href={`/article/${article.slug}`} className="block article-card transition-transform duration-200 hover:scale-105 focus:outline-none">
                     <OptimizedImage 
                       src={article.urlToImage || '/placeholder-news.jpg'} 
                       alt={article.title}
@@ -102,16 +98,14 @@ export default function HomeClient({ articles, featuredArticle, error }: { artic
                       className="article-image"
                     />
                     <div className="article-content">
-                      <h2 className="article-title">
-                        <Link href={`/article/${encodeURIComponent(article.url)}`}>{article.title}</Link>
-                      </h2>
+                      <h2 className="article-title">{article.title}</h2>
                       <p className="article-excerpt">{article.description}</p>
                       <div className="article-meta">
                         <span>{article.source.name}</span>
                         <span>{new Date(article.publishedAt).toUTCString()}</span>
                       </div>
                     </div>
-                  </article>
+                  </Link>
                 ))}
               </div>
             </section>

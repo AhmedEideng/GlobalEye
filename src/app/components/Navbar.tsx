@@ -21,50 +21,50 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <div className="navbar-container flex items-center justify-between">
-      <ul className="nav-menu flex gap-4 items-center">
-        <li key="home" className="nav-item">
-          <Link
-            href="/"
-            className={`nav-link ${pathname === '/' ? 'active' : ''}`}
-          >
-            Home
-          </Link>
-        </li>
-        {categories.filter(c => c.name !== 'home').map((category) => (
+    <div className="navbar-container flex items-center justify-between py-2 px-4 bg-white shadow-md sticky top-0 z-40">
+      {/* شعار الموقع */}
+      <Link href="/" className="flex items-center text-2xl font-bold mr-6 select-none">
+        <span className="text-black">Global</span><span className="text-red-600">Eye</span>
+      </Link>
+      {/* أزرار الأقسام */}
+      <ul className="nav-menu flex gap-2 items-center bg-gray-100 rounded-full px-2 py-1 shadow-inner">
+        {categories.map((category) => (
           <li key={category.name} className="nav-item">
             <Link
               href={category.path}
-              className={`nav-link ${pathname === category.path ? 'active' : ''}`}
+              className={`nav-link px-4 py-2 rounded-full font-medium transition-colors duration-200 ${pathname === category.path ? 'bg-red-600 text-white shadow' : 'text-gray-700 hover:bg-gray-200 hover:text-red-600'}`}
             >
               {category.label}
             </Link>
           </li>
         ))}
       </ul>
-      {/* زر تسجيل الدخول في نهاية الشريط */}
+      {/* زر تسجيل الدخول */}
       <div className="ml-4">
         <AuthButtons />
       </div>
-      {/* Mobile Menu Button */}
+      {/* زر القائمة للجوال */}
       <button
-        className="mobile-menu-btn"
+        className="mobile-menu-btn ml-2 md:hidden"
         onClick={() => setIsMenuOpen(!isMenuOpen)}
         aria-label="Toggle menu"
       >
-        <span></span>
-        <span></span>
-        <span></span>
+        <span className="block w-6 h-0.5 bg-gray-800 mb-1"></span>
+        <span className="block w-6 h-0.5 bg-gray-800 mb-1"></span>
+        <span className="block w-6 h-0.5 bg-gray-800"></span>
       </button>
-      {/* Mobile Navigation */}
+      {/* القائمة الجانبية للجوال */}
       {isMenuOpen && (
-        <div className="mobile-nav">
-          <div className="flex flex-col gap-4 p-4">
+        <div className="mobile-nav fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50 flex justify-end">
+          <div className="bg-white w-64 h-full p-6 flex flex-col gap-4">
+            <Link href="/" className="flex items-center text-2xl font-bold mb-6 select-none" onClick={() => setIsMenuOpen(false)}>
+              <span className="text-black">Global</span><span className="text-red-600">Eye</span>
+            </Link>
             <ul className="mobile-nav-menu flex flex-col gap-2">
               <li key="home" className="mobile-nav-item">
                 <Link
                   href="/"
-                  className={`mobile-nav-link ${pathname === '/' ? 'active' : ''}`}
+                  className={`mobile-nav-link px-4 py-2 rounded-full font-medium transition-colors duration-200 ${pathname === '/' ? 'bg-red-600 text-white shadow' : 'text-gray-700 hover:bg-gray-200 hover:text-red-600'}`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Home
@@ -74,7 +74,7 @@ export default function Navbar() {
                 <li key={category.name} className="mobile-nav-item">
                   <Link
                     href={category.path}
-                    className={`mobile-nav-link ${pathname === category.path ? 'active' : ''}`}
+                    className={`mobile-nav-link px-4 py-2 rounded-full font-medium transition-colors duration-200 ${pathname === category.path ? 'bg-red-600 text-white shadow' : 'text-gray-700 hover:bg-gray-200 hover:text-red-600'}`}
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {category.label}
@@ -82,7 +82,6 @@ export default function Navbar() {
                 </li>
               ))}
             </ul>
-            {/* زر تسجيل الدخول في القائمة الجانبية */}
             <div className="mt-4">
               <AuthButtons />
             </div>

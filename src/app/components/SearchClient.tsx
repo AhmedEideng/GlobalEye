@@ -94,7 +94,7 @@ export default function SearchClient({ query }: SearchClientProps) {
       ) : articles.length > 0 ? (
         <div className="space-y-6">
           {articles.map((article, index) => (
-            <article key={index} className="article-card">
+            <Link key={index} href={`/article/${article.slug}`} className="block article-card transition-transform duration-200 hover:scale-105 focus:outline-none">
               <OptimizedImage 
                 src={article.urlToImage || '/placeholder-news.jpg'} 
                 alt={article.title}
@@ -104,18 +104,14 @@ export default function SearchClient({ query }: SearchClientProps) {
               />
               <div className="article-content">
                 <div className="article-category">Search Result</div>
-                <h3 className="article-title">
-                  <Link href={`/article/${encodeURIComponent(article.url)}`}>
-                    {article.title}
-                  </Link>
-                </h3>
+                <h3 className="article-title">{article.title}</h3>
                 <p className="article-excerpt">{article.description}</p>
                 <div className="article-meta">
                   <span>{article.source.name}</span>
                   <span>{new Date(article.publishedAt).toUTCString()}</span>
                 </div>
               </div>
-            </article>
+            </Link>
           ))}
         </div>
       ) : (

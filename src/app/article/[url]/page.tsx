@@ -1,4 +1,4 @@
-import { getArticleByUrl, fetchRelatedNews, detectCategory } from "../../utils/fetchNews";
+import { getArticleBySlug, fetchRelatedNews, detectCategory } from "../../utils/fetchNews";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ShareButtons from "../../components/ShareButtons";
@@ -8,21 +8,21 @@ import { Metadata } from 'next';
 
 interface ArticlePageProps {
   params: Promise<{
-    url: string;
+    slug: string;
   }>;
 }
 
 export const revalidate = 900;
 
-export async function generateMetadata({ params }: { params: Promise<{ url: string }> }): Promise<Metadata> {
-  const { url } = await params;
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
   let article = null;
   try {
-    article = await getArticleByUrl(url);
+    article = await getArticleBySlug(slug);
   } catch {}
   const title = article?.title ? `${article.title} | GlobalEye News` : 'Article | GlobalEye News';
   const description = article?.description || 'Read the full article and related news on GlobalEye News.';
-  const pageUrl = `https://globaleye.news/article/${url}`; // Edit this to your final site URL
+  const pageUrl = `https://globaleye.news/article/${slug}`; // Edit this to your final site URL
   const image = article?.urlToImage || '/placeholder-news.jpg';
   return {
     title,
@@ -55,8 +55,8 @@ export async function generateMetadata({ params }: { params: Promise<{ url: stri
 }
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
-  const { url } = await params;
-  const article = await getArticleByUrl(url);
+  const { slug } = await params;
+  const article = await getArticleBySlug(slug);
   if (!article) {
     notFound();
   }

@@ -4,6 +4,7 @@ import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import PwaInstallToast from "./components/PwaInstallToast";
 import DynamicHeader from "./components/DynamicHeader";
+import SearchBar from "./components/SearchBar";
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://globaleye.news'),
@@ -40,9 +41,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* CNN Style Header */}
         <header className="cnn-header">
           {/* Top Bar */}
-          <div className="header-top">
-            <div className="header-top-content">
-              <div>Breaking News: Stay informed with the latest global updates</div>
+          <div className="header-top bg-black text-white w-full">
+            <div className="header-top-content px-4 py-2">
+              <div className="font-semibold tracking-wide">Breaking News: Stay informed with the latest global updates</div>
             </div>
           </div>
           {/* Main Header - Hidden to avoid duplication with DynamicHeader */}
@@ -61,6 +62,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Navbar />
           </div>
         </nav>
+        {/* SearchBar below Navbar */}
+        <div className="w-full bg-white border-b border-gray-100 py-3">
+          <SearchBar />
+        </div>
         {/* Main Content */}
         <div className="main-container">
           {children}

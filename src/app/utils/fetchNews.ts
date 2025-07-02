@@ -12,6 +12,7 @@ export type NewsArticle = {
   urlToImage: string | null;
   publishedAt: string;
   content: string | null;
+  slug: string;
 };
 
 // TODO: Move these to environment variables after creating .env.local file
@@ -154,6 +155,31 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | null> {
   ]);
 }
 
+// دالة مساعدة لتوليد slug من العنوان أو الرابط
+function generateSlug(title: string, url: string): string {
+  // استخدم العنوان إذا كان متاحاً، وإلا استخدم hash من الرابط
+  if (title) {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 60) + '-' + Math.abs(hashCode(url)).toString();
+  }
+  return Math.abs(hashCode(url)).toString();
+}
+
+// دالة hash بسيطة
+function hashCode(str: string): number {
+  let hash = 0, i, chr;
+  if (str.length === 0) return hash;
+  for (i = 0; i < str.length; i++) {
+    chr = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+}
+
 // دالة لحفظ الأخبار في Supabase
 async function saveArticlesToSupabase(articles: NewsArticle[]) {
   if (!articles.length) return;
@@ -168,6 +194,7 @@ async function saveArticlesToSupabase(articles: NewsArticle[]) {
     source_name: article.source.name,
     source_id: article.source.id,
     author: article.author,
+    slug: generateSlug(article.title, article.url),
   }));
   // إدخال الأخبار مع تجاهل المكررات بناءً على url
   await supabase.from('news').upsert(mapped, { onConflict: 'url' });
@@ -193,6 +220,7 @@ export async function fetchNews(category: string = 'general'): Promise<NewsArtic
       urlToImage: article.url_to_image,
       publishedAt: article.published_at,
       content: article.content,
+      slug: article.slug,
     }));
   }
 
@@ -234,24 +262,30 @@ export async function fetchRelatedNews(currentArticle: NewsArticle, category: st
   }
 }
 
-export async function getArticleByUrl(encodedUrl: string): Promise<NewsArticle | null> {
+export async function getArticleBySlug(slug: string): Promise<NewsArticle | null> {
   try {
-    const decodedUrl = decodeURIComponent(encodedUrl);
-    
-    // Try to find the article in recent news
-    const allCategories = ['general', 'business', 'technology', 'sports', 'entertainment', 'health', 'science', 'politics'];
-    
-    for (const category of allCategories) {
-      const articles = await fetchNews(category);
-      const article = articles.find(article => article.url === decodedUrl);
-      if (article) {
-        return article;
-      }
+    const { data, error } = await supabase
+      .from('news')
+      .select('*')
+      .eq('slug', slug)
+      .limit(1)
+      .single();
+    if (!error && data) {
+      return {
+        source: { id: data.source_id, name: data.source_name },
+        author: data.author,
+        title: data.title,
+        description: data.description,
+        url: data.url,
+        urlToImage: data.url_to_image,
+        publishedAt: data.published_at,
+        content: data.content,
+        slug: data.slug,
+      };
     }
-    
     return null;
   } catch (error) {
-    console.error('Error getting article by URL:', error);
+    console.error('Error getting article by slug:', error);
     return null;
   }
 }

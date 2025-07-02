@@ -90,20 +90,21 @@ export default function SearchBar() {
   }, [query, performSearch]);
 
   return (
-    <form onSubmit={handleSearch} className="search-form">
-      <div className="search-wrapper">
+    <form onSubmit={handleSearch} className="w-full max-w-xl mx-auto relative z-50">
+      <div className="flex items-center bg-white rounded-md shadow-lg border border-gray-200 focus-within:ring-2 focus-within:ring-red-600 transition-all px-4 py-2">
+        <svg className="w-5 h-5 text-gray-400 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.35-4.35" />
+        </svg>
         <input
           type="text"
           placeholder="Search for news..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="search-input"
+          className="flex-1 bg-transparent outline-none text-lg px-2 py-1 text-gray-900 placeholder-gray-400"
         />
-        <button type="submit" className="search-btn">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="8"/>
-            <path d="m21 21-4.35-4.35"/>
-          </svg>
+        <button type="submit" className="ml-2 bg-red-600 hover:bg-red-700 text-white rounded-md px-4 py-2 font-semibold transition-colors shadow focus:outline-none focus:ring-2 focus:ring-red-600">
+          Search
         </button>
       </div>
 
