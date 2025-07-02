@@ -6,7 +6,8 @@ import Link from 'next/link';
 
 export const revalidate = 120;
 
-export default async function ArticlePage({ params }: { params: { slug: string } }) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default async function ArticlePage({ params }: any) {
   const { slug } = params;
   const article: NewsArticle | null = await getArticleBySlug(slug);
 
