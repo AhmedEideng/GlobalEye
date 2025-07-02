@@ -62,7 +62,8 @@ export async function generateMetadata({ params }: { params: { category: string 
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default async function CategoryPage({ params }: any) {
+export default async function CategoryPage(props: { params: { category: string } }) {
+  const { params } = props;
   const { category } = params;
   const categoryLabel = categoryLabels[category] || category;
   let articles: Article[] = [];
