@@ -61,6 +61,7 @@ export async function generateMetadata({ params }: { params: { category: string 
   };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function CategoryPage({ params }: any) {
   const { category } = params;
   const categoryLabel = categoryLabels[category] || category;
