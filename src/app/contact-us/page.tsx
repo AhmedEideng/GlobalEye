@@ -21,7 +21,7 @@ export default function ContactUsPage() {
     try {
       window.location.href = `mailto:info@globaleye.live?subject=${encodeURIComponent(subject || 'Contact from GlobalEye')}&body=${encodeURIComponent('Name: ' + name + '\nEmail: ' + email + '\n\n' + message)}`;
       setStatus('success');
-    } catch (err) {
+    } catch {
       setStatus('error');
       setError('Something went wrong. Please try again or email us directly.');
     }
