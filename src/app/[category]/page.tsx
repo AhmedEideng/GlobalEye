@@ -24,9 +24,7 @@ const categoryLabels: { [key: string]: string } = {
   'science': 'Science'
 };
 
-type Props = { params: { category: string } };
-
-export default function CategoryPage({ params }: Props) {
+export default function CategoryPage({ params }: any) {
   const { category } = params;
   const categoryLabel = categoryLabels[category] || category;
   const [articles, setArticles] = useState<Article[]>([]);
