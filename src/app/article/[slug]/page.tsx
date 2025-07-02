@@ -6,11 +6,7 @@ import Link from 'next/link';
 
 export const revalidate = 120;
 
-interface ArticlePageProps {
-  params: { slug: string };
-}
-
-export default async function ArticlePage({ params }: ArticlePageProps) {
+export default async function ArticlePage({ params }: { params: { slug: string } }) {
   const { slug } = params;
   const article: NewsArticle | null = await getArticleBySlug(slug);
 
