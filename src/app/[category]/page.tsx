@@ -11,12 +11,6 @@ interface Article {
   slug: string;
 }
 
-interface CategoryPageProps {
-  params: {
-    category: string;
-  };
-}
-
 const categoryLabels: { [key: string]: string } = {
   'world': 'World News',
   'politics': 'Politics',
