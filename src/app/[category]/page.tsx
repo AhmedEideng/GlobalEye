@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import React, { useEffect, useState } from 'react';
 
 interface Article {
   title: string;
@@ -61,26 +62,43 @@ export async function generateMetadata({ params }: { params: { category: string 
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default async function CategoryPage(props: { params: { category: string } }) {
-  const { params } = props;
+type Props = { params: { category: string } };
+
+export default function CategoryPage({ params }: Props) {
   const { category } = params;
   const categoryLabel = categoryLabels[category] || category;
-  let articles: Article[] = [];
-  let error: string | null = null;
-  try {
-    const res = await fetch(`http://localhost:3000/api/news?category=${category}`, { next: { revalidate: 120 } });
-    const data = await res.json();
-    if (data.articles && data.articles.length > 0) {
-      articles = data.articles;
-    } else {
-      error = `No news available in the "${categoryLabel}" category. Please try again.`;
-    }
-  } catch {
-    error = 'Failed to load news. Please try again.';
-  }
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch(`/api/news?category=${category}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.articles && data.articles.length > 0) {
+          setArticles(data.articles);
+          setError(null);
+        } else {
+          setError(`No news available in the "${categoryLabel}" category. Please try again.`);
+        }
+      })
+      .catch(() => {
+        setError('Failed to load news. Please try again.');
+      })
+      .finally(() => setLoading(false));
+  }, [category, categoryLabel]);
+
   const featuredArticle = articles.length > 0 ? articles[0] : null;
   const restArticles = articles.length > 1 ? articles.slice(1) : [];
+
+  if (loading) {
+    return (
+      <div className="loading">
+        <h2>Loading {categoryLabel} news...</h2>
+      </div>
+    );
+  }
 
   if (error) {
     return (
