@@ -12,9 +12,9 @@ interface Article {
 }
 
 interface CategoryPageProps {
-  params: Promise<{
+  params: {
     category: string;
-  }>;
+  };
 }
 
 const categoryLabels: { [key: string]: string } = {
@@ -30,8 +30,8 @@ const categoryLabels: { [key: string]: string } = {
 
 export const revalidate = 120;
 
-export async function generateMetadata({ params }: { params: Promise<{ category: string }> }): Promise<Metadata> {
-  const { category } = await params;
+export async function generateMetadata({ params }: { params: { category: string } }): Promise<Metadata> {
+  const { category } = params;
   const categoryLabel = categoryLabels[category] || category;
   const title = `${categoryLabel} | GlobalEye News`;
   const description = `Latest news and updates in ${categoryLabel}. Stay informed with trusted sources from around the world.`;
@@ -67,8 +67,8 @@ export async function generateMetadata({ params }: { params: Promise<{ category:
   };
 }
 
-export default async function CategoryPage({ params }: CategoryPageProps) {
-  const { category } = await params;
+export default async function CategoryPage({ params }: { params: { category: string } }) {
+  const { category } = params;
   const categoryLabel = categoryLabels[category] || category;
   let articles: Article[] = [];
   let error: string | null = null;
