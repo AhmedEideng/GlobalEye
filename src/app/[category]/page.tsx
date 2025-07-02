@@ -24,6 +24,7 @@ const categoryLabels: { [key: string]: string } = {
   'science': 'Science'
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function CategoryPage({ params }: any) {
   const { category } = params;
   const categoryLabel = categoryLabels[category] || category;
