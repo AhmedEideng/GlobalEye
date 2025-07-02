@@ -181,7 +181,7 @@ function hashCode(str: string): number {
 }
 
 // دالة لحفظ الأخبار في Supabase
-async function saveArticlesToSupabase(articles: NewsArticle[]) {
+async function saveArticlesToSupabase(articles: NewsArticle[], category: string) {
   if (!articles.length) return;
   // تجهيز البيانات لتتوافق مع الجدول
   const mapped = articles.map(article => ({
@@ -195,6 +195,7 @@ async function saveArticlesToSupabase(articles: NewsArticle[]) {
     source_id: article.source.id,
     author: article.author,
     slug: generateSlug(article.title, article.url),
+    category,
   }));
   // إدخال الأخبار مع تجاهل المكررات بناءً على url
   await supabase.from('news').upsert(mapped, { onConflict: 'url' });
@@ -243,8 +244,8 @@ export async function fetchNews(category: string = 'general'): Promise<NewsArtic
   const all = results.filter(Boolean).flat() as NewsArticle[];
   const unique = all.filter((item, idx, arr) => arr.findIndex(a => a.url === item.url) === idx);
   unique.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
-  // حفظ الأخبار في Supabase
-  await saveArticlesToSupabase(unique);
+  // حفظ الأخبار في Supabase مع category
+  await saveArticlesToSupabase(unique, category);
   console.log("DEBUG: fetchNews result", unique);
   return unique;
 }
