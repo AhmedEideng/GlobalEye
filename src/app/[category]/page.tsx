@@ -61,7 +61,7 @@ export async function generateMetadata({ params }: { params: { category: string 
   };
 }
 
-export default async function CategoryPage({ params }: { params: { category: string } }) {
+export default async function CategoryPage({ params }: any) {
   const { category } = params;
   const categoryLabel = categoryLabels[category] || category;
   let articles: Article[] = [];
