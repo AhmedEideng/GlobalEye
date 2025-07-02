@@ -1,16 +1,5 @@
 import HomeClient from './components/HomeClient';
-import { fetchAllNews } from './utils/fetchNews';
-
-interface Article {
-  title: string;
-  description: string;
-  url: string;
-  urlToImage: string;
-  publishedAt: string;
-  source: { name: string };
-  category?: string;
-  slug: string;
-}
+import { fetchAllNews, NewsArticle } from './utils/fetchNews';
 
 export const revalidate = 120;
 
@@ -50,14 +39,22 @@ export async function generateMetadata() {
 }
 
 export default async function HomePage() {
-  let articles: Article[] = [];
-  let featuredArticle: Article | null = null;
+  let articles: NewsArticle[] = [];
+  let featuredArticle: NewsArticle | null = null;
   let error: string | null = null;
   try {
     const allArticles = await fetchAllNews();
     if (allArticles && allArticles.length > 0) {
-      featuredArticle = allArticles[0];
-      articles = allArticles.slice(1, 31);
+      featuredArticle = {
+        ...allArticles[0],
+        description: allArticles[0].description || '',
+        urlToImage: allArticles[0].urlToImage || '',
+      };
+      articles = allArticles.slice(1, 31).map((a) => ({
+        ...a,
+        description: a.description || '',
+        urlToImage: a.urlToImage || '',
+      }));
     } else {
       error = 'No news available at the moment. Please check your API settings.';
     }
