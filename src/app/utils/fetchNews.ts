@@ -335,4 +335,26 @@ export function detectCategory(article: NewsArticle): string {
   }
   
   return 'general';
+}
+
+export async function fetchAllNews(): Promise<NewsArticle[]> {
+  const { data: dbArticles, error } = await supabase
+    .from('news')
+    .select('*')
+    .order('published_at', { ascending: false });
+
+  if (!error && dbArticles && dbArticles.length > 0) {
+    return dbArticles.map((article: NewsRow) => ({
+      source: { id: article.source_id, name: article.source_name },
+      author: article.author,
+      title: article.title,
+      description: article.description,
+      url: article.url,
+      urlToImage: article.url_to_image,
+      publishedAt: article.published_at,
+      content: article.content,
+      slug: article.slug,
+    }));
+  }
+  return [];
 } 

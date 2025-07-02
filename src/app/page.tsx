@@ -1,4 +1,5 @@
 import HomeClient from './components/HomeClient';
+import { fetchAllNews } from './utils/fetchNews';
 
 interface Article {
   title: string;
@@ -53,21 +54,10 @@ export default async function HomePage() {
   let featuredArticle: Article | null = null;
   let error: string | null = null;
   try {
-    const res = await fetch('http://localhost:3000/api/news?category=general', { next: { revalidate: 120 } });
-    const data = await res.json();
-    if (data.articles && data.articles.length > 0) {
-      featuredArticle = {
-        ...data.articles[0],
-        description: data.articles[0].description || '',
-        urlToImage: data.articles[0].urlToImage || '',
-        slug: data.articles[0].slug || encodeURIComponent(data.articles[0].title || data.articles[0].url),
-      } as Article;
-      articles = data.articles.slice(1, 31).map((a: Article) => ({
-        ...a,
-        description: a.description || '',
-        urlToImage: a.urlToImage || '',
-        slug: a.slug || encodeURIComponent(a.title || a.url),
-      })) as Article[];
+    const allArticles = await fetchAllNews();
+    if (allArticles && allArticles.length > 0) {
+      featuredArticle = allArticles[0];
+      articles = allArticles.slice(1, 31);
     } else {
       error = 'No news available at the moment. Please check your API settings.';
     }
