@@ -26,7 +26,7 @@ export default function TermsAndConditionsPage() {
         <h2>5. Third-Party Links</h2>
         <p>Our website may contain links to third-party sites. We are not responsible for the content or practices of these external sites. Access them at your own risk.</p>
         <h2>6. Disclaimer of Warranties</h2>
-        <p>GlobalEye News provides content "as is" without warranties of any kind, either express or implied. We do not guarantee the accuracy, completeness, or reliability of any information on the site.</p>
+        <p>GlobalEye News provides content &quot;as is&quot; without warranties of any kind, either express or implied. We do not guarantee the accuracy, completeness, or reliability of any information on the site.</p>
         <h2>7. Limitation of Liability</h2>
         <p>In no event shall GlobalEye News, its affiliates, or its partners be liable for any damages arising from your use of the website or reliance on its content.</p>
         <h2>8. Changes to Terms</h2>
