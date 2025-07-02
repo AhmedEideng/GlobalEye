@@ -18,7 +18,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
         <h1 className="text-3xl font-bold mb-4 text-red-700">Article Not Found</h1>
-        <p className="text-lg text-gray-500 mb-6">Sorry, we couldn't find the article you are looking for.</p>
+        <p className="text-lg text-gray-500 mb-6">Sorry, we couldn&apos;t find the article you are looking for.</p>
         <Link href="/" className="btn btn-primary">Back to Home</Link>
       </div>
     );
