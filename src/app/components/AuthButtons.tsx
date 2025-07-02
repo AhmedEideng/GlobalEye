@@ -90,14 +90,6 @@ export default function AuthButtons() {
           >
             {isLoading ? 'Signing in...' : 'SIGN IN'}
           </button>
-          <button
-            className="btn btn-secondary"
-            style={{ minWidth: 110 }}
-            onClick={handleSignIn}
-            disabled={isLoading}
-          >
-            SUBSCRIBE
-          </button>
         </>
       )}
       {error && <span className="text-xs text-destructive">{error}</span>}

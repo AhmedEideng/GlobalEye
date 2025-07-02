@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from 'react';
+import AuthButtons from './AuthButtons';
 
 const categories = [
   { name: 'home', path: '/', label: 'Home' },
@@ -20,7 +21,7 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <div className="navbar-container">
+    <div className="navbar-container flex items-center justify-between">
       <ul className="nav-menu flex gap-4 items-center">
         <li key="home" className="nav-item">
           <Link
@@ -41,6 +42,10 @@ export default function Navbar() {
           </li>
         ))}
       </ul>
+      {/* زر تسجيل الدخول في نهاية الشريط */}
+      <div className="ml-4">
+        <AuthButtons />
+      </div>
       {/* Mobile Menu Button */}
       <button
         className="mobile-menu-btn"
@@ -56,6 +61,15 @@ export default function Navbar() {
         <div className="mobile-nav">
           <div className="flex flex-col gap-4 p-4">
             <ul className="mobile-nav-menu flex flex-col gap-2">
+              <li key="home" className="mobile-nav-item">
+                <Link
+                  href="/"
+                  className={`mobile-nav-link ${pathname === '/' ? 'active' : ''}`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Home
+                </Link>
+              </li>
               {categories.filter(c => c.name !== 'home').map((category) => (
                 <li key={category.name} className="mobile-nav-item">
                   <Link
@@ -68,6 +82,10 @@ export default function Navbar() {
                 </li>
               ))}
             </ul>
+            {/* زر تسجيل الدخول في القائمة الجانبية */}
+            <div className="mt-4">
+              <AuthButtons />
+            </div>
           </div>
         </div>
       )}

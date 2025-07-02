@@ -174,7 +174,29 @@ async function saveArticlesToSupabase(articles: NewsArticle[]) {
 }
 
 export async function fetchNews(category: string = 'general'): Promise<NewsArticle[]> {
-  // Only fetch directly from APIs
+  // Try to fetch news from Supabase first
+  const { data: dbArticles, error } = await supabase
+    .from('news')
+    .select('*')
+    .eq('category', category)
+    .order('published_at', { ascending: false })
+    .limit(30);
+
+  // If we have recent news in the DB, return it
+  if (!error && dbArticles && dbArticles.length > 0) {
+    return dbArticles.map((article: any) => ({
+      source: { id: article.source_id, name: article.source_name },
+      author: article.author,
+      title: article.title,
+      description: article.description,
+      url: article.url,
+      urlToImage: article.url_to_image,
+      publishedAt: article.published_at,
+      content: article.content,
+    }));
+  }
+
+  // Otherwise, fetch from APIs and upsert
   // Each source is fetched with a 3-second timeout
   const sources = [
     { fn: fetchFromNewsAPI },

@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import CategoryClient from '../components/CategoryClient';
 
 interface Article {
   title: string;
@@ -85,5 +84,92 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   }
   const featuredArticle = articles.length > 0 ? articles[0] : null;
   const restArticles = articles.length > 1 ? articles.slice(1) : [];
-  return <CategoryClient articles={restArticles} featuredArticle={featuredArticle} categoryLabel={categoryLabel} error={error} />;
+
+  if (error) {
+    return (
+      <div className="error">
+        <h2>Error loading {categoryLabel} news</h2>
+        <p>{error}</p>
+      </div>
+    );
+  }
+
+  if (!featuredArticle && articles.length === 0) {
+    return (
+      <div className="error">
+        <h2>No news available in {categoryLabel}</h2>
+        <p>No news articles found in the {categoryLabel} category at the moment.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="category-page">
+      <div className="category-header">
+        <h1 className="category-title">{categoryLabel}</h1>
+        <p className="category-description">Latest news in {categoryLabel}</p>
+      </div>
+
+      {featuredArticle && (
+        <article className="featured-article">
+          <img 
+            src={featuredArticle.urlToImage || '/placeholder-news.jpg'} 
+            alt={featuredArticle.title}
+            width={800}
+            height={400}
+            className="featured-image"
+            style={{ width: '100%', height: 'auto' }}
+          />
+          <div className="featured-content">
+            <div className="article-category">{categoryLabel.toUpperCase()}</div>
+            <h1 className="featured-title">
+              <a href={`/article/${encodeURIComponent(featuredArticle.url)}`}>{featuredArticle.title}</a>
+            </h1>
+            <p className="featured-excerpt">{featuredArticle.description}</p>
+            <div className="article-meta">
+              <span>{featuredArticle.source.name}</span>
+              <span>{new Date(featuredArticle.publishedAt).toUTCString()}</span>
+            </div>
+          </div>
+        </article>
+      )}
+
+      <div className="cnn-grid">
+        <div className="main-content">
+          {restArticles.length > 0 && (
+            <section>
+              <div className="section-header">
+                <h2 className="section-title">All {categoryLabel} News</h2>
+                <span className="article-count">{restArticles.length} articles</span>
+              </div>
+              <div className="news-grid">
+                {restArticles.map((article, index) => (
+                  <article key={index} className="article-card">
+                    <img 
+                      src={article.urlToImage || '/placeholder-news.jpg'} 
+                      alt={article.title}
+                      width={400}
+                      height={200}
+                      className="article-image"
+                      style={{ width: '100%', height: 'auto' }}
+                    />
+                    <div className="article-content">
+                      <h2 className="article-title">
+                        <a href={`/article/${encodeURIComponent(article.url)}`}>{article.title}</a>
+                      </h2>
+                      <p className="article-excerpt">{article.description}</p>
+                      <div className="article-meta">
+                        <span>{article.source.name}</span>
+                        <span>{new Date(article.publishedAt).toUTCString()}</span>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 } 

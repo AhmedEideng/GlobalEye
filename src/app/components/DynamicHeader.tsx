@@ -9,7 +9,7 @@ export default function DynamicHeader() {
           <span className="text-red-600">Global</span>
           <span className="text-gray-800">Eye</span>
         </div>
-        <AuthButtons />
+        {/* تم إخفاء زر AuthButtons هنا كمثال */}
       </div>
     </div>
   );
