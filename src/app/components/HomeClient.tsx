@@ -52,14 +52,17 @@ export default function HomeClient({ articles, featuredArticle, error }: { artic
       {/* Featured Article */}
       {featuredArticle && (
         <article className="featured-article">
-          <OptimizedImage 
-            src={featuredArticle.urlToImage || '/placeholder-news.jpg'} 
-            alt={featuredArticle.title}
-            width={800}
-            height={400}
-            className="featured-image"
-            priority
-          />
+          <div className="relative w-full h-[320px] md:h-[420px] lg:h-[500px] rounded-xl overflow-hidden mb-4">
+            <OptimizedImage
+              src={featuredArticle.urlToImage || '/placeholder-news.jpg'}
+              alt={featuredArticle.title}
+              fill
+              className="featured-image object-cover w-full h-full"
+              priority
+              sizes="100vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+          </div>
           <div className="featured-content">
             <div className="article-category">Breaking News</div>
             <h1 className="featured-title">

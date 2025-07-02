@@ -10,3 +10,5 @@ export default async function SearchPage({
   
   return <SearchClient query={query} />;
 }
+
+export const revalidate = 120;

@@ -10,7 +10,7 @@ interface Article {
   category?: string;
 }
 
-export const revalidate = 900;
+export const revalidate = 120;
 
 export async function generateMetadata() {
   const title = 'GlobalEye News | Latest World News, Business, Tech, Sports, Entertainment';
@@ -52,7 +52,7 @@ export default async function HomePage() {
   let featuredArticle: Article | null = null;
   let error: string | null = null;
   try {
-    const res = await fetch('http://localhost:3000/api/news?category=general', { cache: 'no-store' });
+    const res = await fetch('http://localhost:3000/api/news?category=general', { next: { revalidate: 120 } });
     const data = await res.json();
     if (data.articles && data.articles.length > 0) {
       featuredArticle = {

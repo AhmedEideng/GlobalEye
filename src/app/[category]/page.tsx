@@ -28,7 +28,7 @@ const categoryLabels: { [key: string]: string } = {
   'science': 'Science'
 };
 
-export const revalidate = 900;
+export const revalidate = 120;
 
 export async function generateMetadata({ params }: { params: Promise<{ category: string }> }): Promise<Metadata> {
   const { category } = await params;
@@ -73,7 +73,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   let articles: Article[] = [];
   let error: string | null = null;
   try {
-    const res = await fetch(`http://localhost:3000/api/news?category=${category}`, { cache: 'no-store' });
+    const res = await fetch(`http://localhost:3000/api/news?category=${category}`, { next: { revalidate: 120 } });
     const data = await res.json();
     if (data.articles && data.articles.length > 0) {
       articles = data.articles;
@@ -106,21 +106,34 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
   return (
     <div className="category-page">
-      <div className="category-header">
-        <h1 className="category-title">{categoryLabel}</h1>
-        <p className="category-description">Latest news in {categoryLabel}</p>
+      <div className="category-header text-center mb-10">
+        <h1
+          className="category-title text-6xl md:text-7xl font-extrabold mb-2 tracking-tight inline-block relative text-red-700"
+          style={{
+            fontFamily: `'Playfair Display', 'Merriweather', serif`,
+            textShadow: '0 2px 16px rgba(220,38,38,0.10)',
+          }}
+        >
+          {categoryLabel}
+          <span className="block h-1 w-16 mx-auto mt-2 bg-gradient-to-r from-red-600 via-red-400 to-yellow-400 rounded-full"></span>
+        </h1>
+        <p className="category-description text-lg md:text-xl text-gray-500 mt-3 font-medium max-w-2xl mx-auto">
+          Stay updated with the latest, most important, and trending news in <span className="text-red-600 font-semibold">{categoryLabel}</span> from trusted sources around the world.
+        </p>
       </div>
 
       {featuredArticle && (
         <article className="featured-article">
-          <img 
-            src={featuredArticle.urlToImage || '/placeholder-news.jpg'} 
-            alt={featuredArticle.title}
-            width={800}
-            height={400}
-            className="featured-image"
-            style={{ width: '100%', height: 'auto' }}
-          />
+          <div className="relative w-full h-[320px] md:h-[420px] lg:h-[500px] rounded-xl overflow-hidden mb-4">
+            <img
+              src={featuredArticle.urlToImage || '/placeholder-news.jpg'}
+              alt={featuredArticle.title}
+              className="featured-image object-cover w-full h-full"
+              style={{ objectFit: 'cover' }}
+              loading="eager"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+          </div>
           <div className="featured-content">
             <div className="article-category">{categoryLabel.toUpperCase()}</div>
             <h1 className="featured-title">

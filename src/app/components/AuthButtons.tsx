@@ -69,17 +69,31 @@ export default function AuthButtons() {
   return (
     <div style={{ display: 'flex', gap: '16px', marginLeft: 'auto', alignItems: 'center' }}>
       {user ? (
-        <>
-          <span className="text-sm text-muted-foreground">{user.email}</span>
-          <button
-            className="btn btn-secondary"
-            style={{ minWidth: 110 }}
-            onClick={handleSignOut}
-            disabled={isLoading}
-          >
-            {isLoading ? 'Signing out...' : 'Sign out'}
+        <div className="relative group">
+          <button className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors shadow text-gray-800 font-semibold focus:outline-none">
+            <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-red-600 text-white text-lg font-bold uppercase">
+              {user.name ? user.name[0] : user.email[0]}
+            </span>
+            <span className="hidden md:inline text-base font-medium text-gray-800">
+              {user.name ? user.name.split(' ')[0] : user.email.split('@')[0]}
+            </span>
+            <svg className="w-4 h-4 text-gray-500 ml-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
           </button>
-        </>
+          {/* Dropdown */}
+          <div className="absolute right-0 mt-2 w-44 bg-white rounded-lg shadow-lg border border-gray-100 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto transition-all z-50">
+            <button
+              className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-t-lg"
+              onClick={handleSignOut}
+              disabled={isLoading}
+            >
+              {isLoading ? 'Signing out...' : 'Sign out'}
+            </button>
+            <div className="border-t border-gray-200" />
+            <span className="block px-4 py-2 text-xs text-gray-400">{user.email}</span>
+          </div>
+        </div>
       ) : (
         <>
           <button
