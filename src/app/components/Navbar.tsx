@@ -5,7 +5,7 @@ import { useState } from 'react';
 import AuthButtons from './AuthButtons';
 
 const categories = [
-  { name: 'home', path: '/', label: 'Home' },
+  { name: 'home', path: '/', label: 'الرئيسية' },
   { name: 'world', path: '/world', label: 'World' },
   { name: 'politics', path: '/politics', label: 'Politics' },
   { name: 'business', path: '/business', label: 'Business' },
@@ -27,7 +27,7 @@ export default function Navbar() {
         <span className="text-black">Global</span><span className="text-red-600">Eye</span>
       </Link>
       {/* أزرار الأقسام */}
-      <ul className="nav-menu flex gap-2 items-center bg-gray-100 rounded-full px-2 py-1 shadow-inner">
+      <ul className="nav-menu hidden md:flex gap-2 items-center bg-gray-100 rounded-full px-2 py-1 shadow-inner overflow-x-auto max-w-full">
         {categories.map((category) => (
           <li key={category.name} className="nav-item">
             <Link
@@ -61,16 +61,7 @@ export default function Navbar() {
               <span className="text-black">Global</span><span className="text-red-600">Eye</span>
             </Link>
             <ul className="mobile-nav-menu flex flex-col gap-2">
-              <li key="home" className="mobile-nav-item">
-                <Link
-                  href="/"
-                  className={`mobile-nav-link px-4 py-2 rounded-full font-medium transition-colors duration-200 ${pathname === '/' ? 'bg-red-600 text-white shadow' : 'text-gray-700 hover:bg-gray-200 hover:text-red-600'}`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Home
-                </Link>
-              </li>
-              {categories.filter(c => c.name !== 'home').map((category) => (
+              {categories.map((category) => (
                 <li key={category.name} className="mobile-nav-item">
                   <Link
                     href={category.path}

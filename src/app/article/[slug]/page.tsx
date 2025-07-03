@@ -8,15 +8,26 @@ export const revalidate = 120;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function ArticlePage({ params }: any) {
-  const { slug } = params;
+  const { slug } = await params;
+  console.log("DEBUG: ArticlePage - Received slug from params:", slug);
   const article: NewsArticle | null = await getArticleBySlug(slug);
 
   if (!article) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
         <h1 className="text-3xl font-bold mb-4 text-red-700">Article Not Found</h1>
-        <p className="text-lg text-gray-500 mb-6">Sorry, we couldn&apos;t find the article you are looking for.</p>
-        <Link href="/" className="btn btn-primary">Back to Home</Link>
+        <p className="text-lg text-gray-500 mb-6">
+          Sorry, we couldn&apos;t find the article you are looking for.
+          <br />
+          <span className="text-sm text-gray-400">Slug: {slug}</span>
+        </p>
+        <div className="space-y-4">
+        <Link href="/world" className="btn btn-primary">Back to World News</Link>
+          <br />
+          <Link href="/politics" className="btn btn-secondary">Browse Politics News</Link>
+          <br />
+          <Link href="/world" className="btn btn-secondary">Browse World News</Link>
+        </div>
       </div>
     );
   }

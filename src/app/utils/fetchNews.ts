@@ -87,16 +87,28 @@ async function fetchFromNewsAPI(category: string): Promise<NewsArticle[]> {
     const res = await fetch(url, { next: { revalidate: 900 }, headers: { 'User-Agent': 'GlobalEye-News/1.0' } });
     if (!res.ok) return [];
     const data = await res.json();
-    return (data.articles || []).map((article: NewsAPIArticle) => ({
+    const articles = (data.articles || []).map((article: NewsAPIArticle) => {
+      const title = article.title || '';
+      const url = article.url || '';
+      const slug = generateSlug(title, url);
+      return {
       source: { id: article.source?.id || null, name: article.source?.name || 'Unknown' },
       author: article.author || null,
-      title: article.title || '',
+        title: title,
       description: article.description || null,
-      url: article.url || '',
+        url: url,
       urlToImage: article.urlToImage || null,
       publishedAt: article.publishedAt || '',
-      content: article.content || null
-    }));
+        content: article.content || null,
+        slug: slug
+      };
+    });
+    console.log("DEBUG: NewsAPI articles with images:", articles.filter((a: NewsArticle) => a.urlToImage).length, "out of", articles.length);
+    if (articles.length > 0) {
+      console.log("DEBUG: First NewsAPI article image:", articles[0].urlToImage);
+      console.log("DEBUG: First NewsAPI article slug:", articles[0].slug);
+    }
+    return articles;
   } catch { return []; }
 }
 
@@ -107,16 +119,28 @@ async function fetchFromGNews(category: string): Promise<NewsArticle[]> {
     const res = await fetch(url, { next: { revalidate: 900 }, headers: { 'User-Agent': 'GlobalEye-News/1.0' } });
     if (!res.ok) return [];
     const data = await res.json();
-    return (data.articles || []).map((article: GNewsArticle) => ({
+    const articles = (data.articles || []).map((article: GNewsArticle) => {
+      const title = article.title || '';
+      const url = article.url || '';
+      const slug = generateSlug(title, url);
+      return {
       source: { id: null, name: article.source?.name || 'GNews' },
       author: article.author || null,
-      title: article.title || '',
+        title: title,
       description: article.description || null,
-      url: article.url || '',
+        url: url,
       urlToImage: article.image || null,
       publishedAt: article.publishedAt || '',
-      content: article.content || null
-    }));
+        content: article.content || null,
+        slug: slug
+      };
+    });
+    console.log("DEBUG: GNews articles with images:", articles.filter((a: NewsArticle) => a.urlToImage).length, "out of", articles.length);
+    if (articles.length > 0) {
+      console.log("DEBUG: First GNews article image:", articles[0].urlToImage);
+      console.log("DEBUG: First GNews article slug:", articles[0].slug);
+    }
+    return articles;
   } catch { return []; }
 }
 
@@ -127,16 +151,22 @@ async function fetchFromGuardian(category: string): Promise<NewsArticle[]> {
     const res = await fetch(url, { next: { revalidate: 900 }, headers: { 'User-Agent': 'GlobalEye-News/1.0' } });
     if (!res.ok) return [];
     const data = await res.json();
-    return (data.response?.results || []).map((article: GuardianArticle) => ({
+    return (data.response?.results || []).map((article: GuardianArticle) => {
+      const title = article.webTitle || '';
+      const url = article.webUrl || '';
+      const slug = generateSlug(title, url);
+      return {
       source: { id: 'guardian', name: 'The Guardian' },
       author: article.fields?.byline || null,
-      title: article.webTitle || '',
+        title: title,
       description: article.fields?.trailText || null,
-      url: article.webUrl || '',
+        url: url,
       urlToImage: article.fields?.thumbnail || null,
       publishedAt: article.webPublicationDate || '',
-      content: article.fields?.bodyText || null
-    }));
+        content: article.fields?.bodyText || null,
+        slug: slug
+      };
+    });
   } catch { return []; }
 }
 
@@ -147,16 +177,22 @@ async function fetchFromMediastack(category: string): Promise<NewsArticle[]> {
     const res = await fetch(url, { next: { revalidate: 900 }, headers: { 'User-Agent': 'GlobalEye-News/1.0' } });
     if (!res.ok) return [];
     const data = await res.json();
-    return (data.data || []).map((article: MediastackArticle) => ({
+    return (data.data || []).map((article: MediastackArticle) => {
+      const title = article.title || '';
+      const url = article.url || '';
+      const slug = generateSlug(title, url);
+      return {
       source: { id: null, name: article.source || 'Mediastack' },
       author: article.author || null,
-      title: article.title || '',
+        title: title,
       description: article.description || null,
-      url: article.url || '',
+        url: url,
       urlToImage: article.image || null,
       publishedAt: article.published_at || '',
-      content: null
-    }));
+        content: null,
+        slug: slug
+      };
+    });
   } catch { return []; }
 }
 
@@ -165,22 +201,40 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | null> {
   return Promise.race([
     promise,
     new Promise<null>((resolve) => setTimeout(() => {
+      console.log(`DEBUG: API request timed out after ${ms}ms`);
       resolve(null);
     }, ms))
   ]);
 }
 
-// دالة مساعدة لتوليد slug من العنوان أو الرابط
+// دالة محسنة لتوليد slug من العنوان أو الرابط
 function generateSlug(title: string, url: string): string {
-  // استخدم العنوان إذا كان متاحاً، وإلا استخدم hash من الرابط
-  if (title) {
-    return title
+  // تنظيف العنوان وإزالة الأحرف الخاصة
+  if (title && title.trim()) {
+    let cleanTitle = title
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
+      .trim()
+      // إزالة الأحرف العربية والأحرف الخاصة
+      .replace(/[^\w\s-]/g, '')
+      // استبدال المسافات والشرطات المتعددة بشرطة واحدة
+      .replace(/[\s\-]+/g, '-')
+      // إزالة الشرطات من البداية والنهاية
       .replace(/^-+|-+$/g, '')
-      .slice(0, 60) + '-' + Math.abs(hashCode(url)).toString();
+      // تحديد الطول الأقصى
+      .slice(0, 50);
+    
+    // إذا كان العنوان فارغاً بعد التنظيف، استخدم hash من URL
+    if (!cleanTitle) {
+      return `article-${Math.abs(hashCode(url)).toString()}`;
+    }
+    
+    // إضافة hash من URL لضمان التفرد
+    const urlHash = Math.abs(hashCode(url)).toString().slice(0, 8);
+    return `${cleanTitle}-${urlHash}`;
   }
-  return Math.abs(hashCode(url)).toString();
+  
+  // إذا لم يكن هناك عنوان، استخدم hash من URL
+  return `article-${Math.abs(hashCode(url)).toString()}`;
 }
 
 // دالة hash بسيطة
@@ -195,28 +249,51 @@ function hashCode(str: string): number {
   return hash;
 }
 
-// دالة لحفظ الأخبار في Supabase
+// دالة محسنة لحفظ الأخبار في Supabase
 async function saveArticlesToSupabase(articles: NewsArticle[], category: string) {
   if (!articles.length) return;
+  
   // تجهيز البيانات لتتوافق مع الجدول
-  const mapped = articles.map(article => ({
-    title: article.title,
-    description: article.description,
-    url: article.url,
-    url_to_image: article.urlToImage,
-    published_at: article.publishedAt ? new Date(article.publishedAt) : null,
-    content: article.content,
-    source_name: article.source.name,
-    source_id: article.source.id,
-    author: article.author,
-    slug: generateSlug(article.title, article.url),
-    category,
-  }));
+  const mapped = articles.map(article => {
+    // التأكد من وجود slug، وإذا لم يكن موجوداً قم بتوليده
+    let finalSlug = article.slug;
+    if (!finalSlug || finalSlug === '' || finalSlug === 'null') {
+      finalSlug = generateSlug(article.title, article.url);
+      console.log("DEBUG: Generated new slug for:", article.title?.slice(0, 50), "->", finalSlug);
+    } else {
+      console.log("DEBUG: Using existing slug for:", article.title?.slice(0, 50), "->", finalSlug);
+    }
+    
+    return {
+      title: article.title,
+      description: article.description,
+      url: article.url,
+      url_to_image: article.urlToImage,
+      published_at: article.publishedAt ? new Date(article.publishedAt) : null,
+      content: article.content,
+      source_name: article.source.name,
+      source_id: article.source.id,
+      author: article.author,
+      slug: finalSlug,
+      category,
+    };
+  });
+  
+  console.log("DEBUG: Saving articles to DB, articles with images:", mapped.filter(a => a.url_to_image).length, "out of", mapped.length);
+  
   // إدخال الأخبار مع تجاهل المكررات بناءً على url
-  await supabase.from('news').upsert(mapped, { onConflict: 'url' });
+  const { error } = await supabase.from('news').upsert(mapped, { onConflict: 'url' });
+  
+  if (error) {
+    console.error("DEBUG: Error saving articles to Supabase:", error);
+  } else {
+    console.log("DEBUG: Successfully saved", mapped.length, "articles to Supabase");
+  }
 }
 
 export async function fetchNews(category: string = 'general'): Promise<NewsArticle[]> {
+  console.log(`DEBUG: fetchNews called for category: ${category}`);
+  
   // Try to fetch news from Supabase first
   const { data: dbArticles, error } = await supabase
     .from('news')
@@ -227,7 +304,7 @@ export async function fetchNews(category: string = 'general'): Promise<NewsArtic
 
   // If we have recent news in the DB, return it
   if (!error && dbArticles && dbArticles.length > 0) {
-    return dbArticles.map((article: NewsRow) => ({
+    const mappedArticles = dbArticles.map((article: NewsRow) => ({
       source: { id: article.source_id, name: article.source_name },
       author: article.author,
       title: article.title,
@@ -238,30 +315,50 @@ export async function fetchNews(category: string = 'general'): Promise<NewsArtic
       content: article.content,
       slug: article.slug,
     }));
+    console.log(`DEBUG: fetchNews - Reading from DB for ${category}, articles with images:`, mappedArticles.filter((a: NewsArticle) => a.urlToImage).length, "out of", mappedArticles.length);
+    if (mappedArticles.length > 0) {
+      console.log(`DEBUG: fetchNews - First DB article image for ${category}:`, mappedArticles[0].urlToImage);
+    }
+    return mappedArticles;
   }
 
+  console.log(`DEBUG: No data in DB for ${category}, fetching from APIs...`);
+
   // Otherwise, fetch from APIs and upsert
-  // Each source is fetched with a 3-second timeout
+  // Each source is fetched with a 8-second timeout (increased from 3)
   const sources = [
-    { fn: fetchFromNewsAPI },
-    { fn: fetchFromGNews },
-    { fn: fetchFromGuardian },
-    { fn: fetchFromMediastack },
+    { fn: fetchFromNewsAPI, name: 'NewsAPI' },
+    { fn: fetchFromGNews, name: 'GNews' },
+    { fn: fetchFromGuardian, name: 'Guardian' },
+    { fn: fetchFromMediastack, name: 'Mediastack' },
   ];
-  const promises = sources.map(({ fn }) =>
+  
+  console.log(`DEBUG: Starting API calls for ${category}...`);
+  const promises = sources.map(({ fn, name }) =>
     withTimeout(
-      fn(category),
-      3000
+      fn(category).then(result => {
+        console.log(`DEBUG: ${name} returned ${result.length} articles for ${category}`);
+        return result;
+      }),
+      8000 // Increased timeout to 8 seconds
     )
   );
+  
   const results = await Promise.all(promises);
   // Ignore sources that failed or timed out
   const all = results.filter(Boolean).flat() as NewsArticle[];
   const unique = all.filter((item, idx, arr) => arr.findIndex(a => a.url === item.url) === idx);
   unique.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+  
+  console.log(`DEBUG: Total unique articles for ${category}:`, unique.length);
+  console.log(`DEBUG: Articles with images for ${category}:`, unique.filter(a => a.urlToImage).length);
+  
   // حفظ الأخبار في Supabase مع category
+  if (unique.length > 0) {
   await saveArticlesToSupabase(unique, category);
-  console.log("DEBUG: fetchNews result", unique);
+  }
+  
+  console.log(`DEBUG: fetchNews result for ${category}:`, unique.length, "articles");
   return unique;
 }
 
@@ -278,15 +375,46 @@ export async function fetchRelatedNews(currentArticle: NewsArticle, category: st
   }
 }
 
-export async function getArticleBySlug(slug: string): Promise<NewsArticle | null> {
+// Debug function to check database contents
+export async function debugDatabaseContents() {
   try {
     const { data, error } = await supabase
+      .from('news')
+      .select('title, slug, category')
+      .order('published_at', { ascending: false })
+      .limit(10);
+    
+    if (error) {
+      console.error("DEBUG: Error fetching database contents:", error);
+      return;
+    }
+    
+    console.log("DEBUG: Recent articles in database:");
+    data?.forEach((article, index) => {
+      console.log(`${index + 1}. Title: ${article.title?.slice(0, 50)}...`);
+      console.log(`   Slug: ${article.slug}`);
+      console.log(`   Category: ${article.category}`);
+      console.log('---');
+    });
+  } catch (error) {
+    console.error("DEBUG: Error in debugDatabaseContents:", error);
+  }
+}
+
+export async function getArticleBySlug(slug: string): Promise<NewsArticle | null> {
+  console.log("DEBUG: getArticleBySlug called with slug:", slug);
+  
+  try {
+    // Strategy 1: Exact slug match
+    let { data, error } = await supabase
       .from('news')
       .select('*')
       .eq('slug', slug)
       .limit(1)
       .single();
+    
     if (!error && data) {
+      console.log("DEBUG: Found article with exact slug match:", data.title);
       return {
         source: { id: data.source_id, name: data.source_name },
         author: data.author,
@@ -299,7 +427,62 @@ export async function getArticleBySlug(slug: string): Promise<NewsArticle | null
         slug: data.slug,
       };
     }
+    
+    console.log("DEBUG: Exact slug match failed, trying partial match...");
+    
+    // Strategy 2: Partial slug match (first 3 words)
+    const slugWords = slug.split('-').slice(0, 3).join('-');
+    const { data: partialData, error: partialError } = await supabase
+      .from('news')
+      .select('*')
+      .ilike('slug', `%${slugWords}%`)
+      .limit(5);
+    
+    if (!partialError && partialData && partialData.length > 0) {
+      console.log("DEBUG: Found articles with partial slug match:", partialData.length);
+      const article = partialData[0];
+      return {
+        source: { id: article.source_id, name: article.source_name },
+        author: article.author,
+        title: article.title,
+        description: article.description,
+        url: article.url,
+        urlToImage: article.url_to_image,
+        publishedAt: article.published_at,
+        content: article.content,
+        slug: article.slug,
+      };
+    }
+    
+    console.log("DEBUG: Partial slug match failed, trying title search...");
+    
+    // Strategy 3: Search by title (convert slug back to title-like search)
+    const titleSearch = slug.replace(/-/g, ' ').replace(/\d+$/, '').trim();
+    const { data: titleData, error: titleError } = await supabase
+      .from('news')
+      .select('*')
+      .ilike('title', `%${titleSearch}%`)
+      .limit(5);
+    
+    if (!titleError && titleData && titleData.length > 0) {
+      console.log("DEBUG: Found articles with title search:", titleData.length);
+      const article = titleData[0];
+      return {
+        source: { id: article.source_id, name: article.source_name },
+        author: article.author,
+        title: article.title,
+        description: article.description,
+        url: article.url,
+        urlToImage: article.url_to_image,
+        publishedAt: article.published_at,
+        content: article.content,
+        slug: article.slug,
+      };
+    }
+    
+    console.log("DEBUG: All search strategies failed for slug:", slug);
     return null;
+    
   } catch (error) {
     console.error('Error getting article by slug:', error);
     return null;
@@ -337,24 +520,186 @@ export function detectCategory(article: NewsArticle): string {
   return 'general';
 }
 
-export async function fetchAllNews(): Promise<NewsArticle[]> {
-  const { data: dbArticles, error } = await supabase
-    .from('news')
-    .select('*')
-    .order('published_at', { ascending: false });
 
-  if (!error && dbArticles && dbArticles.length > 0) {
-    return dbArticles.map((article: NewsRow) => ({
-      source: { id: article.source_id, name: article.source_name },
-      author: article.author,
-      title: article.title,
-      description: article.description,
-      url: article.url,
-      urlToImage: article.url_to_image,
-      publishedAt: article.published_at,
-      content: article.content,
-      slug: article.slug,
-    }));
+
+// دالة محسنة لتحديث جميع الأخبار الموجودة مع slugs
+export async function updateAllArticlesWithSlugs() {
+  console.log("DEBUG: Starting to update all articles with slugs...");
+  try {
+    // جلب جميع الأخبار من قاعدة البيانات
+    const { data: allArticles, error: fetchError } = await supabase
+      .from('news')
+      .select('*')
+      .order('published_at', { ascending: false });
+    
+    if (fetchError) {
+      console.error("DEBUG: Error fetching articles:", fetchError);
+      return { success: false, error: fetchError.message };
+    }
+    
+    if (!allArticles || allArticles.length === 0) {
+      console.log("DEBUG: No articles found in database");
+      return { success: true, message: "No articles found in database" };
+    }
+    
+    console.log(`DEBUG: Found ${allArticles.length} articles in database`);
+    
+    // تصفية الأخبار التي تحتاج إلى تحديث slugs
+    const articlesNeedingSlugs = allArticles.filter(article => 
+      !article.slug || 
+      article.slug === '' || 
+      article.slug === 'null' ||
+      article.slug.length < 5 // slugs قصيرة جداً قد تكون غير صحيحة
+    );
+    
+    // أيضاً نتحقق من slugs التي قد تحتاج إلى تحسين
+    const articlesWithPoorSlugs = allArticles.filter(article => 
+      article.slug && 
+      article.slug !== '' && 
+      article.slug !== 'null' &&
+      (article.slug.includes('undefined') || 
+       article.slug.includes('null') ||
+       article.slug.length > 100) // slugs طويلة جداً
+    );
+    
+    const allArticlesToUpdate = [...articlesNeedingSlugs, ...articlesWithPoorSlugs];
+    
+    if (allArticlesToUpdate.length === 0) {
+      console.log("DEBUG: All articles already have good slugs");
+      return { success: true, message: "All articles already have good slugs" };
+    }
+    
+    console.log(`DEBUG: Found ${articlesNeedingSlugs.length} articles needing slugs`);
+    console.log(`DEBUG: Found ${articlesWithPoorSlugs.length} articles with poor slugs`);
+    console.log(`DEBUG: Total articles to update: ${allArticlesToUpdate.length}`);
+    
+    // تحديث كل خبر مع slug محسن
+    const updates = allArticlesToUpdate.map(article => {
+      const newSlug = generateSlug(article.title, article.url);
+      console.log(`DEBUG: Generating slug for "${article.title?.slice(0, 50)}..." -> ${newSlug}`);
+      
+      return {
+        id: article.id,
+        slug: newSlug
+      };
+    });
+    
+    // تحديث قاعدة البيانات
+    const { error: updateError } = await supabase
+      .from('news')
+      .upsert(updates, { onConflict: 'id' });
+    
+    if (updateError) {
+      console.error("DEBUG: Error updating articles with slugs:", updateError);
+      return { success: false, error: updateError.message };
+    }
+    
+    console.log(`DEBUG: Successfully updated ${updates.length} articles with slugs`);
+    return { 
+      success: true, 
+      message: `Updated ${updates.length} articles with slugs`,
+      details: {
+        articlesNeedingSlugs: articlesNeedingSlugs.length,
+        articlesWithPoorSlugs: articlesWithPoorSlugs.length,
+        totalUpdated: updates.length
+      }
+    };
+    
+  } catch (error) {
+    console.error("DEBUG: Error in updateAllArticlesWithSlugs:", error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
-  return [];
+}
+
+// دالة لفحص حالة slugs في قاعدة البيانات
+export async function checkSlugsStatus() {
+  console.log("DEBUG: Checking slugs status in database...");
+  try {
+    const { data: allArticles, error: fetchError } = await supabase
+      .from('news')
+      .select('id, title, slug, published_at')
+      .order('published_at', { ascending: false });
+    
+    if (fetchError) {
+      console.error("DEBUG: Error fetching articles:", fetchError);
+      return { success: false, error: fetchError.message };
+    }
+    
+    if (!allArticles || allArticles.length === 0) {
+      return { success: true, message: "No articles found in database" };
+    }
+    
+    const totalArticles = allArticles.length;
+    const articlesWithSlugs = allArticles.filter(article => 
+      article.slug && article.slug !== '' && article.slug !== 'null'
+    ).length;
+    
+    const articlesWithoutSlugs = totalArticles - articlesWithSlugs;
+    
+    const articlesWithPoorSlugs = allArticles.filter(article => 
+      article.slug && 
+      article.slug !== '' && 
+      article.slug !== 'null' &&
+      (article.slug.includes('undefined') || 
+       article.slug.includes('null') ||
+       article.slug.length > 100 ||
+       article.slug.length < 5)
+    ).length;
+    
+    return {
+      success: true,
+      stats: {
+        totalArticles,
+        articlesWithSlugs,
+        articlesWithoutSlugs,
+        articlesWithPoorSlugs,
+        percentageWithSlugs: Math.round((articlesWithSlugs / totalArticles) * 100)
+      }
+    };
+    
+  } catch (error) {
+    console.error("DEBUG: Error in checkSlugsStatus:", error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}
+
+// دالة لتحسين slug محدد
+export async function improveSpecificSlug(articleId: string) {
+  console.log("DEBUG: Improving slug for article ID:", articleId);
+  try {
+    const { data: article, error: fetchError } = await supabase
+      .from('news')
+      .select('*')
+      .eq('id', articleId)
+      .single();
+    
+    if (fetchError || !article) {
+      console.error("DEBUG: Error fetching article:", fetchError);
+      return { success: false, error: "Article not found" };
+    }
+    
+    const newSlug = generateSlug(article.title, article.url);
+    console.log(`DEBUG: Improving slug for "${article.title}" from "${article.slug}" to "${newSlug}"`);
+    
+    const { error: updateError } = await supabase
+      .from('news')
+      .update({ slug: newSlug })
+      .eq('id', articleId);
+    
+    if (updateError) {
+      console.error("DEBUG: Error updating article slug:", updateError);
+      return { success: false, error: updateError.message };
+    }
+    
+    return { 
+      success: true, 
+      message: "Slug improved successfully",
+      oldSlug: article.slug,
+      newSlug: newSlug
+    };
+    
+  } catch (error) {
+    console.error("DEBUG: Error in improveSpecificSlug:", error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
 } 

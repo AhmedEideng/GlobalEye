@@ -9,9 +9,9 @@
   "orientation": "any",
   "icons": [
     {
-      "src": "/favicon.ico",
+      "src": "/favicon.ico.jpg",
       "sizes": "48x48 64x64 96x96 128x128 256x256 512x512",
-      "type": "image/x-icon"
+      "type": "image/jpeg"
     },
     {
       "src": "/globe.svg",

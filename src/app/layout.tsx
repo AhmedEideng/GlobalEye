@@ -13,6 +13,11 @@ export const metadata: Metadata = {
   keywords: "news, global news, breaking news, business news, technology news, sports news, world news",
   authors: [{ name: "GlobalEye News" }],
   robots: "index, follow",
+  icons: {
+    icon: '/favicon.ico.jpg',
+    shortcut: '/favicon.ico.jpg',
+    apple: '/favicon.ico.jpg',
+  },
   openGraph: {
     title: "GlobalEye News",
     description: "Your trusted source for global news and insights",
@@ -67,7 +72,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <SearchBar />
         </div>
         {/* Main Content */}
-        <div className="main-container">
+        <div className="main-container max-w-screen-xl mx-auto px-2 sm:px-4 pt-4 pb-8 w-full">
           {children}
         </div>
         {/* Footer */}
