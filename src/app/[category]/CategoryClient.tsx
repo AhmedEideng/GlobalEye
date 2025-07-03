@@ -1,6 +1,9 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { NewsArticle, fetchNews, cleanImageUrl } from '../utils/fetchNews';
+import OptimizedImage from '../components/OptimizedImage';
 
 // Helper function to generate slug (updated version)
 function generateSlug(title: string, url: string): string {
@@ -181,17 +184,14 @@ export default function CategoryClient({ category }: { category: string }) {
 
       {featuredArticle && (
         <article className="featured-article mb-6">
-          <div className="relative w-full h-56 sm:h-72 md:h-96 rounded-xl overflow-hidden mb-4">
-            <img
-              src={featuredArticle.urlToImage && featuredArticle.urlToImage !== 'null' && featuredArticle.urlToImage !== '' ? featuredArticle.urlToImage : '/placeholder-news.svg'}
+          <div className="relative w-full h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-lg">
+            <OptimizedImage
+              src={cleanImageUrl(featuredArticle.urlToImage) || '/placeholder-news.svg'}
               alt={featuredArticle.title}
-              className="featured-image object-cover w-full h-full"
-              style={{ objectFit: 'cover' }}
-              loading="eager"
-              onError={(e) => {
-                console.log(`DEBUG: Featured article image failed to load:`, featuredArticle.urlToImage);
-                e.currentTarget.src = '/placeholder-news.svg';
-              }}
+              fill
+              className="object-cover w-full h-full"
+              priority
+              sizes="100vw"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
           </div>
@@ -218,17 +218,13 @@ export default function CategoryClient({ category }: { category: string }) {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {restArticles.map((article, index) => (
                 <a key={index} href={`/article/${article.slug || generateSlug(article.title, article.url)}`} className="group block bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-200 overflow-hidden border border-gray-100 hover:-translate-y-1">
-                  <div className="relative w-full h-40 sm:h-48 md:h-56 overflow-hidden">
-                    <img
-                      src={article.urlToImage && article.urlToImage !== 'null' && article.urlToImage !== '' ? article.urlToImage : '/placeholder-news.svg'}
+                  <div className="relative w-full h-48 overflow-hidden">
+                    <OptimizedImage
+                      src={cleanImageUrl(article.urlToImage) || '/placeholder-news.svg'}
                       alt={article.title}
-                      className="w-full h-full object-cover rounded-t-xl group-hover:scale-105 transition-transform duration-300"
-                      style={{ objectFit: 'cover' }}
-                      loading={index === 0 ? "eager" : "lazy"}
-                      onError={(e) => {
-                        console.log(`DEBUG: Article image failed to load:`, article.urlToImage);
-                        e.currentTarget.src = '/placeholder-news.svg';
-                      }}
+                      fill
+                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                      sizes="100vw"
                     />
                   </div>
                   <div className="flex flex-col justify-between h-full p-4">

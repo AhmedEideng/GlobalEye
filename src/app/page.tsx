@@ -1,4 +1,3 @@
-import HomeHero from './components/HomeHero';
 import HomeFeatured from './components/HomeFeatured';
 import HomeNewsGrid from './components/HomeNewsGrid';
 import HomeTrending from './components/HomeTrending';
@@ -26,7 +25,6 @@ export default async function HomePage() {
 
   return (
     <main>
-      <HomeHero />
       {featuredArticle && <HomeFeatured article={featuredArticle} />}
       {articles.length > 0 && <HomeTrending articles={articles} />}
       {articles.length > 0 && <HomeMostRead articles={articles} />}

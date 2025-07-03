@@ -20,6 +20,23 @@ interface OptimizedImageProps {
 const BLUR_PLACEHOLDER =
   "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q==";
 
+// دالة لتنظيف رابط الصورة
+const cleanImageUrl = (url: string): string => {
+  if (!url) return '/placeholder-news.jpg';
+  
+  // إصلاح الروابط التي تبدأ بـ //
+  if (url.startsWith('//')) {
+    return 'https:' + url;
+  }
+  
+  // إصلاح الروابط التي تبدأ بـ http:// (تحويلها إلى https://)
+  if (url.startsWith('http://')) {
+    return url.replace('http://', 'https://');
+  }
+  
+  return url;
+};
+
 const OptimizedImage: React.FC<OptimizedImageProps> = ({ 
   src, 
   alt, 
@@ -35,6 +52,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   const [isLoading, setIsLoading] = useState(true);
 
   const handleError = () => {
+    console.warn(`Failed to load image: ${src}`);
     setHasError(true);
     setIsLoading(false);
   };
@@ -43,13 +61,17 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
     setIsLoading(false);
   };
 
-  const isExternal = /^https?:\/\//.test(src);
+  // تنظيف رابط الصورة
+  const cleanSrc = cleanImageUrl(src);
+  
+  const isExternal = /^https?:\/\//.test(cleanSrc);
   const proxiedSrc = useMemo(() => {
     if (isExternal) {
-      return `/api/image-proxy?url=${encodeURIComponent(src)}`;
+      return `/api/image-proxy?url=${encodeURIComponent(cleanSrc)}`;
     }
-    return src;
-  }, [src, isExternal]);
+    return cleanSrc;
+  }, [cleanSrc, isExternal]);
+  
   const imageSrc = hasError ? placeholder : proxiedSrc;
 
   if (fill) {

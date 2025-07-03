@@ -5,7 +5,7 @@ import { useState } from 'react';
 import AuthButtons from './AuthButtons';
 
 const categories = [
-  { name: 'home', path: '/', label: 'الرئيسية' },
+  { name: 'home', path: '/', label: 'Home' },
   { name: 'world', path: '/world', label: 'World' },
   { name: 'politics', path: '/politics', label: 'Politics' },
   { name: 'business', path: '/business', label: 'Business' },

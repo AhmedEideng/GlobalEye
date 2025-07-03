@@ -253,41 +253,51 @@ function hashCode(str: string): number {
 async function saveArticlesToSupabase(articles: NewsArticle[], category: string) {
   if (!articles.length) return;
   
-  // تجهيز البيانات لتتوافق مع الجدول
-  const mapped = articles.map(article => {
-    // التأكد من وجود slug، وإذا لم يكن موجوداً قم بتوليده
-    let finalSlug = article.slug;
-    if (!finalSlug || finalSlug === '' || finalSlug === 'null') {
-      finalSlug = generateSlug(article.title, article.url);
-      console.log("DEBUG: Generated new slug for:", article.title?.slice(0, 50), "->", finalSlug);
-    } else {
-      console.log("DEBUG: Using existing slug for:", article.title?.slice(0, 50), "->", finalSlug);
-    }
+  try {
+    // تجهيز البيانات لتتوافق مع الجدول
+    const mapped = articles.map(article => {
+      // التأكد من وجود slug، وإذا لم يكن موجوداً قم بتوليده
+      let finalSlug = article.slug;
+      if (!finalSlug || finalSlug === '' || finalSlug === 'null') {
+        finalSlug = generateSlug(article.title, article.url);
+        console.log("DEBUG: Generated new slug for:", article.title?.slice(0, 50), "->", finalSlug);
+      } else {
+        console.log("DEBUG: Using existing slug for:", article.title?.slice(0, 50), "->", finalSlug);
+      }
+      
+      // تنظيف رابط الصورة
+      let cleanImageUrl = article.urlToImage;
+      if (cleanImageUrl && cleanImageUrl.startsWith('//')) {
+        cleanImageUrl = 'https:' + cleanImageUrl;
+      }
+      
+      return {
+        title: article.title,
+        description: article.description,
+        url: article.url,
+        url_to_image: cleanImageUrl,
+        published_at: article.publishedAt ? new Date(article.publishedAt) : null,
+        content: article.content,
+        source_name: article.source.name,
+        source_id: article.source.id,
+        author: article.author,
+        slug: finalSlug,
+        category,
+      };
+    });
     
-    return {
-      title: article.title,
-      description: article.description,
-      url: article.url,
-      url_to_image: article.urlToImage,
-      published_at: article.publishedAt ? new Date(article.publishedAt) : null,
-      content: article.content,
-      source_name: article.source.name,
-      source_id: article.source.id,
-      author: article.author,
-      slug: finalSlug,
-      category,
-    };
-  });
-  
-  console.log("DEBUG: Saving articles to DB, articles with images:", mapped.filter(a => a.url_to_image).length, "out of", mapped.length);
-  
-  // إدخال الأخبار مع تجاهل المكررات بناءً على url
-  const { error } = await supabase.from('news').upsert(mapped, { onConflict: 'url' });
-  
-  if (error) {
-    console.error("DEBUG: Error saving articles to Supabase:", error);
-  } else {
-    console.log("DEBUG: Successfully saved", mapped.length, "articles to Supabase");
+    console.log("DEBUG: Saving articles to DB, articles with images:", mapped.filter(a => a.url_to_image).length, "out of", mapped.length);
+    
+    // إدخال الأخبار مع تجاهل المكررات بناءً على url
+    const { error } = await supabase.from('news').upsert(mapped, { onConflict: 'url' });
+    
+    if (error) {
+      console.error("DEBUG: Error saving articles to Supabase:", error.message || error);
+    } else {
+      console.log("DEBUG: Successfully saved", mapped.length, "articles to Supabase");
+    }
+  } catch (error) {
+    console.error("DEBUG: Exception in saveArticlesToSupabase:", error);
   }
 }
 
@@ -520,8 +530,6 @@ export function detectCategory(article: NewsArticle): string {
   return 'general';
 }
 
-
-
 // دالة محسنة لتحديث جميع الأخبار الموجودة مع slugs
 export async function updateAllArticlesWithSlugs() {
   console.log("DEBUG: Starting to update all articles with slugs...");
@@ -702,4 +710,21 @@ export async function improveSpecificSlug(articleId: string) {
     console.error("DEBUG: Error in improveSpecificSlug:", error);
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
+}
+
+// دالة مساعدة لتنظيف روابط الصور
+export function cleanImageUrl(url: string | null): string | null {
+  if (!url) return null;
+  
+  // إصلاح الروابط التي تبدأ بـ //
+  if (url.startsWith('//')) {
+    return 'https:' + url;
+  }
+  
+  // إصلاح الروابط التي تبدأ بـ http:// (تحويلها إلى https://)
+  if (url.startsWith('http://')) {
+    return url.replace('http://', 'https://');
+  }
+  
+  return url;
 } 

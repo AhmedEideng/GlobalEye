@@ -1,14 +1,17 @@
 import Link from "next/link";
-import { NewsArticle } from "../utils/fetchNews";
+import { NewsArticle, cleanImageUrl } from "../utils/fetchNews";
 import OptimizedImage from "./OptimizedImage";
 
 export default function HomeFeatured({ article }: { article: NewsArticle }) {
   if (!article) return null;
+  
+  const cleanImage = cleanImageUrl(article.urlToImage);
+  
   return (
     <section className="mb-10">
       <div className="relative w-full h-[320px] md:h-[420px] lg:h-[500px] rounded-2xl overflow-hidden shadow-lg">
         <OptimizedImage
-          src={article.urlToImage || "/placeholder-news.jpg"}
+          src={cleanImage || "/placeholder-news.jpg"}
           alt={article.title}
           fill
           className="object-cover w-full h-full"

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import OptimizedImage from './OptimizedImage';
 import { searchInArticles } from '../utils/searchUtils';
-import { NewsArticle } from '../utils/fetchNews';
+import { NewsArticle, cleanImageUrl } from '../utils/fetchNews';
 
 export default function SearchBar() {
   const [query, setQuery] = useState("");
@@ -127,13 +127,13 @@ export default function SearchBar() {
                 >
                   <div className="flex gap-4 items-center">
                     {article.urlToImage && (
-                      <div className="flex-shrink-0">
+                      <div className="relative w-16 h-16 flex-shrink-0">
                         <OptimizedImage
-                          src={article.urlToImage}
+                          src={cleanImageUrl(article.urlToImage) || '/placeholder-news.jpg'}
                           alt={article.title}
-                          width={48}
-                          height={40}
-                          className="w-12 h-10 object-cover rounded-lg"
+                          fill
+                          className="object-cover rounded"
+                          sizes="64px"
                         />
                       </div>
                     )}

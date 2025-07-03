@@ -3,6 +3,8 @@ import OptimizedImage from '../../components/OptimizedImage';
 import { NewsReactions } from '../../components/NewsReactions';
 import ShareButtons from '../../components/ShareButtons';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { fetchRelatedNews, cleanImageUrl } from '../../utils/fetchNews';
 
 export const revalidate = 120;
 
@@ -36,16 +38,15 @@ export default async function ArticlePage({ params }: any) {
     <article className="max-w-3xl mx-auto px-4 py-10">
       {/* Main Image */}
       {article.urlToImage && (
-        <div className="relative w-full h-[320px] md:h-[420px] lg:h-[500px] rounded-xl overflow-hidden mb-8">
+        <div className="relative w-full h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-lg mb-6">
           <OptimizedImage
-            src={article.urlToImage}
+            src={cleanImageUrl(article.urlToImage) || '/placeholder-news.jpg'}
             alt={article.title}
             fill
             className="object-cover w-full h-full"
             priority
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
         </div>
       )}
       {/* Title & Meta */}

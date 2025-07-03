@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import OptimizedImage from './OptimizedImage';
 import { searchInArticles, removeDuplicates, sortByRelevance } from '../utils/searchUtils';
-import { NewsArticle } from '../utils/fetchNews';
+import { NewsArticle, cleanImageUrl } from '../utils/fetchNews';
 
 interface SearchClientProps {
   query: string;
@@ -95,13 +95,15 @@ export default function SearchClient({ query }: SearchClientProps) {
         <div className="space-y-6">
           {articles.map((article, index) => (
             <Link key={index} href={`/article/${article.slug}`} className="block article-card transition-transform duration-200 hover:scale-105 focus:outline-none">
-              <OptimizedImage 
-                src={article.urlToImage || '/placeholder-news.jpg'} 
-                alt={article.title}
-                width={400}
-                height={200}
-                className="article-image"
-              />
+              <div className="relative w-full h-48 overflow-hidden">
+                <OptimizedImage
+                  src={cleanImageUrl(article.urlToImage) || '/placeholder-news.jpg'}
+                  alt={article.title}
+                  fill
+                  className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                  sizes="100vw"
+                />
+              </div>
               <div className="article-content">
                 <div className="article-category">Search Result</div>
                 <h3 className="article-title">{article.title}</h3>
