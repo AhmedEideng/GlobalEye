@@ -1,8 +1,9 @@
+import { fetchNews } from './utils/fetchNews';
+import { NewsArticle } from './utils/fetchNews';
 import HomeFeatured from './components/HomeFeatured';
-import HomeNewsGrid from './components/HomeNewsGrid';
 import HomeTrending from './components/HomeTrending';
 import HomeMostRead from './components/HomeMostRead';
-import { fetchNews, NewsArticle } from './utils/fetchNews';
+import HomeNewsGrid from './components/HomeNewsGrid';
 
 export const revalidate = 300;
 
@@ -15,12 +16,12 @@ export default async function HomePage() {
     const allArticles = await fetchNews();
     if (allArticles && allArticles.length > 0) {
       featuredArticle = allArticles[0];
-      articles = allArticles.slice(1, 20); // 20 خبر لاستخدامها في الأقسام
+      articles = allArticles.slice(1, 20); // 20 articles for sections
     } else {
-      error = 'لا توجد أخبار متاحة حالياً.';
+      error = 'No news available at the moment.';
     }
   } catch (err) {
-    error = 'حدث خطأ أثناء تحميل الأخبار.';
+    error = 'An error occurred while loading news.';
   }
 
   return (

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-interface SlugsStats {
+interface SlugStats {
   totalArticles: number;
   articlesWithSlugs: number;
   articlesWithoutSlugs: number;
@@ -10,176 +10,142 @@ interface SlugsStats {
   percentageWithSlugs: number;
 }
 
-export default function UpdateSlugsPage() {
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [isChecking, setIsChecking] = useState(false);
-  const [result, setResult] = useState<string>('');
-  const [stats, setStats] = useState<SlugsStats | null>(null);
-  const [details, setDetails] = useState<any>(null);
+interface UpdateResult {
+  success: boolean;
+  message: string;
+  details?: {
+    articlesNeedingSlugs: number;
+    articlesWithPoorSlugs: number;
+    totalUpdated: number;
+  };
+}
 
-  // فحص حالة slugs عند تحميل الصفحة
+export default function UpdateSlugsPage() {
+  const [stats, setStats] = useState<SlugStats | null>(null);
+  const [result, setResult] = useState<string>('');
+  const [loading, setLoading] = useState(false);
+
+  // Check slug status when page loads
   useEffect(() => {
-    checkSlugsStatus();
+    checkStatus();
   }, []);
 
-  const checkSlugsStatus = async () => {
-    setIsChecking(true);
-    setResult('جاري فحص حالة الروابط...');
-    
+  const checkStatus = async () => {
+    setLoading(true);
     try {
-      const response = await fetch('/api/update-slugs?action=check-status', {
-        method: 'GET',
-      });
-      
+      const response = await fetch('/api/update-slugs?action=check');
       const data = await response.json();
       
       if (data.success) {
         setStats(data.stats);
-        setResult('تم فحص حالة الروابط بنجاح! 📊');
+        setResult(`Status check completed. ${data.stats.percentageWithSlugs}% of articles have good slugs.`);
       } else {
-        setResult(`خطأ في فحص الحالة: ${data.error}`);
+        setResult(`Error checking status: ${data.error}`);
       }
     } catch (error) {
-      setResult(`خطأ في الاتصال: ${error}`);
+      setResult(`Connection error: ${error}`);
     } finally {
-      setIsChecking(false);
+      setLoading(false);
     }
   };
 
-  const handleUpdateSlugs = async () => {
-    setIsUpdating(true);
-    setResult('جاري تحديث الروابط...');
-    
+  const updateSlugs = async () => {
+    setLoading(true);
     try {
       const response = await fetch('/api/update-slugs', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ action: 'update' }),
       });
-      
-      const data = await response.json();
+      const data: UpdateResult = await response.json();
       
       if (data.success) {
-        setResult('تم تحديث الروابط بنجاح! 🎉');
-        setDetails(data.details);
-        // إعادة فحص الحالة بعد التحديث
-        setTimeout(() => {
-          checkSlugsStatus();
-        }, 1000);
+        setResult(`Success: ${data.message}`);
+        if (data.details) {
+          setResult(`Success: ${data.message}. Updated ${data.details.totalUpdated} articles (${data.details.articlesNeedingSlugs} needed slugs, ${data.details.articlesWithPoorSlugs} had poor slugs).`);
+        }
+        // Refresh stats after update
+        setTimeout(checkStatus, 1000);
       } else {
-        setResult(`خطأ: ${data.error}`);
+        setResult(`Error: ${data.error}`);
       }
     } catch (error) {
-      setResult(`خطأ في الاتصال: ${error}`);
+      setResult(`Connection error: ${error}`);
     } finally {
-      setIsUpdating(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="container mx-auto px-4 py-16">
-      <h1 className="text-3xl font-bold mb-8 text-center text-gray-900">إدارة روابط الأخبار</h1>
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <h1 className="text-3xl font-bold mb-8 text-center text-gray-900">News Links Management</h1>
       
-      {/* إحصائيات حالة slugs */}
+      {/* Status Cards */}
       {stats && (
-        <div className="max-w-4xl mx-auto mb-8 bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-4 text-gray-800">إحصائيات الروابط</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-blue-50 p-4 rounded-lg text-center">
-              <div className="text-2xl font-bold text-blue-600">{stats.totalArticles}</div>
-              <div className="text-sm text-blue-800">إجمالي الأخبار</div>
-            </div>
-            <div className="bg-green-50 p-4 rounded-lg text-center">
-              <div className="text-2xl font-bold text-green-600">{stats.articlesWithSlugs}</div>
-              <div className="text-sm text-green-800">أخبار بروابط جيدة</div>
-            </div>
-            <div className="bg-red-50 p-4 rounded-lg text-center">
-              <div className="text-2xl font-bold text-red-600">{stats.articlesWithoutSlugs}</div>
-              <div className="text-sm text-red-800">أخبار بدون روابط</div>
-            </div>
-            <div className="bg-yellow-50 p-4 rounded-lg text-center">
-              <div className="text-2xl font-bold text-yellow-600">{stats.articlesWithPoorSlugs}</div>
-              <div className="text-sm text-yellow-800">روابط تحتاج تحسين</div>
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+            <div className="text-2xl font-bold text-blue-600">{stats.totalArticles}</div>
+            <div className="text-sm text-blue-800">Total Articles</div>
           </div>
-          <div className="mt-4 text-center">
-            <div className="text-lg font-semibold text-gray-700">
-              نسبة الأخبار بروابط جيدة: {stats.percentageWithSlugs}%
-            </div>
+          <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+            <div className="text-2xl font-bold text-green-600">{stats.articlesWithSlugs}</div>
+            <div className="text-sm text-green-800">Articles with Good Links</div>
+          </div>
+          <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+            <div className="text-2xl font-bold text-red-600">{stats.articlesWithoutSlugs}</div>
+            <div className="text-sm text-red-800">Articles without Links</div>
+          </div>
+          <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+            <div className="text-2xl font-bold text-yellow-600">{stats.percentageWithSlugs}%</div>
+            <div className="text-sm text-yellow-800">Percentage with Good Links</div>
           </div>
         </div>
       )}
 
-      {/* تفاصيل التحديث الأخير */}
-      {details && (
-        <div className="max-w-4xl mx-auto mb-8 bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-4 text-gray-800">تفاصيل آخر تحديث</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-blue-50 p-3 rounded-lg text-center">
-              <div className="text-lg font-bold text-blue-600">{details.articlesNeedingSlugs}</div>
-              <div className="text-sm text-blue-800">أخبار بدون روابط</div>
-            </div>
-            <div className="bg-yellow-50 p-3 rounded-lg text-center">
-              <div className="text-lg font-bold text-yellow-600">{details.articlesWithPoorSlugs}</div>
-              <div className="text-sm text-yellow-800">روابط محسنة</div>
-            </div>
-            <div className="bg-green-50 p-3 rounded-lg text-center">
-              <div className="text-lg font-bold text-green-600">{details.totalUpdated}</div>
-              <div className="text-sm text-green-800">إجمالي المحدثة</div>
-            </div>
-          </div>
+      {/* Action Buttons */}
+      <div className="flex flex-col sm:flex-row gap-4 mb-8">
+        <button
+          onClick={checkStatus}
+          disabled={loading}
+          className="btn btn-secondary flex-1"
+        >
+          {loading ? 'Checking...' : 'Check Status'}
+        </button>
+        <button
+          onClick={updateSlugs}
+          disabled={loading}
+          className="btn btn-primary flex-1"
+        >
+          {loading ? 'Updating...' : 'Update All Links'}
+        </button>
+      </div>
+
+      {/* Result Display */}
+      {result && (
+        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-8">
+          <h3 className="font-semibold mb-2">Operation Result:</h3>
+          <p className="text-gray-700">{result}</p>
         </div>
       )}
-      
-      {/* أزرار التحكم */}
-      <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
-        <p className="text-gray-600 mb-6 text-center">
-          هذا النظام سيقوم بتوليد وتحسين روابط (slugs) لجميع الأخبار الموجودة في قاعدة البيانات
+
+      {/* Information */}
+      <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
+        <h3 className="text-lg font-semibold mb-3 text-blue-800">About This System</h3>
+        <p className="text-blue-700 mb-4">
+          This system will generate and improve links (slugs) for all existing articles in the database.
+          This ensures that all news articles have proper, SEO-friendly URLs.
         </p>
-        
-        <div className="space-y-4">
-          <button
-            onClick={checkSlugsStatus}
-            disabled={isChecking}
-            className={`w-full py-3 px-6 rounded-lg font-semibold transition-colors ${
-              isChecking
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700 text-white'
-            }`}
-          >
-            {isChecking ? 'جاري الفحص...' : 'فحص حالة الروابط'}
-          </button>
-          
-          <button
-            onClick={handleUpdateSlugs}
-            disabled={isUpdating}
-            className={`w-full py-3 px-6 rounded-lg font-semibold transition-colors ${
-              isUpdating
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-red-600 hover:bg-red-700 text-white'
-            }`}
-          >
-            {isUpdating ? 'جاري التحديث...' : 'تحديث جميع الروابط'}
-          </button>
+        <div className="space-y-2 text-sm text-blue-600">
+          <p>• <strong>Check Status:</strong> Shows current statistics about article links</p>
+          <p>• <strong>Update All Links:</strong> Generates missing links and improves existing ones</p>
+          <p>• <strong>Safe Operation:</strong> This process is safe and won't affect existing content</p>
         </div>
-        
-        {result && (
-          <div className={`mt-4 p-3 rounded-lg ${
-            result.includes('نجح') || result.includes('تم')
-              ? 'bg-green-100 text-green-800' 
-              : 'bg-red-100 text-red-800'
-          }`}>
-            {result}
-          </div>
-        )}
-      </div>
-      
-      <div className="mt-8 text-sm text-gray-500 text-center">
-        <p>بعد التحديث، ستتمكن من فتح جميع الأخبار بشكل صحيح</p>
-        <p className="mt-2">
-          <a href="/world" className="text-red-600 hover:underline">العودة لأخبار العالم</a>
-        </p>
+        <div className="mt-4 pt-4 border-t border-blue-200">
+          <p>After the update, you will be able to open all articles correctly</p>
+          <a href="/world" className="text-red-600 hover:underline">Return to World News</a>
+        </div>
       </div>
     </div>
   );

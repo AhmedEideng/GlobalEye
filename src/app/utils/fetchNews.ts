@@ -65,9 +65,8 @@ interface MediastackArticle {
   published_at?: string;
 }
 
-// نوع يمثل صف الأخبار من قاعدة البيانات
+// Type representing a news row from the database
 interface NewsRow {
-  source_id: string | null;
   source_name: string;
   author: string | null;
   title: string;
@@ -207,33 +206,33 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | null> {
   ]);
 }
 
-// دالة محسنة لتوليد slug من العنوان أو الرابط
+// Enhanced function to generate slug from title or URL
 function generateSlug(title: string, url: string): string {
-  // تنظيف العنوان وإزالة الأحرف الخاصة
+  // Clean title and remove special characters
   if (title && title.trim()) {
     let cleanTitle = title
       .toLowerCase()
       .trim()
-      // إزالة الأحرف العربية والأحرف الخاصة
+      // Remove special characters
       .replace(/[^\w\s-]/g, '')
-      // استبدال المسافات والشرطات المتعددة بشرطة واحدة
+      // Replace multiple spaces and dashes with single dash
       .replace(/[\s\-]+/g, '-')
-      // إزالة الشرطات من البداية والنهاية
+      // Remove dashes from start and end
       .replace(/^-+|-+$/g, '')
-      // تحديد الطول الأقصى
+      // Limit maximum length
       .slice(0, 50);
     
-    // إذا كان العنوان فارغاً بعد التنظيف، استخدم hash من URL
+    // If title is empty after cleaning, use hash from URL
     if (!cleanTitle) {
       return `article-${Math.abs(hashCode(url)).toString()}`;
     }
     
-    // إضافة hash من URL لضمان التفرد
+    // Add hash from URL to ensure uniqueness
     const urlHash = Math.abs(hashCode(url)).toString().slice(0, 8);
     return `${cleanTitle}-${urlHash}`;
   }
   
-  // إذا لم يكن هناك عنوان، استخدم hash من URL
+  // If no title, use hash from URL
   return `article-${Math.abs(hashCode(url)).toString()}`;
 }
 
@@ -249,14 +248,14 @@ function hashCode(str: string): number {
   return hash;
 }
 
-// دالة محسنة لحفظ الأخبار في Supabase
+// Enhanced function to save articles to Supabase
 async function saveArticlesToSupabase(articles: NewsArticle[], category: string) {
   if (!articles.length) return;
   
   try {
-    // تجهيز البيانات لتتوافق مع الجدول
-    const mapped = articles.map(article => {
-      // التأكد من وجود slug، وإذا لم يكن موجوداً قم بتوليده
+  // Prepare data to match the table structure
+  const mapped = articles.map(article => {
+      // Ensure slug exists, if not generate it
       let finalSlug = article.slug;
       if (!finalSlug || finalSlug === '' || finalSlug === 'null') {
         finalSlug = generateSlug(article.title, article.url);
@@ -265,30 +264,29 @@ async function saveArticlesToSupabase(articles: NewsArticle[], category: string)
         console.log("DEBUG: Using existing slug for:", article.title?.slice(0, 50), "->", finalSlug);
       }
       
-      // تنظيف رابط الصورة
+      // Clean image URL
       let cleanImageUrl = article.urlToImage;
       if (cleanImageUrl && cleanImageUrl.startsWith('//')) {
         cleanImageUrl = 'https:' + cleanImageUrl;
       }
       
-      return {
-        title: article.title,
-        description: article.description,
-        url: article.url,
+    return {
+    title: article.title,
+    description: article.description,
+    url: article.url,
         url_to_image: cleanImageUrl,
-        published_at: article.publishedAt ? new Date(article.publishedAt) : null,
-        content: article.content,
-        source_name: article.source.name,
-        source_id: article.source.id,
-        author: article.author,
+    published_at: article.publishedAt ? new Date(article.publishedAt) : null,
+    content: article.content,
+    source_name: article.source.name,
+    author: article.author,
         slug: finalSlug,
-        category,
-      };
-    });
+    category,
+    };
+  });
     
-    console.log("DEBUG: Saving articles to DB, articles with images:", mapped.filter(a => a.url_to_image).length, "out of", mapped.length);
+  console.log("DEBUG: Saving articles to DB, articles with images:", mapped.filter(a => a.url_to_image).length, "out of", mapped.length);
     
-    // إدخال الأخبار مع تجاهل المكررات بناءً على url
+  // Insert articles while ignoring duplicates based on url
     const { error } = await supabase.from('news').upsert(mapped, { onConflict: 'url' });
     
     if (error) {
@@ -315,7 +313,7 @@ export async function fetchNews(category: string = 'general'): Promise<NewsArtic
   // If we have recent news in the DB, return it
   if (!error && dbArticles && dbArticles.length > 0) {
     const mappedArticles = dbArticles.map((article: NewsRow) => ({
-      source: { id: article.source_id, name: article.source_name },
+      source: { id: null, name: article.source_name },
       author: article.author,
       title: article.title,
       description: article.description,
@@ -363,7 +361,7 @@ export async function fetchNews(category: string = 'general'): Promise<NewsArtic
   console.log(`DEBUG: Total unique articles for ${category}:`, unique.length);
   console.log(`DEBUG: Articles with images for ${category}:`, unique.filter(a => a.urlToImage).length);
   
-  // حفظ الأخبار في Supabase مع category
+  // Save articles to Supabase with category
   if (unique.length > 0) {
   await saveArticlesToSupabase(unique, category);
   }
@@ -452,7 +450,7 @@ export async function getArticleBySlug(slug: string): Promise<NewsArticle | null
       console.log("DEBUG: Found articles with partial slug match:", partialData.length);
       const article = partialData[0];
       return {
-        source: { id: article.source_id, name: article.source_name },
+        source: { id: null, name: article.source_name },
         author: article.author,
         title: article.title,
         description: article.description,
@@ -478,7 +476,7 @@ export async function getArticleBySlug(slug: string): Promise<NewsArticle | null
       console.log("DEBUG: Found articles with title search:", titleData.length);
       const article = titleData[0];
       return {
-        source: { id: article.source_id, name: article.source_name },
+        source: { id: null, name: article.source_name },
         author: article.author,
         title: article.title,
         description: article.description,
@@ -530,11 +528,11 @@ export function detectCategory(article: NewsArticle): string {
   return 'general';
 }
 
-// دالة محسنة لتحديث جميع الأخبار الموجودة مع slugs
+// Enhanced function to update all existing articles with slugs
 export async function updateAllArticlesWithSlugs() {
   console.log("DEBUG: Starting to update all articles with slugs...");
   try {
-    // جلب جميع الأخبار من قاعدة البيانات
+    // Fetch all articles from database
     const { data: allArticles, error: fetchError } = await supabase
       .from('news')
       .select('*')
@@ -552,22 +550,22 @@ export async function updateAllArticlesWithSlugs() {
     
     console.log(`DEBUG: Found ${allArticles.length} articles in database`);
     
-    // تصفية الأخبار التي تحتاج إلى تحديث slugs
+    // Filter articles that need slug updates
     const articlesNeedingSlugs = allArticles.filter(article => 
       !article.slug || 
       article.slug === '' || 
       article.slug === 'null' ||
-      article.slug.length < 5 // slugs قصيرة جداً قد تكون غير صحيحة
+      article.slug.length < 5 // Very short slugs might be incorrect
     );
     
-    // أيضاً نتحقق من slugs التي قد تحتاج إلى تحسين
+    // Also check for slugs that might need improvement
     const articlesWithPoorSlugs = allArticles.filter(article => 
       article.slug && 
       article.slug !== '' && 
       article.slug !== 'null' &&
       (article.slug.includes('undefined') || 
        article.slug.includes('null') ||
-       article.slug.length > 100) // slugs طويلة جداً
+       article.slug.length > 100) // Very long slugs
     );
     
     const allArticlesToUpdate = [...articlesNeedingSlugs, ...articlesWithPoorSlugs];
@@ -581,7 +579,7 @@ export async function updateAllArticlesWithSlugs() {
     console.log(`DEBUG: Found ${articlesWithPoorSlugs.length} articles with poor slugs`);
     console.log(`DEBUG: Total articles to update: ${allArticlesToUpdate.length}`);
     
-    // تحديث كل خبر مع slug محسن
+    // Update each article with improved slug
     const updates = allArticlesToUpdate.map(article => {
       const newSlug = generateSlug(article.title, article.url);
       console.log(`DEBUG: Generating slug for "${article.title?.slice(0, 50)}..." -> ${newSlug}`);
@@ -592,7 +590,7 @@ export async function updateAllArticlesWithSlugs() {
       };
     });
     
-    // تحديث قاعدة البيانات
+    // Update database
     const { error: updateError } = await supabase
       .from('news')
       .upsert(updates, { onConflict: 'id' });
@@ -619,7 +617,7 @@ export async function updateAllArticlesWithSlugs() {
   }
 }
 
-// دالة لفحص حالة slugs في قاعدة البيانات
+// Function to check slug status in database
 export async function checkSlugsStatus() {
   console.log("DEBUG: Checking slugs status in database...");
   try {
@@ -671,7 +669,7 @@ export async function checkSlugsStatus() {
   }
 }
 
-// دالة لتحسين slug محدد
+// Function to improve specific slug
 export async function improveSpecificSlug(articleId: string) {
   console.log("DEBUG: Improving slug for article ID:", articleId);
   try {
