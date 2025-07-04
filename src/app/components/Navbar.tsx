@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from "../utils/supabaseClient";
 
 type User = { email?: string };
@@ -23,6 +23,8 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -44,18 +46,45 @@ export default function Navbar() {
     };
   }, []);
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    setDropdownOpen(false);
-    setUser(null);
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true);
+    try {
+      await supabase.auth.signInWithOAuth({ provider: 'google' });
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  const handleSignOut = async () => {
+    setIsLoading(true);
+    try {
+      await supabase.auth.signOut();
+      setDropdownOpen(false);
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [dropdownOpen]);
 
   return (
     <div className="navbar-container flex items-center justify-between py-2 px-4 bg-white fixed top-0 left-0 w-full z-50 shadow-md">
       {/* زر تسجيل الدخول وزر القائمة يمين */}
       <div className="flex-1 flex justify-end gap-2 md:hidden">
-        <div className="relative">
-          <button className="login-btn-circle-red login-btn-signedin" onClick={() => setDropdownOpen(v => !v)}>Sign out</button>
+        <div className="relative" ref={dropdownRef}>
+          <button className="login-btn-circle-red login-btn-signedin" onClick={() => setDropdownOpen(v => !v)} disabled={isLoading}>
+            {isLoading ? 'Signing out...' : 'Sign out'}
+          </button>
           {dropdownOpen && (
             <div className="dropdown-auth-menu">
               <div className="dropdown-auth-email">{user?.email}</div>
@@ -99,8 +128,10 @@ export default function Navbar() {
         ))}
       </ul>
       <div className="ml-4 hidden md:flex">
-        <div className="relative">
-          <button className="login-btn-circle-red login-btn-signedin" onClick={() => setDropdownOpen(v => !v)}>Sign out</button>
+        <div className="relative" ref={dropdownRef}>
+          <button className="login-btn-circle-red login-btn-signedin" onClick={() => setDropdownOpen(v => !v)} disabled={isLoading}>
+            {isLoading ? 'Signing out...' : 'Sign out'}
+          </button>
           {dropdownOpen && (
             <div className="dropdown-auth-menu">
               <div className="dropdown-auth-email">{user?.email}</div>
@@ -130,8 +161,10 @@ export default function Navbar() {
               ))}
             </ul>
             <div className="mt-4">
-              <div className="relative">
-                <button className="login-btn-circle-red login-btn-signedin" onClick={() => setDropdownOpen(v => !v)}>Sign out</button>
+              <div className="relative" ref={dropdownRef}>
+                <button className="login-btn-circle-red login-btn-signedin" onClick={() => setDropdownOpen(v => !v)} disabled={isLoading}>
+                  {isLoading ? 'Signing out...' : 'Sign out'}
+                </button>
                 {dropdownOpen && (
                   <div className="dropdown-auth-menu">
                     <div className="dropdown-auth-email">{user?.email}</div>
