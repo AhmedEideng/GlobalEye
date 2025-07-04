@@ -25,7 +25,17 @@ export default function ShareButtons({ url, title }: { url: string, title: strin
       </a>
       {/* X (Twitter) */}
       <a href={`https://x.com/intent/tweet?url=${encodeURIComponent(fullUrl)}&text=${encodeURIComponent(title)}`} target="_blank" rel="noopener noreferrer" title="Share on X">
-        <svg className="w-7 h-7 text-black" fill="currentColor" viewBox="0 0 24 24"><path d="M17.53 2.477c2.366 0 4.287 1.92 4.287 4.287 0 2.366-1.92 4.287-4.287 4.287-2.366 0-4.287-1.92-4.287-4.287 0-2.366 1.92-4.287 4.287-4.287zm0 1.143c-1.734 0-3.144 1.41-3.144 3.144 0 1.734 1.41 3.144 3.144 3.144 1.734 0 3.144-1.41 3.144-3.144 0-1.734-1.41-3.144-3.144-3.144zm-7.53 2.38c.41 0 .744.334.744.744v13.49c0 .41-.334.744-.744.744s-.744-.334-.744-.744V6.744c0-.41.334-.744.744-.744zm-2.477 2.477c.41 0 .744.334.744.744v8.536c0 .41-.334.744-.744.744s-.744-.334-.744-.744v-8.536c0-.41.334-.744.744-.744zm-2.477 2.477c.41 0 .744.334.744.744v3.582c0 .41-.334.744-.744.744s-.744-.334-.744-.744v-3.582c0-.41.334-.744.744-.744zm15.53 2.477c.41 0 .744.334.744.744v3.582c0 .41-.334.744-.744.744s-.744-.334-.744-.744v-3.582c0-.41.334-.744.744-.744zm-2.477 2.477c.41 0 .744.334.744.744v1.105c0 .41-.334.744-.744.744s-.744-.334-.744-.744v-1.105c0-.41.334-.744.744-.744zm-2.477 2.477c.41 0 .744.334.744.744v.37c0 .41-.334.744-.744.744s-.744-.334-.744-.744v-.37c0-.41.334-.744.744-.744z"/></svg>
+        <svg className="w-7 h-7 text-black" viewBox="0 0 1200 1227" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g clipPath="url(#clip0_87_390)">
+            <rect width="1200" height="1227" fill="white"/>
+            <path d="M908.305 0H1090.7L704.305 521.49L1152 1227H797.305L523.305 813.49L211.305 1227H28.3052L438.305 667.49L0 0H364.305L610.305 375.49L908.305 0ZM845.305 1105H945.305L308.305 114H203.305L845.305 1105Z" fill="black"/>
+          </g>
+          <defs>
+            <clipPath id="clip0_87_390">
+              <rect width="1200" height="1227" fill="white"/>
+            </clipPath>
+          </defs>
+        </svg>
       </a>
       {/* Instagram */}
       <a href={`https://www.instagram.com/?url=${encodeURIComponent(fullUrl)}`} target="_blank" rel="noopener noreferrer" title="Share on Instagram">

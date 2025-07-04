@@ -548,3 +548,12 @@ html, body {
   max-width: 100vw;
   overflow-x: hidden;
 }
+
+.text-gradient-eye {
+  background: linear-gradient(90deg, #dc2626 0%, #f59e42 60%, #ffd600 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+  font-weight: bold;
+}
