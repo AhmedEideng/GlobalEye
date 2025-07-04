@@ -3,8 +3,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from 'react';
 
-type User = { email?: string };
-
 const categories = [
   { name: 'home', path: '/', label: 'Home' },
   { name: 'world', path: '/world', label: 'World' },
