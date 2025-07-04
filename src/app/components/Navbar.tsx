@@ -47,6 +47,7 @@ export default function Navbar() {
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     setDropdownOpen(false);
+    setUser(null);
   };
 
   return (
@@ -65,7 +66,7 @@ export default function Navbar() {
       </div>
       {/* اسم الموقع وسط */}
       <div className="flex-1 flex justify-center md:hidden">
-        <Link href="/" className="site-logo flex items-center text-2xl font-extrabold select-none bg-gradient-to-r from-red-600 via-yellow-500 to-red-700 bg-clip-text text-transparent tracking-tight drop-shadow-lg">
+        <Link href="/" className="site-logo flex items-center text-2xl font-extrabold select-none text-red-600 tracking-tight drop-shadow-lg">
           <svg className="w-7 h-7 mr-1" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="url(#paint0_linear)"/><defs><linearGradient id="paint0_linear" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse"><stop stop-color="#dc2626"/><stop offset="1" stop-color="#f59e42"/></linearGradient></defs></svg>
           Global<span className="text-red-600">Eye</span>
         </Link>
@@ -80,7 +81,7 @@ export default function Navbar() {
       </div>
       {/* الشعار والدخول في الديسكتوب */}
       <div className="hidden md:flex flex-1 justify-start">
-        <Link href="/" className="site-logo flex items-center text-3xl font-extrabold select-none bg-gradient-to-r from-red-600 via-yellow-500 to-red-700 bg-clip-text text-transparent tracking-tight drop-shadow-lg">
+        <Link href="/" className="site-logo flex items-center text-3xl font-extrabold select-none text-red-600 tracking-tight drop-shadow-lg">
           <svg className="w-8 h-8 mr-2" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="url(#paint0_linear)"/><defs><linearGradient id="paint0_linear" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse"><stop stop-color="#dc2626"/><stop offset="1" stop-color="#f59e42"/></linearGradient></defs></svg>
           <span className="text-red-600">Global</span><span className="text-gradient-eye">Eye</span>
         </Link>
