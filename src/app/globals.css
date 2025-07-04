@@ -468,6 +468,26 @@
   .footer-section a:hover {
     color: var(--cnn-white);
   }
+
+  .login-btn-circle {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #fff 60%, #f9fafb 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid #f59e42;
+    box-shadow: 0 2px 8px 0 rgba(220,38,38,0.08);
+    transition: box-shadow 0.2s, border 0.2s;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .login-btn-circle:hover {
+    box-shadow: 0 4px 16px 0 rgba(220,38,38,0.18);
+    border: 1.5px solid #dc2626;
+  }
 }
 
 /* --- Utilities Layer --- */
