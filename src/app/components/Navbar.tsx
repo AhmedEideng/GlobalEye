@@ -23,9 +23,7 @@ export default function Navbar() {
     <div className="navbar-container flex items-center justify-between py-2 px-4 bg-white fixed top-0 left-0 w-full z-50 shadow-md">
       {/* زر تسجيل الدخول يمين */}
       <div className="flex-1 flex justify-end md:hidden">
-        <button className="login-btn-circle" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-          <svg className="w-6 h-6" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="url(#paint0_linear)"/><defs><linearGradient id="paint0_linear" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse"><stop stop-color="#dc2626"/><stop offset="1" stop-color="#f59e42"/></linearGradient></defs></svg>
-        </button>
+        <button className="login-btn-circle-red">sign in</button>
       </div>
       {/* اسم الموقع وسط */}
       <div className="flex-1 flex justify-center md:hidden">
@@ -62,9 +60,7 @@ export default function Navbar() {
         ))}
       </ul>
       <div className="ml-4 hidden md:flex">
-        <button className="login-btn-circle" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-          <svg className="w-6 h-6" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="url(#paint0_linear)"/><defs><linearGradient id="paint0_linear" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse"><stop stop-color="#dc2626"/><stop offset="1" stop-color="#f59e42"/></linearGradient></defs></svg>
-        </button>
+        <button className="login-btn-circle-red">sign in</button>
       </div>
       {/* Mobile sidebar */}
       {isMenuOpen && (
@@ -87,9 +83,7 @@ export default function Navbar() {
               ))}
             </ul>
             <div className="mt-4">
-              <button className="login-btn-circle" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                <svg className="w-6 h-6" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="url(#paint0_linear)"/><defs><linearGradient id="paint0_linear" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse"><stop stop-color="#dc2626"/><stop offset="1" stop-color="#f59e42"/></linearGradient></defs></svg>
-              </button>
+              <button className="login-btn-circle-red">sign in</button>
             </div>
           </div>
         </div>
