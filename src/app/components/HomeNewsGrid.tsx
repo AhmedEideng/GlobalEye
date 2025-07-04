@@ -2,7 +2,6 @@
 import Link from "next/link";
 import { NewsArticle, cleanImageUrl } from "../utils/fetchNews";
 import OptimizedImage from "./OptimizedImage";
-import { useState } from 'react';
 
 export default function HomeNewsGrid({ articles }: { articles: NewsArticle[] }) {
   if (!articles?.length) return null;

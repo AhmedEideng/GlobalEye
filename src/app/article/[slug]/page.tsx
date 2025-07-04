@@ -2,7 +2,6 @@ import { getArticleBySlug, NewsArticle } from '../../utils/fetchNews';
 import OptimizedImage from '../../components/OptimizedImage';
 import Link from 'next/link';
 import { fetchRelatedNews, cleanImageUrl, detectCategory } from '../../utils/fetchNews';
-import { useState } from 'react';
 import ShareButtons from '../../components/ShareButtons';
 
 export const revalidate = 120;
