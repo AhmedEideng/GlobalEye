@@ -20,16 +20,16 @@ interface OptimizedImageProps {
 const BLUR_PLACEHOLDER =
   "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q==";
 
-// دالة لتنظيف رابط الصورة
+// Function to clean the image URL
 const cleanImageUrl = (url: string): string => {
   if (!url) return '/placeholder-news.jpg';
   
-  // إصلاح الروابط التي تبدأ بـ //
+  // Fix URLs that start with //
   if (url.startsWith('//')) {
     return 'https:' + url;
   }
   
-  // إصلاح الروابط التي تبدأ بـ http:// (تحويلها إلى https://)
+  // Fix URLs that start with http:// (convert to https://)
   if (url.startsWith('http://')) {
     return url.replace('http://', 'https://');
   }
@@ -61,7 +61,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
     setIsLoading(false);
   };
 
-  // تنظيف رابط الصورة
+  // Clean the image URL
   const cleanSrc = cleanImageUrl(src);
   
   const isExternal = /^https?:\/\//.test(cleanSrc);

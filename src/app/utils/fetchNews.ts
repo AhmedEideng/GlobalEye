@@ -236,7 +236,7 @@ function generateSlug(title: string, url: string): string {
   return `article-${Math.abs(hashCode(url)).toString()}`;
 }
 
-// دالة hash بسيطة
+// Simple hash function
 function hashCode(str: string): number {
   let hash = 0, i, chr;
   if (str.length === 0) return hash;
@@ -713,16 +713,16 @@ export async function improveSpecificSlug(articleId: string) {
   }
 }
 
-// دالة مساعدة لتنظيف روابط الصور
+// Helper function to clean image URLs
 export function cleanImageUrl(url: string | null): string | null {
   if (!url) return null;
   
-  // إصلاح الروابط التي تبدأ بـ //
+  // Fix URLs that start with //
   if (url.startsWith('//')) {
     return 'https:' + url;
   }
   
-  // إصلاح الروابط التي تبدأ بـ http:// (تحويلها إلى https://)
+  // Fix URLs that start with http:// (convert to https://)
   if (url.startsWith('http://')) {
     return url.replace('http://', 'https://');
   }

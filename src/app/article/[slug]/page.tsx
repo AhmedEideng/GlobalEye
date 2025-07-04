@@ -1,7 +1,5 @@
 import { getArticleBySlug, NewsArticle } from '../../utils/fetchNews';
 import OptimizedImage from '../../components/OptimizedImage';
-import { NewsReactions } from '../../components/NewsReactions';
-import ShareButtons from '../../components/ShareButtons';
 import Link from 'next/link';
 import { fetchRelatedNews, cleanImageUrl, detectCategory } from '../../utils/fetchNews';
 
@@ -77,10 +75,6 @@ export default async function ArticlePage({ params }: { params: Promise<Record<s
           Read on the official website
         </a>
       </div>
-      {/* Share Buttons */}
-      <ShareButtons title={article.title} url={`/article/${article.slug}`} />
-      {/* Reactions */}
-      <NewsReactions articleUrl={article.url} />
 
       {/* Related News Section */}
       <RelatedNewsSection article={article} />

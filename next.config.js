@@ -43,14 +43,14 @@ module.exports = withPWA({
     optimizeCss: true,
     optimizePackageImports: ['react-icons'],
   },
-  // تحسين الأداء
+  // Performance improvement
   compress: true,
   poweredByHeader: false,
   generateEtags: true,
-  // تحسين التخزين المؤقت
+  // Improve caching
   onDemandEntries: {
     maxInactiveAge: 25 * 1000,
     pagesBufferLength: 2,
   },
-  // يمكنك إضافة إعدادات Next.js هنا
+  // You can add Next.js settings here
 }); 

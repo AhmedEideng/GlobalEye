@@ -5,31 +5,31 @@ import OptimizedImage from '../components/OptimizedImage';
 
 // Helper function to generate slug (updated version)
 function generateSlug(title: string, url: string): string {
-  // تنظيف العنوان وإزالة الأحرف الخاصة
+  // Clean the title and remove special characters
   if (title && title.trim()) {
     const cleanTitle = title
       .toLowerCase()
       .trim()
-      // إزالة الأحرف العربية والأحرف الخاصة
+      // Remove Arabic characters and special characters
       .replace(/[^\w\s-]/g, '')
-      // استبدال المسافات والشرطات المتعددة بشرطة واحدة
+      // Replace multiple spaces and dashes with a single dash
       .replace(/[\s\-]+/g, '-')
-      // إزالة الشرطات من البداية والنهاية
+      // Remove dashes from the beginning and end
       .replace(/^-+|-+$/g, '')
-      // تحديد الطول الأقصى
+      // Set the maximum length
       .slice(0, 50);
     
-    // إذا كان العنوان فارغاً بعد التنظيف، استخدم hash من URL
+    // If the title is empty after cleaning, use hash from URL
     if (!cleanTitle) {
       return `article-${Math.abs(hashCode(url)).toString()}`;
     }
     
-    // إضافة hash من URL لضمان التفرد
+    // Add hash from URL to ensure uniqueness
     const urlHash = Math.abs(hashCode(url)).toString().slice(0, 8);
     return `${cleanTitle}-${urlHash}`;
   }
   
-  // إذا لم يكن هناك عنوان، استخدم hash من URL
+  // If there is no title, use hash from URL
   return `article-${Math.abs(hashCode(url)).toString()}`;
 }
 

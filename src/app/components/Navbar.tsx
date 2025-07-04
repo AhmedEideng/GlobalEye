@@ -22,12 +22,12 @@ export default function Navbar() {
 
   return (
     <div className="navbar-container flex items-center justify-between py-2 px-4 bg-white sticky top-0 z-40">
-      {/* شعار الموقع */}
+      {/* Website logo */}
       <Link href="/" className="flex items-center text-2xl font-bold mr-6 select-none">
         <span className="text-black">Global</span><span className="text-red-600">Eye</span>
       </Link>
-      {/* أزرار الأقسام */}
-      <ul className="nav-menu hidden md:flex gap-2 items-center rounded-full px-2 py-1 overflow-x-auto max-w-full">
+      {/* Section buttons */}
+      <ul className="nav-menu hidden md:flex gap-2 items-center rounded-full px-2 py-1 overflow-x-hidden max-w-full">
         {categories.map((category) => (
           <li key={category.name} className="nav-item">
             <Link
@@ -39,11 +39,11 @@ export default function Navbar() {
           </li>
         ))}
       </ul>
-      {/* زر تسجيل الدخول */}
+      {/* Login button */}
       <div className="ml-4">
         <AuthButtons />
       </div>
-      {/* زر القائمة للجوال */}
+      {/* Mobile menu button */}
       <button
         className="mobile-menu-btn ml-2 md:hidden"
         onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -53,10 +53,10 @@ export default function Navbar() {
         <span className="block w-6 h-0.5 bg-gray-800 mb-1"></span>
         <span className="block w-6 h-0.5 bg-gray-800"></span>
       </button>
-      {/* القائمة الجانبية للجوال */}
+      {/* Mobile sidebar */}
       {isMenuOpen && (
-        <div className="mobile-nav fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50 flex justify-end">
-          <div className="bg-white w-64 h-full p-6 flex flex-col gap-4">
+        <div className="mobile-nav fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50 flex justify-start">
+          <div className="bg-white w-64 h-full p-6 flex flex-col gap-4 shadow-lg rounded-r-2xl">
             <Link href="/" className="flex items-center text-2xl font-bold mb-6 select-none" onClick={() => setIsMenuOpen(false)}>
               <span className="text-black">Global</span><span className="text-red-600">Eye</span>
             </Link>

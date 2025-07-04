@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 
-// تعريف مؤقت لنوع BeforeInstallPromptEvent إذا لم يكن معرفًا في TypeScript
-// يمكنك نقله لاحقًا إلى ملف types عام إذا احتجت
+// Temporary definition for BeforeInstallPromptEvent type if not defined in TypeScript
+// You can move it later to a common types file if needed
 
 type BeforeInstallPromptEvent = Event & {
   readonly platforms: string[];

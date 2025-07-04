@@ -16,8 +16,8 @@ export default function ContactUsPage() {
     const email = formData.get('email') as string;
     const subject = formData.get('subject') as string;
     const message = formData.get('message') as string;
-    // يمكنك هنا ربط النموذج مع خدمة خارجية مثل EmailJS أو Formspree أو API خاص بك
-    // سنستخدم mailto كحل بسيط
+    // Here you can connect the form with an external service like EmailJS, Formspree, or your own API
+    // We will use mailto as a simple solution
     try {
       window.location.href = `mailto:info@globaleye.live?subject=${encodeURIComponent(subject || 'Contact from GlobalEye')}&body=${encodeURIComponent('Name: ' + name + '\nEmail: ' + email + '\n\n' + message)}`;
       setStatus('success');

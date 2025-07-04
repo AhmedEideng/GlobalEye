@@ -1,8 +1,6 @@
 import { fetchNews } from './utils/fetchNews';
 import { NewsArticle } from './utils/fetchNews';
 import HomeFeatured from './components/HomeFeatured';
-import HomeTrending from './components/HomeTrending';
-import HomeMostRead from './components/HomeMostRead';
 import HomeNewsGrid from './components/HomeNewsGrid';
 
 export const revalidate = 300;
@@ -15,7 +13,7 @@ export default async function HomePage() {
     const allArticles = await fetchNews();
     if (allArticles && allArticles.length > 0) {
       featuredArticle = allArticles[0];
-      articles = allArticles.slice(1, 20); // 20 articles for sections
+      articles = allArticles.slice(0, 50); // 50 articles for sections
     }
   } catch {
     // Removed unused error variable
@@ -24,8 +22,6 @@ export default async function HomePage() {
   return (
     <main>
       {featuredArticle && <HomeFeatured article={featuredArticle} />}
-      {articles.length > 0 && <HomeTrending articles={articles} />}
-      {articles.length > 0 && <HomeMostRead articles={articles} />}
       {articles.length > 0 && <HomeNewsGrid articles={articles.slice(0, 12)} />}
     </main>
   );

@@ -4,7 +4,6 @@ import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import PwaInstallToast from "./components/PwaInstallToast";
 import DynamicHeader from "./components/DynamicHeader";
-import SearchBar from "./components/SearchBar";
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://globaleye.news'),
@@ -67,10 +66,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Navbar />
           </div>
         </nav>
-        {/* SearchBar below Navbar */}
-        <div className="w-full bg-white border-b border-gray-100 py-3">
-          <SearchBar />
-        </div>
         {/* Main Content */}
         <div className="main-container max-w-screen-xl mx-auto px-2 sm:px-4 pt-4 pb-8 w-full">
           {children}
