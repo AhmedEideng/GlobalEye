@@ -30,7 +30,7 @@ export default function HomeNewsGrid({ articles }: { articles: NewsArticle[] }) 
                 />
               </div>
               <div className="p-4">
-                <div className="article-category text-xs text-red-600 font-bold mb-1">{article.source?.name}</div>
+                <div className="article-category text-xs font-bold mb-1 bg-red-600 text-white rounded-full px-3 py-1 inline-block">{article.source?.name}</div>
                 <h3 className="article-title text-lg font-bold mb-2 line-clamp-2">{article.title}</h3>
                 <p className="article-excerpt text-gray-600 text-sm mb-2 line-clamp-2">{article.description}</p>
                 <div className="article-meta text-xs flex flex-wrap gap-2 text-gray-400">

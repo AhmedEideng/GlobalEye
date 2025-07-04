@@ -21,9 +21,9 @@ export default function Navbar() {
 
   return (
     <div className="navbar-container flex items-center justify-between py-2 px-4 bg-white fixed top-0 left-0 w-full z-50 shadow-md">
-      {/* زر تسجيل الدخول يمين */}
-      <div className="flex-1 flex justify-end md:hidden">
-        <button className="login-btn-circle-red">sign in</button>
+      {/* زر تسجيل الدخول وزر القائمة يمين */}
+      <div className="flex-1 flex justify-end gap-2 md:hidden">
+        <button className="login-btn-circle-red"><span className="signin-text">sign in</span></button>
       </div>
       {/* اسم الموقع وسط */}
       <div className="flex-1 flex justify-center md:hidden">
@@ -60,7 +60,7 @@ export default function Navbar() {
         ))}
       </ul>
       <div className="ml-4 hidden md:flex">
-        <button className="login-btn-circle-red">sign in</button>
+        <button className="login-btn-circle-red"><span className="signin-text">sign in</span></button>
       </div>
       {/* Mobile sidebar */}
       {isMenuOpen && (
@@ -83,7 +83,7 @@ export default function Navbar() {
               ))}
             </ul>
             <div className="mt-4">
-              <button className="login-btn-circle-red">sign in</button>
+              <button className="login-btn-circle-red"><span className="signin-text">sign in</span></button>
             </div>
           </div>
         </div>
