@@ -8,7 +8,7 @@ import { fetchRelatedNews, cleanImageUrl, detectCategory } from '../../utils/fet
 export const revalidate = 120;
 
 export default async function ArticlePage({ params }: { params: Record<string, string> }) {
-  const { slug } = await params;
+  const { slug } = params;
   console.log("DEBUG: ArticlePage - Received slug from params:", slug);
   const article: NewsArticle | null = await getArticleBySlug(slug);
 
