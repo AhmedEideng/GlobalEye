@@ -17,7 +17,7 @@ export default function HomeNewsGrid({ articles }: { articles: NewsArticle[] }) 
             <Link
               key={article.slug + idx}
               href={`/article/${article.slug}`}
-              className="group block bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-200 overflow-hidden border border-gray-100 hover:-translate-y-1"
+              className="group block bg-white rounded-xl border border-gray-100 overflow-hidden transition-all duration-200 hover:-translate-y-1"
             >
               <div className="relative w-full h-48 overflow-hidden">
                 <OptimizedImage

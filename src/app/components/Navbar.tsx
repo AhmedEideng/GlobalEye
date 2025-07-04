@@ -21,18 +21,18 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <div className="navbar-container flex items-center justify-between py-2 px-4 bg-white shadow-md sticky top-0 z-40">
+    <div className="navbar-container flex items-center justify-between py-2 px-4 bg-white sticky top-0 z-40">
       {/* شعار الموقع */}
       <Link href="/" className="flex items-center text-2xl font-bold mr-6 select-none">
         <span className="text-black">Global</span><span className="text-red-600">Eye</span>
       </Link>
       {/* أزرار الأقسام */}
-      <ul className="nav-menu hidden md:flex gap-2 items-center bg-gray-100 rounded-full px-2 py-1 shadow-inner overflow-x-auto max-w-full">
+      <ul className="nav-menu hidden md:flex gap-2 items-center bg-gray-100 rounded-full px-2 py-1 overflow-x-auto max-w-full">
         {categories.map((category) => (
           <li key={category.name} className="nav-item">
             <Link
               href={category.path}
-              className={`nav-link px-4 py-2 rounded-full font-medium transition-colors duration-200 ${pathname === category.path ? 'bg-red-600 text-white shadow' : 'text-gray-700 hover:bg-gray-200 hover:text-red-600'}`}
+              className={`nav-link px-4 py-2 rounded-full font-medium transition-colors duration-200 ${pathname === category.path ? 'bg-red-600 text-white' : 'text-gray-700 hover:bg-gray-200 hover:text-red-600'}`}
             >
               {category.label}
             </Link>
@@ -65,7 +65,7 @@ export default function Navbar() {
                 <li key={category.name} className="mobile-nav-item">
                   <Link
                     href={category.path}
-                    className={`mobile-nav-link px-4 py-2 rounded-full font-medium transition-colors duration-200 ${pathname === category.path ? 'bg-red-600 text-white shadow' : 'text-gray-700 hover:bg-gray-200 hover:text-red-600'}`}
+                    className={`mobile-nav-link px-4 py-2 rounded-full font-medium transition-colors duration-200 ${pathname === category.path ? 'bg-red-600 text-white' : 'text-gray-700 hover:bg-gray-200 hover:text-red-600'}`}
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {category.label}

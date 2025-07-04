@@ -184,7 +184,7 @@ export default function CategoryClient({ category }: { category: string }) {
 
       {featuredArticle && (
         <article className="featured-article mb-6">
-          <div className="relative w-full h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-lg">
+          <div className="relative w-full h-[400px] md:h-[500px] rounded-2xl overflow-hidden">
             <OptimizedImage
               src={cleanImageUrl(featuredArticle.urlToImage) || '/placeholder-news.svg'}
               alt={featuredArticle.title}
@@ -217,7 +217,7 @@ export default function CategoryClient({ category }: { category: string }) {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {restArticles.map((article, index) => (
-                <a key={index} href={`/article/${article.slug || generateSlug(article.title, article.url)}`} className="group block bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-200 overflow-hidden border border-gray-100 hover:-translate-y-1">
+                <a key={index} href={`/article/${article.slug || generateSlug(article.title, article.url)}`} className="group block bg-white rounded-xl border border-gray-100 overflow-hidden transition-all duration-200 hover:-translate-y-1">
                   <div className="relative w-full h-48 overflow-hidden">
                     <OptimizedImage
                       src={cleanImageUrl(article.urlToImage) || '/placeholder-news.svg'}

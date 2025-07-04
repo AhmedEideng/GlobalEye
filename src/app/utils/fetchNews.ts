@@ -251,10 +251,18 @@ function hashCode(str: string): number {
 // Enhanced function to save articles to Supabase
 async function saveArticlesToSupabase(articles: NewsArticle[], category: string) {
   if (!articles.length) return;
-  
+
+  // Filter out articles missing image, title, or content
+  const filtered = articles.filter(article =>
+    article.title && article.title.trim() !== '' &&
+    article.urlToImage && article.urlToImage.trim() !== '' &&
+    article.content && article.content.trim() !== ''
+  );
+  if (!filtered.length) return;
+
   try {
-  // Prepare data to match the table structure
-  const mapped = articles.map(article => {
+    // Prepare data to match the table structure
+    const mapped = filtered.map(article => {
       // Ensure slug exists, if not generate it
       let finalSlug = article.slug;
       if (!finalSlug || finalSlug === '' || finalSlug === 'null') {
@@ -263,32 +271,27 @@ async function saveArticlesToSupabase(articles: NewsArticle[], category: string)
       } else {
         console.log("DEBUG: Using existing slug for:", article.title?.slice(0, 50), "->", finalSlug);
       }
-      
       // Clean image URL
       let cleanImageUrl = article.urlToImage;
       if (cleanImageUrl && cleanImageUrl.startsWith('//')) {
         cleanImageUrl = 'https:' + cleanImageUrl;
       }
-      
-    return {
-    title: article.title,
-    description: article.description,
-    url: article.url,
+      return {
+        title: article.title,
+        description: article.description,
+        url: article.url,
         url_to_image: cleanImageUrl,
-    published_at: article.publishedAt ? new Date(article.publishedAt) : null,
-    content: article.content,
-    source_name: article.source.name,
-    author: article.author,
+        published_at: article.publishedAt ? new Date(article.publishedAt) : null,
+        content: article.content,
+        source_name: article.source.name,
+        author: article.author,
         slug: finalSlug,
-    category,
-    };
-  });
-    
-  console.log("DEBUG: Saving articles to DB, articles with images:", mapped.filter(a => a.url_to_image).length, "out of", mapped.length);
-    
-  // Insert articles while ignoring duplicates based on url
+        category,
+      };
+    });
+    console.log("DEBUG: Saving articles to DB, articles with images:", mapped.filter(a => a.url_to_image).length, "out of", mapped.length);
+    // Insert articles while ignoring duplicates based on url
     const { error } = await supabase.from('news').upsert(mapped, { onConflict: 'url' });
-    
     if (error) {
       console.error("DEBUG: Error saving articles to Supabase:", error.message || error);
     } else {

@@ -18,7 +18,7 @@ export default function HomeMostRead({ articles }: { articles: NewsArticle[] }) 
           <Link
             key={article.slug + idx}
             href={`/article/${article.slug}`}
-            className="group block bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 overflow-hidden border border-gray-100 hover:-translate-y-1"
+            className="group block bg-white rounded-lg border border-gray-100 overflow-hidden transition-all duration-200 hover:-translate-y-1"
           >
             <div className="relative w-full h-32 overflow-hidden">
               <img

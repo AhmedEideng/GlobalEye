@@ -12,10 +12,10 @@ export default function HomeHero() {
           The Smart Global News Platform — Faster, Smarter, and More Beautiful Experience to Follow the Most Important Events Around the World Moment by Moment.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
-          <Link href="/world" className="bg-white text-red-600 font-bold px-6 py-3 rounded-full shadow hover:bg-gray-100 transition">World News</Link>
-          <Link href="/technology" className="bg-white text-red-600 font-bold px-6 py-3 rounded-full shadow hover:bg-gray-100 transition">Technology</Link>
-          <Link href="/sports" className="bg-white text-red-600 font-bold px-6 py-3 rounded-full shadow hover:bg-gray-100 transition">Sports</Link>
-          <Link href="/business" className="bg-white text-red-600 font-bold px-6 py-3 rounded-full shadow hover:bg-gray-100 transition">Business</Link>
+          <Link href="/world" className="bg-white text-red-600 font-bold px-6 py-3 rounded-full hover:bg-gray-100 transition">World News</Link>
+          <Link href="/technology" className="bg-white text-red-600 font-bold px-6 py-3 rounded-full hover:bg-gray-100 transition">Technology</Link>
+          <Link href="/sports" className="bg-white text-red-600 font-bold px-6 py-3 rounded-full hover:bg-gray-100 transition">Sports</Link>
+          <Link href="/business" className="bg-white text-red-600 font-bold px-6 py-3 rounded-full hover:bg-gray-100 transition">Business</Link>
         </div>
       </div>
       <div className="absolute inset-0 bg-gradient-to-tr from-black/30 via-transparent to-red-800/40 pointer-events-none" />
