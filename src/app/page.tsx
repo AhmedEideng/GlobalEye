@@ -17,8 +17,8 @@ export default async function HomePage() {
       featuredArticle = allArticles[0];
       articles = allArticles.slice(1, 20); // 20 articles for sections
     }
-  } catch (err) {
-    // تم حذف تعريف err لأنه غير مستخدم
+  } catch {
+    // Removed unused error variable
   }
 
   return (
