@@ -46,15 +46,6 @@ export default function Navbar() {
     };
   }, []);
 
-  const handleGoogleSignIn = async () => {
-    setIsLoading(true);
-    try {
-      await supabase.auth.signInWithOAuth({ provider: 'google' });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleSignOut = async () => {
     setIsLoading(true);
     try {
