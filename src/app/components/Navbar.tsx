@@ -21,20 +21,20 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <div className="navbar-container flex items-center justify-between py-2 px-4 bg-white sticky top-0 z-40">
+    <div className="navbar-container flex items-center justify-between py-2 px-4 bg-white fixed top-0 left-0 w-full z-50 shadow-md">
       {/* زر تسجيل الدخول يمين */}
-      <div className="flex-1 flex justify-end md:hidden">
+      <div className="flex-1 flex justify-start md:hidden">
         <AuthButtons />
       </div>
       {/* اسم الموقع وسط */}
       <div className="flex-1 flex justify-center md:hidden">
         <Link href="/" className="site-logo flex items-center text-2xl font-extrabold select-none bg-gradient-to-r from-red-600 via-yellow-500 to-red-700 bg-clip-text text-transparent tracking-tight drop-shadow-lg">
           <svg className="w-7 h-7 mr-1" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="url(#paint0_linear)"/><defs><linearGradient id="paint0_linear" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse"><stop stop-color="#dc2626"/><stop offset="1" stop-color="#f59e42"/></linearGradient></defs></svg>
-          GlobalEye
+          Global<span className="text-red-600">Eye</span>
         </Link>
       </div>
       {/* زر القائمة يسار */}
-      <div className="flex-1 flex justify-start md:hidden">
+      <div className="flex-1 flex justify-end md:hidden">
         <button className="mobile-menu-btn" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">
           <span className="block w-6 h-0.5 bg-gray-800 mb-1"></span>
           <span className="block w-6 h-0.5 bg-gray-800 mb-1"></span>
@@ -45,7 +45,7 @@ export default function Navbar() {
       <div className="hidden md:flex flex-1 justify-start">
         <Link href="/" className="site-logo flex items-center text-3xl font-extrabold select-none bg-gradient-to-r from-red-600 via-yellow-500 to-red-700 bg-clip-text text-transparent tracking-tight drop-shadow-lg">
           <svg className="w-8 h-8 mr-2" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="url(#paint0_linear)"/><defs><linearGradient id="paint0_linear" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse"><stop stop-color="#dc2626"/><stop offset="1" stop-color="#f59e42"/></linearGradient></defs></svg>
-          GlobalEye
+          Global<span className="text-red-600">Eye</span>
         </Link>
       </div>
       <ul className="nav-menu hidden md:flex gap-2 items-center rounded-full px-2 py-1 overflow-x-hidden max-w-full">
