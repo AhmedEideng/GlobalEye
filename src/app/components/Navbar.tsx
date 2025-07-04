@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from 'react';
+import { supabase } from "../utils/supabaseClient";
 
 const categories = [
   { name: 'home', path: '/', label: 'Home' },
@@ -19,11 +20,15 @@ export default function Navbar() {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const handleGoogleSignIn = async () => {
+    await supabase.auth.signInWithOAuth({ provider: 'google' });
+  };
+
   return (
     <div className="navbar-container flex items-center justify-between py-2 px-4 bg-white fixed top-0 left-0 w-full z-50 shadow-md">
       {/* زر تسجيل الدخول وزر القائمة يمين */}
       <div className="flex-1 flex justify-end gap-2 md:hidden">
-        <button className="login-btn-circle-red"><span className="signin-text">sign in</span></button>
+        <button className="login-btn-circle-red" onClick={handleGoogleSignIn}><span className="signin-text">sign in</span></button>
       </div>
       {/* اسم الموقع وسط */}
       <div className="flex-1 flex justify-center md:hidden">
@@ -60,7 +65,7 @@ export default function Navbar() {
         ))}
       </ul>
       <div className="ml-4 hidden md:flex">
-        <button className="login-btn-circle-red"><span className="signin-text">sign in</span></button>
+        <button className="login-btn-circle-red" onClick={handleGoogleSignIn}><span className="signin-text">sign in</span></button>
       </div>
       {/* Mobile sidebar */}
       {isMenuOpen && (
@@ -83,7 +88,7 @@ export default function Navbar() {
               ))}
             </ul>
             <div className="mt-4">
-              <button className="login-btn-circle-red"><span className="signin-text">sign in</span></button>
+              <button className="login-btn-circle-red" onClick={handleGoogleSignIn}><span className="signin-text">sign in</span></button>
             </div>
           </div>
         </div>
