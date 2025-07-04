@@ -44,9 +44,6 @@ export default function Navbar() {
     };
   }, []);
 
-  const handleGoogleSignIn = async () => {
-    await supabase.auth.signInWithOAuth({ provider: 'google' });
-  };
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     setDropdownOpen(false);
