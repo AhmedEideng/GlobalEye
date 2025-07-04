@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { NewsArticle } from "../utils/fetchNews";
 
 export default function HomeTrending({ articles }: { articles: NewsArticle[] }) {
@@ -21,9 +22,11 @@ export default function HomeTrending({ articles }: { articles: NewsArticle[] }) 
             className="group block bg-white rounded-lg border border-gray-100 overflow-hidden transition-all duration-200 hover:-translate-y-1"
           >
             <div className="relative w-full h-32 overflow-hidden">
-              <img
+              <Image
                 src={article.urlToImage || "/placeholder-news.jpg"}
                 alt={article.title}
+                width={400}
+                height={128}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 loading="lazy"
               />

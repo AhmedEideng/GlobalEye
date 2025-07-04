@@ -1,15 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { NewsArticle, fetchNews, cleanImageUrl } from '../utils/fetchNews';
+import React from 'react';
 import OptimizedImage from '../components/OptimizedImage';
 
 // Helper function to generate slug (updated version)
 function generateSlug(title: string, url: string): string {
   // تنظيف العنوان وإزالة الأحرف الخاصة
   if (title && title.trim()) {
-    let cleanTitle = title
+    const cleanTitle = title
       .toLowerCase()
       .trim()
       // إزالة الأحرف العربية والأحرف الخاصة
@@ -186,7 +184,7 @@ export default function CategoryClient({ category }: { category: string }) {
         <a href={`/article/${featuredArticle.slug || generateSlug(featuredArticle.title, featuredArticle.url)}`} className="block featured-article mb-6 group cursor-pointer">
           <div className="relative w-full h-[400px] md:h-[500px] rounded-2xl overflow-hidden group-hover:opacity-90 transition-opacity duration-200">
             <OptimizedImage
-              src={cleanImageUrl(featuredArticle.urlToImage) || '/placeholder-news.svg'}
+              src={featuredArticle.urlToImage || '/placeholder-news.svg'}
               alt={featuredArticle.title}
               fill
               className="object-cover w-full h-full"
@@ -220,7 +218,7 @@ export default function CategoryClient({ category }: { category: string }) {
                 <a key={index} href={`/article/${article.slug || generateSlug(article.title, article.url)}`} className="group block bg-white rounded-xl border border-gray-100 overflow-hidden transition-all duration-200 hover:-translate-y-1">
                   <div className="relative w-full h-48 overflow-hidden">
                     <OptimizedImage
-                      src={cleanImageUrl(article.urlToImage) || '/placeholder-news.svg'}
+                      src={article.urlToImage || '/placeholder-news.svg'}
                       alt={article.title}
                       fill
                       className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"

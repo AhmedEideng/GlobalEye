@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function HomeHero() {
   return (
@@ -20,7 +21,7 @@ export default function HomeHero() {
       </div>
       <div className="absolute inset-0 bg-gradient-to-tr from-black/30 via-transparent to-red-800/40 pointer-events-none" />
       <div className="absolute -bottom-10 -right-10 opacity-30 select-none" aria-hidden>
-        <img src="/favicon.ico.jpg" alt="GE Logo" className="w-40 h-40 rounded-full shadow-2xl" />
+        <Image src="/favicon.ico.jpg" alt="GE Logo" width={160} height={160} className="w-40 h-40 rounded-full shadow-2xl" />
       </div>
     </section>
   );

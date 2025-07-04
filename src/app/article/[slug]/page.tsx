@@ -3,13 +3,11 @@ import OptimizedImage from '../../components/OptimizedImage';
 import { NewsReactions } from '../../components/NewsReactions';
 import ShareButtons from '../../components/ShareButtons';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { fetchRelatedNews, cleanImageUrl } from '../../utils/fetchNews';
+import { fetchRelatedNews, cleanImageUrl, detectCategory } from '../../utils/fetchNews';
 
 export const revalidate = 120;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default async function ArticlePage({ params }: any) {
+export default async function ArticlePage({ params }: { params: Record<string, string> }) {
   const { slug } = await params;
   console.log("DEBUG: ArticlePage - Received slug from params:", slug);
   const article: NewsArticle | null = await getArticleBySlug(slug);
@@ -92,7 +90,7 @@ export default async function ArticlePage({ params }: any) {
 
 // Related News Section Component
 async function RelatedNewsSection({ article }: { article: NewsArticle }) {
-  const related = await fetchRelatedNews(article, (article as any).category || 'general');
+  const related = await fetchRelatedNews(article, detectCategory(article));
   if (!related || related.length === 0) return null;
   return (
     <section className="mt-12">

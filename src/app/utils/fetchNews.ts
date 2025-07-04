@@ -210,7 +210,7 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | null> {
 function generateSlug(title: string, url: string): string {
   // Clean title and remove special characters
   if (title && title.trim()) {
-    let cleanTitle = title
+    const cleanTitle = title
       .toLowerCase()
       .trim()
       // Remove special characters
@@ -417,7 +417,7 @@ export async function getArticleBySlug(slug: string): Promise<NewsArticle | null
   
   try {
     // Strategy 1: Exact slug match
-    let { data, error } = await supabase
+    const { data, error } = await supabase
       .from('news')
       .select('*')
       .eq('slug', slug)
