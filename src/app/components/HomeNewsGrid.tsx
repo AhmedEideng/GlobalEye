@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import { NewsArticle, cleanImageUrl } from "../utils/fetchNews";
 import OptimizedImage from "./OptimizedImage";
