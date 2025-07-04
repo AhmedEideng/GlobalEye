@@ -183,8 +183,8 @@ export default function CategoryClient({ category }: { category: string }) {
       </div>
 
       {featuredArticle && (
-        <article className="featured-article mb-6">
-          <div className="relative w-full h-[400px] md:h-[500px] rounded-2xl overflow-hidden">
+        <a href={`/article/${featuredArticle.slug || generateSlug(featuredArticle.title, featuredArticle.url)}`} className="block featured-article mb-6 group cursor-pointer">
+          <div className="relative w-full h-[400px] md:h-[500px] rounded-2xl overflow-hidden group-hover:opacity-90 transition-opacity duration-200">
             <OptimizedImage
               src={cleanImageUrl(featuredArticle.urlToImage) || '/placeholder-news.svg'}
               alt={featuredArticle.title}
@@ -198,7 +198,7 @@ export default function CategoryClient({ category }: { category: string }) {
           <div className="featured-content">
             <div className="article-category">{categoryLabel.toUpperCase()}</div>
             <h1 className="featured-title text-xl sm:text-2xl md:text-3xl font-bold mb-2">
-              <a href={`/article/${featuredArticle.slug || generateSlug(featuredArticle.title, featuredArticle.url)}`}>{featuredArticle.title}</a>
+              {featuredArticle.title}
             </h1>
             <p className="featured-excerpt text-base sm:text-lg mb-2">{featuredArticle.description}</p>
             <div className="article-meta text-xs sm:text-sm flex flex-wrap gap-2 text-gray-500">
@@ -206,7 +206,7 @@ export default function CategoryClient({ category }: { category: string }) {
               <span>{new Date(featuredArticle.publishedAt).toLocaleDateString('en-GB')}</span>
             </div>
           </div>
-        </article>
+        </a>
       )}
 
       {restArticles.length > 0 && (

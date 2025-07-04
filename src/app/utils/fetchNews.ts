@@ -379,7 +379,7 @@ export async function fetchRelatedNews(currentArticle: NewsArticle, category: st
     const articles = await fetchNews(category);
     return articles
       .filter(article => article.url !== currentArticle.url)
-      .slice(0, 6); // Return up to 6 related articles
+      .slice(0, 15); // Return up to 15 related articles
   } catch (error) {
     console.error('Failed to fetch related news:', error);
     return [];
