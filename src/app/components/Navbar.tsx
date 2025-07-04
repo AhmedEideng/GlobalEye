@@ -26,71 +26,8 @@ export default function Navbar() {
   const [isLoading, setIsLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) {
-        setUser({ email: data.user.email || '' });
-      } else {
-        setUser(null);
-      }
-    });
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        setUser({ email: session.user.email || '' });
-      } else {
-        setUser(null);
-      }
-    });
-    return () => {
-      listener?.subscription.unsubscribe();
-    };
-  }, []);
-
-  const handleSignOut = async () => {
-    setIsLoading(true);
-    try {
-      await supabase.auth.signOut();
-      setDropdownOpen(false);
-      setUser(null);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (!dropdownOpen) return;
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setDropdownOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [dropdownOpen]);
-
   return (
     <div className="navbar-container flex items-center justify-between py-2 px-4 bg-white fixed top-0 left-0 w-full z-50 shadow-md">
-      {/* زر تسجيل الدخول وزر القائمة يمين */}
-      <div className="flex-1 flex justify-end gap-2 md:hidden">
-        <div className="relative" ref={dropdownRef}>
-          <button className="login-btn-circle-red login-btn-signedin" onClick={() => setDropdownOpen(v => !v)} disabled={isLoading}>
-            {isLoading ? 'Signing out...' : 'Sign out'}
-          </button>
-          {dropdownOpen && (
-            <div className="dropdown-auth-menu">
-              <div className="dropdown-auth-email">{user?.email}</div>
-              <button className="dropdown-auth-signout" onClick={handleSignOut}>Sign out</button>
-            </div>
-          )}
-        </div>
-      </div>
-      {/* اسم الموقع وسط */}
-      <div className="flex-1 flex justify-center md:hidden">
-        <Link href="/" className="site-logo flex items-center text-2xl font-extrabold select-none text-red-600 tracking-tight drop-shadow-lg">
-          <svg className="w-7 h-7 mr-1" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="url(#paint0_linear)"/><defs><linearGradient id="paint0_linear" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse"><stop stop-color="#dc2626"/><stop offset="1" stop-color="#f59e42"/></linearGradient></defs></svg>
-          Global<span className="text-red-600">Eye</span>
-        </Link>
-      </div>
       {/* زر القائمة يسار */}
       <div className="flex-1 flex justify-start md:hidden">
         <button className="mobile-menu-btn" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">
@@ -99,7 +36,16 @@ export default function Navbar() {
           <span className="block w-6 h-0.5 bg-gray-800"></span>
         </button>
       </div>
-      {/* الشعار والدخول في الديسكتوب */}
+      {/* اسم الموقع وسط */}
+      <div className="flex-1 flex justify-center md:hidden">
+        <Link href="/" className="site-logo flex items-center text-2xl font-extrabold select-none text-red-600 tracking-tight drop-shadow-lg">
+          <svg className="w-7 h-7 mr-1" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="url(#paint0_linear)"/><defs><linearGradient id="paint0_linear" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse"><stop stop-color="#dc2626"/><stop offset="1" stop-color="#f59e42"/></linearGradient></defs></svg>
+          Global<span className="text-red-600">Eye</span>
+        </Link>
+      </div>
+      {/* يمين فارغ */}
+      <div className="flex-1 flex justify-end gap-2 md:hidden"></div>
+      {/* الشعار في الديسكتوب */}
       <div className="hidden md:flex flex-1 justify-start">
         <Link href="/" className="site-logo flex items-center text-3xl font-extrabold select-none text-red-600 tracking-tight drop-shadow-lg">
           <svg className="w-8 h-8 mr-2" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="url(#paint0_linear)"/><defs><linearGradient id="paint0_linear" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse"><stop stop-color="#dc2626"/><stop offset="1" stop-color="#f59e42"/></linearGradient></defs></svg>
@@ -118,19 +64,6 @@ export default function Navbar() {
           </li>
         ))}
       </ul>
-      <div className="ml-4 hidden md:flex">
-        <div className="relative" ref={dropdownRef}>
-          <button className="login-btn-circle-red login-btn-signedin" onClick={() => setDropdownOpen(v => !v)} disabled={isLoading}>
-            {isLoading ? 'Signing out...' : 'Sign out'}
-          </button>
-          {dropdownOpen && (
-            <div className="dropdown-auth-menu">
-              <div className="dropdown-auth-email">{user?.email}</div>
-              <button className="dropdown-auth-signout" onClick={handleSignOut}>Sign out</button>
-            </div>
-          )}
-        </div>
-      </div>
       {/* Mobile sidebar */}
       {isMenuOpen && (
         <div className="mobile-nav fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50 flex justify-start">
@@ -151,19 +84,6 @@ export default function Navbar() {
                 </li>
               ))}
             </ul>
-            <div className="mt-4">
-              <div className="relative" ref={dropdownRef}>
-                <button className="login-btn-circle-red login-btn-signedin" onClick={() => setDropdownOpen(v => !v)} disabled={isLoading}>
-                  {isLoading ? 'Signing out...' : 'Sign out'}
-                </button>
-                {dropdownOpen && (
-                  <div className="dropdown-auth-menu">
-                    <div className="dropdown-auth-email">{user?.email}</div>
-                    <button className="dropdown-auth-signout" onClick={handleSignOut}>Sign out</button>
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
         </div>
       )}

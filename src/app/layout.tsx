@@ -55,7 +55,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="cnn-logo">
               <span>Global</span>Eye
             </div>
-            <AuthButtons />
           </div> */}
         </header>
         {/* Dynamic Header - disappears on scroll down, appears on scroll up */}
