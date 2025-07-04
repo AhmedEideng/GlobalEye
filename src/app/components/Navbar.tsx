@@ -1,8 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect, useRef } from 'react';
-import { supabase } from "../utils/supabaseClient";
+import { useState } from 'react';
 
 type User = { email?: string };
 
@@ -21,10 +20,6 @@ const categories = [
 export default function Navbar() {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
   return (
     <div className="navbar-container flex items-center justify-between py-2 px-4 bg-white fixed top-0 left-0 w-full z-50 shadow-md">
