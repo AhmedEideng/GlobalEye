@@ -1,17 +1,7 @@
 import { NextResponse } from 'next/server';
-import { fetchNews } from '@utils/fetchNews';
 
 export async function GET() {
   const baseUrl = 'https://globaleye.live';
-
-  // Static pages
-  const staticPages = [
-    '',
-    'about',
-    'contact-us',
-    'privacy',
-    'terms-and-conditions',
-  ];
 
   // Categories
   const categories = [

@@ -30,9 +30,7 @@ export default function LoginPage() {
 
   const handleGoogleSignIn = async () => {
     try {
-      console.log("[GoogleLogin] Signing out...");
       await signOut();
-      console.log("[GoogleLogin] Calling signInWithOAuth...");
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -40,15 +38,12 @@ export default function LoginPage() {
           skipBrowserRedirect: true
         }
       });
-      console.log("[GoogleLogin] OAuth result:", data, error);
       if (data?.url) {
-        console.log("[GoogleLogin] Redirecting to:", data.url);
         window.location.href = data.url;
       } else {
         alert("Google login failed. Please check your Supabase settings and API keys.");
       }
     } catch (err) {
-      console.error("[GoogleLogin] Exception:", err);
       alert("Exception during Google login: " + err);
     }
   };
