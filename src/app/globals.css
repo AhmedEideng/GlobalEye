@@ -290,7 +290,7 @@
 
   /* WhatsApp Button - Original App Style */
   .btn-whatsapp {
-    @apply px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl flex items-center gap-2;
+    @apply rounded-full font-semibold transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center;
 
     background: #25D366;
     color: white;
@@ -299,7 +299,9 @@
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
     font-weight: 600;
     box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
   }
@@ -315,8 +317,8 @@
   }
 
   .btn-whatsapp svg {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     fill: currentColor;
   }
 
