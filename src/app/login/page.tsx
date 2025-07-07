@@ -31,7 +31,7 @@ export default function LoginPage() {
   const handleGoogleSignIn = async () => {
     try {
       await signOut();
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { data } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: typeof window !== 'undefined' ? window.location.origin + '/profile' : undefined,
