@@ -639,7 +639,7 @@ body {
   position: static;
   overflow-x: hidden;
   scroll-behavior: smooth;
-  animation: scroll-left-to-right 25s linear infinite;
+  animation: scroll-left-to-right 27.5s linear infinite;
   animation-play-state: running;
   -ms-overflow-style: none;
   scrollbar-width: none;

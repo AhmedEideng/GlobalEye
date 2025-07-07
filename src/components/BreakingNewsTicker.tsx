@@ -39,11 +39,15 @@ export default function BreakingNewsTicker() {
             </div>
           ) : news.length > 0 ? (
             <div className="ticker-items flex items-center">
-              {news.map((newsItem: BreakingNewsItem, index: number) => (
+              {news.slice(0, 5).map((newsItem: BreakingNewsItem) => (
                 <div
                   key={newsItem.id}
-                  className="ticker-item flex-shrink-0"
+                  className="ticker-item flex-shrink-0 flex items-center"
                 >
+                  {/* Yellow dot at the start of each news */}
+                  <div className="separator-dot mr-2 flex-shrink-0">
+                    <div className="w-3 h-3 bg-yellow-300 rounded-full"></div>
+                  </div>
                   <Link 
                     href={newsItem.url}
                     className="news-link flex items-center"
@@ -52,12 +56,6 @@ export default function BreakingNewsTicker() {
                       {newsItem.title}
                     </span>
                   </Link>
-                  {/* Large separator dot */}
-                  {index < news.length - 1 && (
-                    <div className="separator-dot mx-6 flex-shrink-0">
-                      <div className="w-3 h-3 bg-yellow-300 rounded-full"></div>
-                    </div>
-                  )}
                 </div>
               ))}
             </div>
