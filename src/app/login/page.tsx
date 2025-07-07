@@ -26,7 +26,7 @@ export default function LoginPage() {
   };
 
   const passwordValidation = validatePassword(password);
-  const { signInWithGoogle, signOut } = useAuth();
+  const { signOut } = useAuth();
 
   const handleGoogleSignIn = async () => {
     try {
