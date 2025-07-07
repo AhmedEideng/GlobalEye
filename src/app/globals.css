@@ -288,6 +288,38 @@
     background: var(--cnn-light-gray);
   }
 
+  /* WhatsApp Button - Original App Style */
+  .btn-whatsapp {
+    @apply px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl flex items-center gap-2;
+
+    background: #25D366;
+    color: white;
+    border: none;
+    text-decoration: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+  }
+
+  .btn-whatsapp:hover {
+    background: #128C7E;
+    box-shadow: 0 6px 16px rgba(37, 211, 102, 0.4);
+    transform: translateY(-1px);
+  }
+
+  .btn-whatsapp:active {
+    transform: translateY(0);
+  }
+
+  .btn-whatsapp svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+  }
+
   /* Article card styles */
   .article-card {
     @apply bg-card text-card-foreground rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2;
