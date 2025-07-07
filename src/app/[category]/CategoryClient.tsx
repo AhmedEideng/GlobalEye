@@ -1,7 +1,8 @@
 "use client";
 
 import React from 'react';
-import OptimizedImage from '../components/OptimizedImage';
+import OptimizedImage from '@components/OptimizedImage';
+import { sendAnalyticsEvent } from '../utils/fetchNews';
 
 // Helper function to generate slug (updated version)
 function generateSlug(title: string, url: string): string {
@@ -69,17 +70,13 @@ const categoryLabels: { [key: string]: string } = {
 export default function CategoryClient({ category }: { category: string }) {
   const categoryLabel = categoryLabels[category] || category;
   const [articles, setArticles] = React.useState<Article[]>([]);
-  const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    console.log(`DEBUG: CategoryClient useEffect triggered for ${category}`);
     setLoading(true);
-    setError(null);
     
     const fetchData = async () => {
       try {
-        console.log(`DEBUG: Fetching data for category: ${category}`);
         const response = await fetch(`/api/news?category=${category}`, {
           cache: 'default', // Use browser cache
           headers: {
@@ -92,19 +89,16 @@ export default function CategoryClient({ category }: { category: string }) {
         }
         
         const data = await response.json();
-        console.log(`DEBUG: API response for ${category}:`, data);
         
         if (data.articles && data.articles.length > 0) {
-          console.log(`DEBUG: Setting ${data.articles.length} articles for ${category}`);
           setArticles(data.articles);
-          setError(null);
+          // Track category visit when page loads
+          sendAnalyticsEvent('view_category', { category });
         } else {
-          console.log(`DEBUG: No articles returned for ${category}`);
-          setError(`No news available in the "${categoryLabel}" category. Please try again.`);
+          throw new Error(`No news available in the "${categoryLabel}" category. Please try again.`);
         }
-      } catch (err) {
-        console.error(`DEBUG: Error fetching data for ${category}:`, err);
-        setError('Failed to load news. Please try again.');
+      } catch {
+        throw new Error('Failed to load news. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -128,21 +122,6 @@ export default function CategoryClient({ category }: { category: string }) {
     );
   }
 
-  if (error) {
-    return (
-      <div className="error text-center py-8">
-        <h2 className="text-2xl font-bold text-red-700 mb-4">Error loading {categoryLabel} news</h2>
-        <p className="text-gray-600 mb-6">{error}</p>
-        <button 
-          className="btn btn-primary"
-          onClick={() => window.location.reload()}
-        >
-          Retry
-        </button>
-      </div>
-    );
-  }
-
   if (!featuredArticle && articles.length === 0) {
     return (
       <div className="error text-center py-8">
@@ -157,10 +136,6 @@ export default function CategoryClient({ category }: { category: string }) {
       </div>
     );
   }
-
-  console.log(`DEBUG: Rendering ${articles.length} articles for ${category}`);
-  console.log(`DEBUG: Featured article for ${category}:`, featuredArticle?.title);
-  console.log(`DEBUG: Articles with images for ${category}:`, articles.filter(a => a.urlToImage && a.urlToImage !== 'null' && a.urlToImage !== '').length);
 
   return (
     <div className="category-page max-w-screen-xl mx-auto px-2 sm:px-4">
@@ -181,7 +156,7 @@ export default function CategoryClient({ category }: { category: string }) {
       </div>
 
       {featuredArticle && (
-        <a href={`/article/${featuredArticle.slug || generateSlug(featuredArticle.title, featuredArticle.url)}`} className="block featured-article mb-6 group cursor-pointer">
+        <a href={`/article/${featuredArticle.slug || generateSlug(featuredArticle.title, featuredArticle.url)}`} className="article-card block featured-article mb-6 group cursor-pointer">
           <div className="relative w-full h-[400px] md:h-[500px] rounded-2xl overflow-hidden group-hover:opacity-90 transition-opacity duration-200">
             <OptimizedImage
               src={featuredArticle.urlToImage || '/placeholder-news.svg'}
@@ -215,7 +190,7 @@ export default function CategoryClient({ category }: { category: string }) {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {restArticles.map((article, index) => (
-                <a key={index} href={`/article/${article.slug || generateSlug(article.title, article.url)}`} className="group block bg-white rounded-xl border border-gray-100 overflow-hidden transition-all duration-200 hover:-translate-y-1">
+                <a key={index} href={`/article/${article.slug || generateSlug(article.title, article.url)}`} className="article-card group">
                   <div className="relative w-full h-48 overflow-hidden">
                     <OptimizedImage
                       src={article.urlToImage || '/placeholder-news.svg'}

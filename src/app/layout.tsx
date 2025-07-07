@@ -1,9 +1,11 @@
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
+import Navbar from '@components/Navbar';
+import Footer from '@components/Footer';
+import BreakingNewsTicker from '@components/BreakingNewsTicker';
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
-import PwaInstallToast from "./components/PwaInstallToast";
-import DynamicHeader from "./components/DynamicHeader";
+import PwaInstallToast from '@components/PwaInstallToast';
+import DynamicHeader from '@components/DynamicHeader';
+import Script from 'next/script';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://globaleye.news'),
@@ -35,21 +37,55 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const lang = 'en';
   const dir = 'ltr';
   return (
     <html lang={lang} dir={dir} suppressHydrationWarning>
+      <head>
+        {/* SEO Meta Tags */}
+        <title>Global Eye - News from Everywhere</title>
+        <meta name="description" content="Global Eye provides you with the latest news from around the world in one place." />
+        <meta property="og:title" content="Global Eye - News from Everywhere" />
+        <meta property="og:description" content="Global Eye provides you with the latest news from around the world in one place." />
+        <meta property="og:image" content="https://globaleye.live/placeholder-news.jpg" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Global Eye - News from Everywhere" />
+        <meta name="twitter:description" content="Global Eye provides you with the latest news from around the world in one place." />
+        <meta name="twitter:image" content="https://globaleye.live/placeholder-news.jpg" />
+        {/* Google Analytics */}
+        {GA_MEASUREMENT_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${GA_MEASUREMENT_ID}');
+              `}
+            </Script>
+          </>
+        )}
+        {/* PWA Meta Tags */}
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="icon" href="/favicon.ico.jpg" />
+        <meta name="theme-color" content="#0a0a0a" />
+      </head>
       <body suppressHydrationWarning>
         <PwaInstallToast />
+        {/* Breaking News Ticker */}
+        <BreakingNewsTicker />
         {/* CNN Style Header */}
         <header className="cnn-header">
           {/* Top Bar */}
-          <div className="header-top bg-black text-white w-full">
-            <div className="header-top-content px-4 py-2">
-              <div className="font-semibold tracking-wide">Breaking News: Stay informed with the latest global updates</div>
-            </div>
-          </div>
+          {/* Removed black bar with breaking news text */}
           {/* Main Header - Hidden to avoid duplication with DynamicHeader */}
           {/* <div className="header-main">
             <div className="cnn-logo">

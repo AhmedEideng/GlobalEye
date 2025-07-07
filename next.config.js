@@ -38,6 +38,14 @@ module.exports = withPWA({
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 300, // Increased to 5 minutes
+    domains: [
+      'images.unsplash.com',
+      'cdn.cnn.com',
+      'ichef.bbci.co.uk',
+      'static01.nyt.com',
+      'media.guim.co.uk',
+      'your-custom-domain.com',
+    ],
   },
   experimental: {
     optimizeCss: true,

@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
-import { NewsArticle, cleanImageUrl } from "../utils/fetchNews";
+import { NewsArticle } from '@utils/fetchNews';
+import { cleanImageUrl } from '@utils/cleanImageUrl';
 import OptimizedImage from "./OptimizedImage";
 
 export default function HomeNewsGrid({ articles }: { articles: NewsArticle[] }) {
@@ -11,6 +12,7 @@ export default function HomeNewsGrid({ articles }: { articles: NewsArticle[] }) 
         <h2 className="section-title text-lg sm:text-xl font-bold">Latest News</h2>
         <Link href="/world" className="btn btn-secondary">View All News</Link>
       </div>
+      <div className="news-grid">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {articles.map((article, idx) => {
           const cleanImage = cleanImageUrl(article.urlToImage);
@@ -18,7 +20,7 @@ export default function HomeNewsGrid({ articles }: { articles: NewsArticle[] }) 
             <Link
               key={article.slug + idx}
               href={`/article/${article.slug}`}
-              className="group block bg-white rounded-xl border border-gray-100 overflow-hidden transition-all duration-200 hover:-translate-y-1"
+                className="article-card group"
             >
               <div className="relative w-full h-48 overflow-hidden">
                 <OptimizedImage
@@ -41,6 +43,7 @@ export default function HomeNewsGrid({ articles }: { articles: NewsArticle[] }) 
             </Link>
           );
         })}
+        </div>
       </div>
     </section>
   );

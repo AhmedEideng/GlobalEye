@@ -1,23 +1,16 @@
 {
-  "name": "GlobalEye News",
-  "short_name": "GEnews",
-  "description": "A global news platform with blazing speed, smart AI, and stunning design.",
+  "name": "Global Eye",
+  "short_name": "GlobalEye",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0a0a0a",
-  "theme_color": "#171717",
-  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#0a0a0a",
+  "description": "Global Eye provides you with the latest news from around the world in one place.",
   "icons": [
     {
       "src": "/favicon.ico.jpg",
-      "sizes": "48x48 64x64 96x96 128x128 256x256 512x512",
+      "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/jpeg"
-    },
-    {
-      "src": "/globe.svg",
-      "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
     }
   ]
 } 

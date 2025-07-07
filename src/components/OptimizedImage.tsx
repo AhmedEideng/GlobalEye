@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { useState, useMemo } from 'react';
+import { cleanImageUrl } from '@utils/cleanImageUrl';
 
 // Next.js Image supports WebP and Lazy Loading automatically based on the browser
 
@@ -20,23 +21,6 @@ interface OptimizedImageProps {
 const BLUR_PLACEHOLDER =
   "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q==";
 
-// Function to clean the image URL
-const cleanImageUrl = (url: string): string => {
-  if (!url) return '/placeholder-news.jpg';
-  
-  // Fix URLs that start with //
-  if (url.startsWith('//')) {
-    return 'https:' + url;
-  }
-  
-  // Fix URLs that start with http:// (convert to https://)
-  if (url.startsWith('http://')) {
-    return url.replace('http://', 'https://');
-  }
-  
-  return url;
-};
-
 const OptimizedImage: React.FC<OptimizedImageProps> = ({ 
   src, 
   alt, 
@@ -52,7 +36,6 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   const [isLoading, setIsLoading] = useState(true);
 
   const handleError = () => {
-    console.warn(`Failed to load image: ${src}`);
     setHasError(true);
     setIsLoading(false);
   };
@@ -64,15 +47,15 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   // Clean the image URL
   const cleanSrc = cleanImageUrl(src);
   
-  const isExternal = /^https?:\/\//.test(cleanSrc);
+  const isExternal = cleanSrc ? /^https?:\/\//.test(cleanSrc) : false;
   const proxiedSrc = useMemo(() => {
     if (isExternal) {
-      return `/api/image-proxy?url=${encodeURIComponent(cleanSrc)}`;
+      return cleanSrc ? `/api/image-proxy?url=${encodeURIComponent(cleanSrc)}` : '';
     }
     return cleanSrc;
   }, [cleanSrc, isExternal]);
   
-  const imageSrc = hasError ? placeholder : proxiedSrc;
+  const imageSrc = hasError ? placeholder : proxiedSrc || cleanSrc || '/placeholder-news.jpg' || '';
 
   if (fill) {
     return (

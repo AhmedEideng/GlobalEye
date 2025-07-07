@@ -26,6 +26,14 @@ export default function PwaInstallToast() {
     return () => window.removeEventListener("beforeinstallprompt", handler as EventListener);
   }, []);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js');
+      });
+    }
+  }, []);
+
   const handleInstall = async () => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
