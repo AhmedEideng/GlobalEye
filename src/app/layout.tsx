@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from "next";
 import PwaInstallToast from '@components/PwaInstallToast';
 import DynamicHeader from '@components/DynamicHeader';
 import Script from 'next/script';
+import BreakingNewsTickerController from '@components/BreakingNewsTickerController';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://globaleye.news'),
@@ -96,12 +97,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <nav className="cnn-nav">
           <div className="nav-container"></div>
         </nav>
-        {/* Main Content */}
-        <div className="main-container max-w-screen-xl mx-auto px-2 sm:px-4 pt-4 pb-8 w-full">
-          {children}
-        </div>
-        {/* Footer */}
-        <Footer />
+        {/* BreakingNewsTickerController wraps all content for ticker and navbar on all pages */}
+        <BreakingNewsTickerController>
+          {/* Main Content */}
+          <div className="main-container max-w-screen-xl mx-auto px-2 sm:px-4 pt-4 pb-8 w-full">
+            {children}
+          </div>
+          {/* Footer */}
+          <Footer />
+        </BreakingNewsTickerController>
       </body>
     </html>
   );

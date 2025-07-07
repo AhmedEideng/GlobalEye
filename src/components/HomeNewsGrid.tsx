@@ -2,7 +2,6 @@
 import Link from "next/link";
 import { NewsArticle } from '@utils/fetchNews';
 import { cleanImageUrl } from '@utils/cleanImageUrl';
-import OptimizedImage from "./OptimizedImage";
 
 export default function HomeNewsGrid({ articles }: { articles: NewsArticle[] }) {
   if (!articles?.length) return null;
@@ -13,22 +12,20 @@ export default function HomeNewsGrid({ articles }: { articles: NewsArticle[] }) 
         <Link href="/world" className="btn btn-secondary">View All News</Link>
       </div>
       <div className="news-grid">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-6 sm:gap-6 gap-y-6 w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {articles.map((article, idx) => {
             const cleanImage = cleanImageUrl(article.urlToImage);
             return (
               <Link
                 key={article.slug + idx}
                 href={`/article/${article.slug}`}
-                  className="article-card group"
+                className="article-card group"
               >
                 <div className="relative w-full h-48 overflow-hidden">
-                  <OptimizedImage
+                  <img
                     src={cleanImage || "/placeholder-news.jpg"}
                     alt={article.title}
-                    fill
                     className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-                    sizes="100vw"
                   />
                 </div>
                 <div className="p-4">
@@ -36,7 +33,7 @@ export default function HomeNewsGrid({ articles }: { articles: NewsArticle[] }) 
                   <h3 className="article-title text-lg font-bold mb-2 line-clamp-2">{article.title}</h3>
                   <p className="article-excerpt text-gray-600 text-sm mb-2 line-clamp-2">{article.description}</p>
                   <div className="article-meta text-xs flex flex-wrap gap-2 text-gray-400">
-                    <span className="flex items-center gap-1 text-gray-400"><svg className="w-4 h-4 inline-block" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>{new Date(article.publishedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                    <span className="flex items-center gap-1 text-gray-400">{new Date(article.publishedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
                     {article.author && <span>by {article.author}</span>}
                   </div>
                 </div>

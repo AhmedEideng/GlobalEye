@@ -192,12 +192,10 @@ export default function CategoryClient({ category }: { category: string }) {
             {restArticles.map((article, index) => (
                 <a key={index} href={`/article/${article.slug || generateSlug(article.title, article.url)}`} className="article-card group">
                   <div className="relative w-full h-48 overflow-hidden">
-                    <OptimizedImage
+                    <img
                       src={article.urlToImage || '/placeholder-news.svg'}
                       alt={article.title}
-                      fill
                       className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-                      sizes="100vw"
                     />
                   </div>
                   <div className="flex flex-col justify-between h-full p-4">
