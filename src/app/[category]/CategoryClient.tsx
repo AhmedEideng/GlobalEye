@@ -2,7 +2,8 @@
 
 import React from 'react';
 import OptimizedImage from '@components/OptimizedImage';
-import { sendAnalyticsEvent } from '../utils/fetchNews';
+import { sendAnalyticsEvent, fetchRelatedNews } from '../utils/fetchNews';
+import Link from 'next/link';
 
 // Helper function to generate slug (updated version)
 function generateSlug(title: string, url: string): string {
@@ -54,6 +55,7 @@ interface Article {
   source: { name: string };
   category?: string;
   slug: string;
+  author?: string | null;
 }
 
 const categoryLabels: { [key: string]: string } = {
@@ -70,6 +72,7 @@ const categoryLabels: { [key: string]: string } = {
 export default function CategoryClient({ category }: { category: string }) {
   const categoryLabel = categoryLabels[category] || category;
   const [articles, setArticles] = React.useState<Article[]>([]);
+  const [suggestedArticles, setSuggestedArticles] = React.useState<Article[]>([]);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
@@ -94,6 +97,13 @@ export default function CategoryClient({ category }: { category: string }) {
           setArticles(data.articles);
           // Track category visit when page loads
           sendAnalyticsEvent('view_category', { category });
+          
+          // Fetch suggested articles from the same category
+          if (data.articles.length > 0) {
+            const firstArticle = data.articles[0];
+            const relatedArticles = await fetchRelatedNews(firstArticle, category);
+            setSuggestedArticles(relatedArticles.slice(0, 20)); // Get up to 20 suggested articles
+          }
         } else {
           throw new Error(`No news available in the "${categoryLabel}" category. Please try again.`);
         }
@@ -207,6 +217,42 @@ export default function CategoryClient({ category }: { category: string }) {
                     </div>
                   </div>
                 </a>
+            ))}
+          </div>
+        </section>
+      )}
+      
+      {/* Suggested Articles Section */}
+      {suggestedArticles.length > 0 && (
+        <section className="mt-12">
+          <div className="section-header flex flex-col sm:flex-row items-center justify-between mb-6 gap-2">
+            <h2 className="section-title text-xl sm:text-2xl font-bold">Suggested Articles</h2>
+            <span className="article-count text-xs text-gray-400">{suggestedArticles.length} articles</span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {suggestedArticles.map((article, idx) => (
+              <Link
+                key={article.slug + idx}
+                href={`/article/${article.slug}`}
+                className="article-card group"
+              >
+                <div className="relative w-full h-48 overflow-hidden">
+                  <img
+                    src={article.urlToImage || "/placeholder-news.jpg"}
+                    alt={article.title}
+                    className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <div className="p-4">
+                  <div className="article-category text-xs font-bold mb-1 bg-red-600 text-white rounded-full px-3 py-1 inline-block">{article.source?.name}</div>
+                  <h3 className="article-title text-lg font-bold mb-2 line-clamp-2">{article.title}</h3>
+                  <p className="article-excerpt text-gray-600 text-sm mb-2 line-clamp-2">{article.description}</p>
+                  <div className="article-meta text-xs flex flex-wrap gap-2 text-gray-400">
+                    <span className="flex items-center gap-1 text-gray-400">{new Date(article.publishedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                    {article.author && <span>by {article.author}</span>}
+                  </div>
+                </div>
+              </Link>
             ))}
           </div>
         </section>

@@ -1,0 +1,53 @@
+import { NextResponse } from 'next/server';
+import { fetchNews } from '@utils/fetchNews';
+
+export async function GET(
+  request: Request,
+  { params }: { params: { category: string } }
+) {
+  const baseUrl = 'https://globaleye.live';
+  const category = params.category;
+
+  try {
+    // Fetch articles for this category
+    const articles = await fetchNews(category);
+    
+    // Limit to 1000 articles per sitemap (Google's limit)
+    const limitedArticles = articles.slice(0, 1000);
+
+    const urls = limitedArticles.map(
+      (article) => `
+        <url>
+          <loc>${baseUrl}/article/${article.slug}</loc>
+          <changefreq>daily</changefreq>
+          <priority>0.9</priority>
+          <lastmod>${new Date(article.publishedAt).toISOString()}</lastmod>
+        </url>
+      `
+    );
+
+    const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+      <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+        ${urls.join('')}
+      </urlset>
+    `;
+
+    return new NextResponse(sitemap, {
+      headers: {
+        'Content-Type': 'application/xml',
+      },
+    });
+  } catch (error) {
+    // Return empty sitemap if error
+    const emptySitemap = `<?xml version="1.0" encoding="UTF-8"?>
+      <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+      </urlset>
+    `;
+
+    return new NextResponse(emptySitemap, {
+      headers: {
+        'Content-Type': 'application/xml',
+      },
+    });
+  }
+} 
