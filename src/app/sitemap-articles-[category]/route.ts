@@ -3,10 +3,10 @@ import { fetchNews } from '@utils/fetchNews';
 
 export async function GET(
   request: Request,
-  { params }: { params: { category: string } }
+  { params }: { params: Promise<{ category: string }> }
 ) {
   const baseUrl = 'https://globaleye.live';
-  const category = params.category;
+  const { category } = await params;
 
   try {
     // Fetch articles for this category
