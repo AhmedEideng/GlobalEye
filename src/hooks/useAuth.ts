@@ -34,7 +34,7 @@ export function useAuth() {
       setLoading(false);
     };
     getUser();
-    // استمع لتغيرات الجلسة
+    // Listen to session changes
     const { data: listener } = supabase.auth.onAuthStateChange(() => {
       getUser();
     });

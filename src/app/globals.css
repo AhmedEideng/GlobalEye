@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('/fonts.css');
 
 @tailwind base;
 @tailwind components;
@@ -205,6 +206,7 @@
     text-decoration: none;
     background: transparent;
     border: none;
+    font-family: 'Poppins', sans-serif;
   }
 
   .nav-link:hover {
@@ -241,6 +243,7 @@
     transition: color 0.3s ease;
     background: transparent;
     border: none;
+    font-family: 'Poppins', sans-serif;
   }
 
   .mobile-nav-link:hover,
@@ -552,10 +555,10 @@ a, a:hover, a:active, a:visited {
     padding-left: 10px;
     padding-right: 10px;
   }
-  .news-grid {
+  .news-grid, .category-page .grid {
     gap: 18px;
     margin-top: 18px;
-    grid-template-columns: repeat(auto-fit, minmax(90vw, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(98vw, 1fr));
   }
   .section-header {
     margin-bottom: 18px;
@@ -569,6 +572,9 @@ a, a:hover, a:active, a:visited {
   }
   .article-excerpt {
     font-size: 1rem;
+  }
+  .breaking-label-text {
+    font-size: 10px !important;
   }
 }
 

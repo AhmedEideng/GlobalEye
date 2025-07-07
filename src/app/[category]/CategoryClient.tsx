@@ -188,7 +188,7 @@ export default function CategoryClient({ category }: { category: string }) {
             <h2 className="section-title text-lg sm:text-xl font-bold">All {categoryLabel} News</h2>
             <span className="article-count text-xs text-gray-400">{restArticles.length} articles</span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full">
             {restArticles.map((article, index) => (
                 <a key={index} href={`/article/${article.slug || generateSlug(article.title, article.url)}`} className="article-card group">
                   <div className="relative w-full h-48 overflow-hidden">

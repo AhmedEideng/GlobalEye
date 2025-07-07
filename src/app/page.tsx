@@ -7,8 +7,17 @@ import HomeFeatured from '@components/HomeFeatured';
 import HomeNewsGrid from '@components/HomeNewsGrid';
 import { useEffect, useState } from 'react';
 import { sendAnalyticsEvent } from './utils/fetchNews';
+import BreakingNewsTickerController from '@components/BreakingNewsTickerController';
 
 export default function HomePage() {
+  return (
+    <BreakingNewsTickerController>
+      <HomePageContent />
+    </BreakingNewsTickerController>
+  );
+}
+
+function HomePageContent() {
   const { user, loading } = useAuth();
   const [articles, setArticles] = useState<NewsArticle[]>([]);
   const [featuredArticle, setFeaturedArticle] = useState<NewsArticle | null>(null);

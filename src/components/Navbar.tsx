@@ -1,8 +1,8 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from 'react';
 import LoginButton from '@components/LoginButton';
+import React from 'react';
 
 const categories = [
   { name: 'home', path: '/', label: 'Home' },
@@ -16,9 +16,13 @@ const categories = [
   { name: 'science', path: '/science', label: 'Science' }
 ];
 
-export default function Navbar() {
+interface NavbarProps {
+  isMenuOpen: boolean;
+  setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export default function Navbar({ isMenuOpen, setIsMenuOpen }: NavbarProps) {
   const pathname = usePathname();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <div className="navbar-container flex items-center justify-between py-2 px-4 bg-white fixed left-0 w-full z-50" style={{ top: '48px' }}>
@@ -62,7 +66,7 @@ export default function Navbar() {
       {isMenuOpen && (
         <div className="mobile-nav fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50 flex justify-start">
           <div className="bg-white w-64 h-full p-6 flex flex-col gap-4 shadow-lg rounded-r-2xl relative">
-            {/* زر تسجيل الدخول في الأعلى */}
+            {/* Login button at the top */}
             <div className="mb-4">
               <LoginButton />
             </div>

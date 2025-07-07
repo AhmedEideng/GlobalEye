@@ -3,17 +3,22 @@ import { NewsArticle } from '../../utils/fetchNews';
 import ArticleHeader from '@components/ArticleHeader';
 import ArticleContent from '@components/ArticleContent';
 import ShareButtons from '@components/ShareButtons';
-import { useEffect } from 'react';
-import { sendAnalyticsEvent } from '../../utils/fetchNews';
+import { useEffect, useState } from 'react';
+import { sendAnalyticsEvent, fetchRelatedNews } from '../../utils/fetchNews';
 import Link from 'next/link';
 
 export default function ArticleClient({ article, slug }: { article: NewsArticle | null, slug: string }) {
+  const [relatedArticles, setRelatedArticles] = useState<NewsArticle[]>([]);
   useEffect(() => {
     if (article) {
       sendAnalyticsEvent('view_article', {
         slug: article.slug,
         category: article.category,
         source: article.source?.name || '',
+      });
+      // Fetch related articles (at least 20)
+      fetchRelatedNews(article, article.category).then((res) => {
+        setRelatedArticles(res.slice(0, 20));
       });
     }
   }, [article]);
@@ -56,6 +61,38 @@ export default function ArticleClient({ article, slug }: { article: NewsArticle 
       </div>
       {/* Share Buttons */}
       <ShareButtons url={`/article/${article.slug}`} title={article.title} />
+      {/* Suggested Articles Section */}
+      {relatedArticles.length > 0 && (
+        <section className="mt-12">
+          <h2 className="text-xl font-bold mb-4">Suggested Articles</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {relatedArticles.map((related, idx) => (
+              <Link
+                key={related.slug + idx}
+                href={`/article/${related.slug}`}
+                className="article-card group"
+              >
+                <div className="relative w-full h-48 overflow-hidden">
+                  <img
+                    src={related.urlToImage || "/placeholder-news.jpg"}
+                    alt={related.title}
+                    className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <div className="p-4">
+                  <div className="article-category text-xs font-bold mb-1 bg-red-600 text-white rounded-full px-3 py-1 inline-block">{related.source?.name}</div>
+                  <h3 className="article-title text-lg font-bold mb-2 line-clamp-2">{related.title}</h3>
+                  <p className="article-excerpt text-gray-600 text-sm mb-2 line-clamp-2">{related.description}</p>
+                  <div className="article-meta text-xs flex flex-wrap gap-2 text-gray-400">
+                    <span className="flex items-center gap-1 text-gray-400">{new Date(related.publishedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                    {related.author && <span>by {related.author}</span>}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
     </article>
   );
 } 

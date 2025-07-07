@@ -2,9 +2,19 @@
 import Link from 'next/link';
 import { FaNewspaper, FaSync } from 'react-icons/fa';
 import { useBreakingNews, BreakingNewsItem } from '@hooks/useBreakingNews';
+import { useWindowSize } from '@hooks/useWindowSize';
 
-export default function BreakingNewsTicker() {
+export default function BreakingNewsTicker({ showTicker = true }: { showTicker?: boolean }) {
   const { news, loading, error, refreshNews } = useBreakingNews();
+  const { width } = useWindowSize();
+
+  let newsCount = 5;
+  if (width < 500) newsCount = 1;
+  else if (width < 700) newsCount = 2;
+  else if (width < 900) newsCount = 3;
+  else if (width < 1200) newsCount = 4;
+
+  if (!showTicker) return null;
 
   return (
     <div className="breaking-news-ticker bg-red-800 text-white w-full overflow-hidden relative">
@@ -14,7 +24,7 @@ export default function BreakingNewsTicker() {
         {/* Breaking News Label */}
         <div className="breaking-label flex items-center gap-2 mr-4 flex-shrink-0">
           <FaNewspaper className="text-yellow-300 animate-pulse" />
-          <span className="font-bold text-sm uppercase tracking-wider">
+          <span className="breaking-label-text font-bold text-sm uppercase tracking-wider">
             Breaking News
           </span>
         </div>
@@ -39,7 +49,7 @@ export default function BreakingNewsTicker() {
             </div>
           ) : news.length > 0 ? (
             <div className="ticker-items flex items-center">
-              {news.slice(0, 5).map((newsItem: BreakingNewsItem) => (
+              {news.slice(0, newsCount).map((newsItem: BreakingNewsItem) => (
                 <div
                   key={newsItem.id}
                   className="ticker-item flex-shrink-0 flex items-center"

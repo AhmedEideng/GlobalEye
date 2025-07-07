@@ -1,6 +1,6 @@
 import { supabase } from '@utils/supabaseClient';
 
-// تعريف مؤقت لـ window.gtag لتفادي خطأ linter
+// Temporary definition for window.gtag to avoid linter error
 declare global {
   interface Window {
     gtag?: (..._args: unknown[]) => void;

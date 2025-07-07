@@ -2,28 +2,28 @@ import { NextResponse } from 'next/server';
 import { fetchNews } from '@utils/fetchNews';
 
 export async function GET() {
-  const baseUrl = 'https://globaleye.live'; // عدل هذا إلى دومين موقعك
+  const baseUrl = 'https://globaleye.live'; // Change this to your site domain
 
-  // الصفحات الثابتة
+  // Static pages
   const staticPages = [
     '',
     'about',
     'contact-us',
     'privacy',
     'terms-and-conditions',
-    // أضف المزيد حسب الحاجة
+    // Add more as needed
   ];
 
-  // جلب التصنيفات (مثال: يمكنك تعديلها لجلب التصنيفات من قاعدة البيانات)
+  // Categories (example: you can modify to fetch categories from DB)
   const categories = [
     'business',
     'sports',
     'technology',
     'health',
-    // أضف أو اجلب التصنيفات ديناميكياً
+    // Add or fetch categories dynamically
   ];
 
-  // جلب المقالات (مثال: جلب أول 50 مقال من كل تصنيف)
+  // Fetch articles (example: fetch first 50 articles from each category)
   let articleSlugs: string[] = [];
   for (const category of categories) {
     try {
@@ -31,10 +31,10 @@ export async function GET() {
       articleSlugs.push(...articles.slice(0, 50).map(article => article.slug));
     } catch {}
   }
-  // إزالة التكرار
+  // Remove duplicates
   articleSlugs = Array.from(new Set(articleSlugs));
 
-  // بناء الروابط
+  // Build URLs
   const urls = [
     ...staticPages.map(
       (page) => `
