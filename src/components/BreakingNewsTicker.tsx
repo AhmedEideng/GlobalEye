@@ -7,7 +7,7 @@ export default function BreakingNewsTicker() {
   const { news, loading, error, refreshNews } = useBreakingNews();
 
   return (
-    <div className="breaking-news-ticker bg-red-600 text-white w-full overflow-hidden relative">
+    <div className="breaking-news-ticker bg-red-800 text-white w-full overflow-hidden relative">
       <div 
         className="ticker-container flex items-center py-2 px-4"
       >
@@ -70,8 +70,8 @@ export default function BreakingNewsTicker() {
       </div>
 
       {/* Gradient overlay for smooth edges */}
-      <div className="absolute top-0 right-0 w-8 h-full bg-gradient-to-l from-red-600 to-transparent pointer-events-none" />
-      <div className="absolute top-0 left-0 w-8 h-full bg-gradient-to-r from-red-600 to-transparent pointer-events-none" />
+      <div className="absolute top-0 right-0 w-8 h-full bg-gradient-to-l from-red-800 to-transparent pointer-events-none" />
+      <div className="absolute top-0 left-0 w-8 h-full bg-gradient-to-r from-red-800 to-transparent pointer-events-none" />
     </div>
   );
 } 
