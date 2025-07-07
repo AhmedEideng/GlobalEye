@@ -555,12 +555,20 @@ a, a:hover, a:active, a:visited {
   .news-grid {
     gap: 18px;
     margin-top: 18px;
+    grid-template-columns: repeat(auto-fit, minmax(90vw, 1fr));
   }
   .section-header {
     margin-bottom: 18px;
   }
   .article-card {
-    padding: 14px 8px 12px 8px;
+    padding: 22px 14px 18px 14px;
+    font-size: 1.08rem;
+  }
+  .article-title {
+    font-size: 1.15rem;
+  }
+  .article-excerpt {
+    font-size: 1rem;
   }
 }
 
