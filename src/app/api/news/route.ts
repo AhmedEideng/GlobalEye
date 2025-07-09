@@ -1,7 +1,7 @@
 import { fetchNews } from '../../utils/fetchNews';
 import { NextResponse } from 'next/server';
 
-export const revalidate = 300; // Cache for 5 minutes
+export const revalidate = 900; // Cache for 5 minutes
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

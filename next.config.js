@@ -22,7 +22,7 @@ const withPWA = require('next-pwa')({
         cacheName: 'news-api',
         expiration: {
           maxEntries: 50,
-          maxAgeSeconds: 5 * 60, // 5 minutes
+          maxAgeSeconds: 15 * 60, // 15 minutes
         },
       },
     },
