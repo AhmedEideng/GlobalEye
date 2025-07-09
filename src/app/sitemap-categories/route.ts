@@ -15,20 +15,23 @@ export async function GET() {
     'science'
   ];
 
-  const urls = categories.map(
-    (category) => `
-      <url>
-        <loc>${baseUrl}/${category}</loc>
-        <changefreq>daily</changefreq>
-        <priority>0.7</priority>
-        <lastmod>${new Date().toISOString()}</lastmod>
-      </url>
-    `
-  );
+  let urls = '';
+  if (categories.length > 0) {
+    urls = categories.map(
+      (category) => `
+        <url>
+          <loc>${baseUrl}/${category}</loc>
+          <changefreq>daily</changefreq>
+          <priority>0.7</priority>
+          <lastmod>${new Date().toISOString()}</lastmod>
+        </url>
+      `
+    ).join('');
+  }
 
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-      ${urls.join('')}
+      ${urls}
     </urlset>
   `;
 
