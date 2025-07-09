@@ -117,8 +117,10 @@ export default function CategoryClient({ category }: { category: string }) {
     fetchData();
   }, [category, categoryLabel]);
 
-  const featuredArticle = articles.length > 0 ? articles[0] : null;
-  const restArticles = articles.length > 1 ? articles.slice(1) : [];
+  // حدد أول 50 خبر فقط
+  const limitedArticles = articles.slice(0, 50);
+  const featuredArticle = limitedArticles.length > 0 ? limitedArticles[0] : null;
+  const restArticles = limitedArticles.length > 1 ? limitedArticles.slice(1) : [];
 
   if (loading) {
     return (

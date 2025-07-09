@@ -32,8 +32,12 @@ function HomePageContent() {
         const favSlugs = await getFavorites(user.id);
         sortedArticles = sortArticlesByUserPreferences(allArticles, favSlugs);
       }
-      setFeaturedArticle(sortedArticles[0] || null);
-      setArticles(sortedArticles.slice(0, 30));
+      // حدد أول خبر كـ featuredArticle
+      const featured = sortedArticles[0] || null;
+      setFeaturedArticle(featured);
+      // استبعد الخبر الرئيسي من الشبكة
+      const restArticles = featured ? sortedArticles.filter(a => a.slug !== featured.slug) : sortedArticles;
+      setArticles(restArticles.slice(0, 49)); // 49 خبر بجانب الرئيسي ليكون المجموع 50
       setPageLoading(false);
       sendAnalyticsEvent('home_view', { userId: user?.id || null });
     };
@@ -47,7 +51,7 @@ function HomePageContent() {
   return (
     <main>
       {featuredArticle && <HomeFeatured article={featuredArticle} />}
-      {articles.length > 0 && <HomeNewsGrid articles={articles.slice(0, 30)} />}
+      {articles.length > 0 && <HomeNewsGrid articles={articles} />}
     </main>
   );
 } 
