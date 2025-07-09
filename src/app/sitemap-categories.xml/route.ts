@@ -11,7 +11,7 @@ export async function GET() {
     return new NextResponse('Error fetching categories', { status: 500 });
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://your-domain.com';
+  const baseUrl = 'https://globaleye.live';
   const urls = (categories as { slug: string }[] | null)?.map((cat) =>
     `<url><loc>${baseUrl}/category/${cat.slug}</loc></url>`
   ).join('') || '';
