@@ -22,7 +22,7 @@ export async function getCategoryByName(name: string) {
  */
 export async function addCategoryIfNotExists(name: string) {
   // جرب جلب القسم أولاً
-  let category = await getCategoryByName(name);
+  const category = await getCategoryByName(name);
   if (category) return category;
   // أضف القسم
   const { data, error } = await supabase
