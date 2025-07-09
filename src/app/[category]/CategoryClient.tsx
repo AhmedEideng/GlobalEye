@@ -117,8 +117,8 @@ export default function CategoryClient({ category }: { category: string }) {
     fetchData();
   }, [category, categoryLabel]);
 
-  // حدد أول 50 خبر فقط
-  const limitedArticles = articles.slice(0, 50);
+  // حدد أول 52 خبر فقط
+  const limitedArticles = articles.slice(0, 52);
   const featuredArticle = limitedArticles.length > 0 ? limitedArticles[0] : null;
   const restArticles = limitedArticles.length > 1 ? limitedArticles.slice(1) : [];
 

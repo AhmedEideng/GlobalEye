@@ -37,7 +37,7 @@ function HomePageContent() {
       setFeaturedArticle(featured);
       // استبعد الخبر الرئيسي من الشبكة
       const restArticles = featured ? sortedArticles.filter(a => a.slug !== featured.slug) : sortedArticles;
-      setArticles(restArticles.slice(0, 49)); // 49 خبر بجانب الرئيسي ليكون المجموع 50
+      setArticles(restArticles.slice(0, 51)); // 51 خبر بجانب الرئيسي ليكون المجموع 52
       setPageLoading(false);
       sendAnalyticsEvent('home_view', { userId: user?.id || null });
     };
