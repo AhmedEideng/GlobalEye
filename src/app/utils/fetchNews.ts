@@ -74,6 +74,20 @@ interface MediastackArticle {
   published_at?: string;
 }
 
+// عرف نوع جديد لنتيجة الاستعلام مع JOIN
+interface NewsWithCategory {
+  source_name: string;
+  author: string | null;
+  title: string;
+  description: string | null;
+  url: string;
+  url_to_image: string | null;
+  published_at: string;
+  content: string | null;
+  slug: string;
+  categories?: { name: string };
+}
+
 /**
  * Fetches news articles for a given category from the database or APIs, sorted from newest to oldest.
  * If no recent news in the DB, fetches from APIs and saves to DB.
@@ -108,20 +122,21 @@ export async function fetchNews(category: string = 'general'): Promise<NewsArtic
     .limit(30);
 
   if (!error && dbArticles && dbArticles.length > 0) {
-    return dbArticles.map((article: { [key: string]: any; categories?: { name: string } }) => ({
-      source: { id: null, name: article.source_name },
-      author: article.author,
-      title: article.title,
-      description: article.description,
-      url: article.url,
-      urlToImage: article.url_to_image,
-      publishedAt: article.published_at,
-      content: article.content,
-      slug: article.slug,
-      category: article.categories?.name || category,
-    }) as NewsArticle);
+    return dbArticles.map((article: NewsWithCategory) =>
+      ({
+        source: { id: null, name: article.source_name },
+        author: article.author,
+        title: article.title,
+        description: article.description,
+        url: article.url,
+        urlToImage: article.url_to_image,
+        publishedAt: article.published_at,
+        content: article.content,
+        slug: article.slug,
+        category: article.categories?.name || category,
+      }) as NewsArticle
+    );
   }
-
   return [];
 }
 
