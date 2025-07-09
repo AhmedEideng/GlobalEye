@@ -1,4 +1,5 @@
 import { supabase } from '@utils/supabaseClient';
+import { getOrAddCategoryId } from './categoryUtils';
 
 // Temporary definition for window.gtag to avoid linter error
 declare global {
@@ -84,7 +85,7 @@ interface NewsRow {
   published_at: string;
   content: string | null;
   slug: string;
-  category: string;
+  category_id: number;
 }
 
 /**
@@ -115,13 +116,13 @@ export async function fetchNews(category: string = 'general'): Promise<NewsArtic
   // 2. Always fetch the latest from DB
   const { data: dbArticles, error } = await supabase
     .from('news')
-    .select('*')
-    .eq('category', category)
+    .select('*, categories(name)')
+    .eq('category_id', await getOrAddCategoryId(category))
     .order('published_at', { ascending: false })
     .limit(30);
 
   if (!error && dbArticles && dbArticles.length > 0) {
-    return dbArticles.map((article: NewsRow) => ({
+    return dbArticles.map((article: any) => ({
       source: { id: null, name: article.source_name },
       author: article.author,
       title: article.title,
@@ -131,7 +132,7 @@ export async function fetchNews(category: string = 'general'): Promise<NewsArtic
       publishedAt: article.published_at,
       content: article.content,
       slug: article.slug,
-      category: article.category || 'general',
+      category: article.categories?.name || category,
     }));
   }
 
@@ -191,14 +192,15 @@ async function saveArticlesToSupabase(articles: NewsArticle[], category: string)
   if (!filtered.length) return;
 
   try {
+    // جلب أو إضافة القسم والحصول على id
+    const categoryId = await getOrAddCategoryId(category);
+    if (!categoryId) return;
     // Prepare data to match the table structure
     const mapped = filtered.map(article => {
-      // Ensure slug exists, if not generate it
       let finalSlug = article.slug;
       if (!finalSlug || finalSlug === '' || finalSlug === 'null') {
         finalSlug = generateSlug(article.title, article.url);
       }
-      // Clean image URL
       let cleanImageUrl = article.urlToImage;
       if (cleanImageUrl && cleanImageUrl.startsWith('//')) {
         cleanImageUrl = 'https:' + cleanImageUrl;
@@ -213,11 +215,11 @@ async function saveArticlesToSupabase(articles: NewsArticle[], category: string)
         source_name: article.source.name,
         author: article.author,
         slug: finalSlug,
-        category,
+        category_id: categoryId,
       };
     });
     // Insert articles while ignoring duplicates based on url
-          await supabase.from('news').upsert(mapped, { onConflict: 'url' });
+    await supabase.from('news').upsert(mapped, { onConflict: 'url' });
   } catch {
   }
 }
