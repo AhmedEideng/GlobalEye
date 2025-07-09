@@ -95,7 +95,36 @@ interface NewsWithCategory {
  * @returns Promise<NewsArticle[]>
  */
 export async function fetchNews(category: string = 'general'): Promise<NewsArticle[]> {
-  // 1. Fetch from APIs and upsert to DB
+  // 1. جلب أحدث الأخبار من قاعدة البيانات (مثلاً آخر ساعة)
+  const { data: dbArticles, error } = await supabase
+    .from('news')
+    .select('*, categories(name)')
+    .eq('category_id', await getOrAddCategoryId(category))
+    .order('published_at', { ascending: false })
+    .limit(50);
+
+  // إذا وجدنا أخبار حديثة (مثلاً منشورة خلال آخر ساعة)، نرجعها فورًا
+  if (!error && dbArticles && dbArticles.length > 0) {
+    const now = new Date();
+    const latest = new Date(dbArticles[0].published_at);
+    const diffMinutes = (now.getTime() - latest.getTime()) / (1000 * 60);
+    if (diffMinutes < 60) { // أقل من ساعة
+      return dbArticles.map((article: NewsWithCategory) => ({
+        source: { id: null, name: article.source_name },
+        author: article.author,
+        title: article.title,
+        description: article.description,
+        url: article.url,
+        urlToImage: article.url_to_image,
+        publishedAt: article.published_at,
+        content: article.content,
+        slug: article.slug,
+        category: article.categories?.name || category,
+      }) as NewsArticle);
+    }
+  }
+
+  // 2. إذا لم نجد أخبار حديثة، جلب من الـ APIs الخارجية وتحديث قاعدة البيانات
   const sources = [
     { fn: fetchFromNewsAPI, name: 'NewsAPI' },
     { fn: fetchFromGNews, name: 'GNews' },
@@ -113,29 +142,27 @@ export async function fetchNews(category: string = 'general'): Promise<NewsArtic
     await saveArticlesToSupabase(unique, category);
   }
 
-  // 2. Always fetch the latest from DB
-  const { data: dbArticles, error } = await supabase
+  // جلب أحدث الأخبار من قاعدة البيانات بعد التحديث
+  const { data: freshDbArticles, error: freshError } = await supabase
     .from('news')
     .select('*, categories(name)')
     .eq('category_id', await getOrAddCategoryId(category))
     .order('published_at', { ascending: false })
-    .limit(30);
+    .limit(50);
 
-  if (!error && dbArticles && dbArticles.length > 0) {
-    return dbArticles.map((article: NewsWithCategory) =>
-      ({
-        source: { id: null, name: article.source_name },
-        author: article.author,
-        title: article.title,
-        description: article.description,
-        url: article.url,
-        urlToImage: article.url_to_image,
-        publishedAt: article.published_at,
-        content: article.content,
-        slug: article.slug,
-        category: article.categories?.name || category,
-      }) as NewsArticle
-    );
+  if (!freshError && freshDbArticles && freshDbArticles.length > 0) {
+    return freshDbArticles.map((article: NewsWithCategory) => ({
+      source: { id: null, name: article.source_name },
+      author: article.author,
+      title: article.title,
+      description: article.description,
+      url: article.url,
+      urlToImage: article.url_to_image,
+      publishedAt: article.published_at,
+      content: article.content,
+      slug: article.slug,
+      category: article.categories?.name || category,
+    }) as NewsArticle);
   }
   return [];
 }
