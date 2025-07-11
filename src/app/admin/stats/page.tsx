@@ -25,6 +25,7 @@ export default function AdminStatsPage() {
 
   async function fetchStats() {
     setLoading(true);
+    type NewsArticleWithSourceName = NewsArticle & { source_name?: string };
     const { data } = await supabase
       .from('news')
       .select('*')
@@ -38,13 +39,13 @@ export default function AdminStatsPage() {
     const articlesCount = data.length;
     // عدد المصادر المستخدمة
     const sourcesSet = new Set<string>();
-    data.forEach((a: NewsArticle) => {
+    (data as (NewsArticleWithSourceName)[]).forEach((a) => {
       // دعم كلا الحالتين: source.name أو source_name
       let names: string[] = [];
-      if (a.source && typeof a.source === 'object' && a.source.name) {
-        names = a.source.name.split(' + ');
-      } else if ((a as any).source_name) {
-        names = (a as any).source_name.split(' + ');
+      if (a.source && typeof a.source === 'object' && (a.source as { name?: string }).name) {
+        names = ((a.source as { name: string }).name).split(' + ');
+      } else if (a.source_name) {
+        names = a.source_name.split(' + ');
       }
       names.forEach((s: string) => s && sourcesSet.add(s.trim()));
     });
