@@ -72,6 +72,11 @@ export default function AdminStatsPage() {
     setLoading(false);
   }
 
+  // دالة خارجية لتفادي تحذير any في map
+  const renderCategory = ([cat, count]: [string, number]) => (
+    <li key={cat}>{cat}: {count}</li>
+  );
+
   if (authLoading) {
     return <div className="max-w-2xl mx-auto py-10 px-4">جاري التحقق من الصلاحيات...</div>;
   }
@@ -105,10 +110,7 @@ export default function AdminStatsPage() {
           <div>
             أكثر التصنيفات تكرارًا:
             <ul className="list-disc pl-6">
-              {stats.topCategories.map((entry: [string, number]) => {
-                const [cat, count] = entry;
-                return <li key={cat}>{cat}: {count}</li>;
-              })}
+              {stats.topCategories.map(renderCategory)}
             </ul>
           </div>
         </div>
