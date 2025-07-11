@@ -1,4 +1,4 @@
-import { fetchNews, NewsArticle, sortArticlesByUserPreferences } from './utils/fetchNews';
+import { fetchNews, NewsArticle } from './utils/fetchNews';
 import HomeFeatured from '@components/HomeFeatured';
 import HomeNewsGrid from '@components/HomeNewsGrid';
 import BreakingNewsTickerController from '@components/BreakingNewsTickerController';

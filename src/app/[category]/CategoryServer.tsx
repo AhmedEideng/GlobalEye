@@ -1,5 +1,3 @@
-import OptimizedImage from '@components/OptimizedImage';
-import Link from 'next/link';
 import { NewsArticle } from '../utils/fetchNews';
 import Image from 'next/image';
 

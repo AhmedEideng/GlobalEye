@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import OptimizedImage from '@components/OptimizedImage';
+import Image from 'next/image';
 import { sendAnalyticsEvent, fetchRelatedNews } from '../utils/fetchNews';
 import Link from 'next/link';
 
@@ -170,7 +170,7 @@ export default function CategoryClient({ category }: { category: string }) {
       {featuredArticle && (
         <a href={`/article/${featuredArticle.slug || generateSlug(featuredArticle.title, featuredArticle.url)}`} className="article-card block featured-article mb-6 group cursor-pointer">
           <div className="relative w-full h-[400px] md:h-[500px] rounded-2xl overflow-hidden group-hover:opacity-90 transition-opacity duration-200">
-            <OptimizedImage
+            <Image
               src={featuredArticle.urlToImage || '/placeholder-news.svg'}
               alt={featuredArticle.title}
               fill
@@ -204,7 +204,7 @@ export default function CategoryClient({ category }: { category: string }) {
             {restArticles.map((article, index) => (
                 <a key={index} href={`/article/${article.slug || generateSlug(article.title, article.url)}`} className="article-card group">
                   <div className="relative w-full h-48 overflow-hidden">
-                    <img
+                    <Image
                       src={article.urlToImage || '/placeholder-news.svg'}
                       alt={article.title}
                       className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
@@ -239,9 +239,10 @@ export default function CategoryClient({ category }: { category: string }) {
                 className="article-card group"
               >
                 <div className="relative w-full h-48 overflow-hidden">
-                  <img
+                  <Image
                     src={article.urlToImage || "/placeholder-news.jpg"}
                     alt={article.title}
+                    fill
                     className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>

@@ -1,11 +1,11 @@
 import { getArticleBySlug, NewsArticle } from '../../utils/fetchNews';
 import ArticleClient from './ArticleClient';
-import { Metadata } from 'next';
 import ArticleJsonLdHead from './ArticleJsonLdHead';
 
 export const revalidate = 120;
 
-export async function generateMetadata({ params }: any) {
+export async function generateMetadata(props: unknown) {
+  const { params } = props as { params: { slug: string } };
   const { slug } = params;
   const article: NewsArticle | null = await getArticleBySlug(slug);
   if (!article) {
@@ -41,7 +41,8 @@ export async function generateMetadata({ params }: any) {
   };
 }
 
-export default async function Page({ params }: any) {
+export default async function Page(props: unknown) {
+  const { params } = props as { params: { slug: string } };
   const { slug } = params;
   const article: NewsArticle | null = await getArticleBySlug(slug);
   return <>

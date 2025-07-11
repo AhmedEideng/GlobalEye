@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import Head from 'next/head';
 import ArticleAboutJsonLdHead from './ArticleAboutJsonLdHead';
 
 export const metadata: Metadata = {

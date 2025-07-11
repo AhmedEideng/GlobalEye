@@ -7,7 +7,13 @@ import { useAuth } from '@hooks/useAuth';
 
 export default function AdminStatsPage() {
   const { user, loading: authLoading, signInWithGoogle } = useAuth();
-  const [stats, setStats] = useState<any>(null);
+  interface Stats {
+    articlesCount: number;
+    sourcesCount: number;
+    removedParagraphs: number;
+    topCategories: [string, number][];
+  }
+  const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
 
   // قائمة إيميلات المشرفين المسموح لهم
@@ -19,7 +25,7 @@ export default function AdminStatsPage() {
 
   async function fetchStats() {
     setLoading(true);
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('news')
       .select('*')
       .eq('published', true);

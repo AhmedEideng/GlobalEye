@@ -23,7 +23,7 @@ export default function AdminReviewPage() {
 
   async function fetchUnpublished() {
     setLoading(true);
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('news')
       .select('*')
       .eq('published', false)

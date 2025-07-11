@@ -819,13 +819,6 @@ function extractSummary(content: string, maxSentences = 3): string {
   return summary;
 }
 
-function generateMetaDescription(content: string, maxLength = 160): string {
-  // استخدم extractSummary لجملة أو جملتين
-  const summary = extractSummary(content, 2);
-  // قص الوصف إذا كان أطول من الحد المطلوب
-  return summary.length > maxLength ? summary.slice(0, maxLength - 1) + '…' : summary;
-}
-
 // دمج نصوص الأخبار في مجموعة واحدة لمقال طويل وفريد
 function mergeArticlesGroup(group: NewsArticle[]): NewsArticle {
   if (group.length === 1) return group[0];
@@ -835,7 +828,7 @@ function mergeArticlesGroup(group: NewsArticle[]): NewsArticle {
   const description = group.map(a => a.description).filter(Boolean).join(' | ');
   // ندمج المحتوى (نزيل التكرار الذكي للفقرات)
   const allContents = group.map(a => a.content || '').join('\n\n');
-  let paragraphs = allContents.split(/\n+/).map(p => p.trim()).filter(Boolean);
+  const paragraphs = allContents.split(/\n+/).map(p => p.trim()).filter(Boolean);
   // إزالة الفقرات المتشابهة جدًا باستخدام Jaro-Winkler
   const uniqueParagraphs: string[] = [];
   for (let i = 0; i < paragraphs.length; i++) {

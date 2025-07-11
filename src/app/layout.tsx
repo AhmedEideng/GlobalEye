@@ -1,9 +1,7 @@
 import Footer from '@components/Footer';
 import "./globals.css";
-import type { Metadata, Viewport } from "next";
 import PwaInstallToast from '@components/PwaInstallToast';
 import DynamicHeader from '@components/DynamicHeader';
-import Script from 'next/script';
 import BreakingNewsTickerController from '@components/BreakingNewsTickerController';
 import ClientLangHead from './ClientLangHead';
 
@@ -43,8 +41,6 @@ export const viewport = {
   width: "device-width",
   initialScale: 1,
 };
-
-const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   // لا تستخدم window أو usePathname هنا

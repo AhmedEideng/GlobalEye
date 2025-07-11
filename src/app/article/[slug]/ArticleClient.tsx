@@ -4,6 +4,7 @@ import ArticleHeader from '@components/ArticleHeader';
 import ArticleContent from '@components/ArticleContent';
 import ShareButtons from '@components/ShareButtons';
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { sendAnalyticsEvent, fetchRelatedNews } from '../../utils/fetchNews';
 import Link from 'next/link';
 
@@ -73,9 +74,10 @@ export default function ArticleClient({ article, slug }: { article: NewsArticle 
                 className="article-card group"
               >
                 <div className="relative w-full h-48 overflow-hidden">
-                  <img
+                  <Image
                     src={related.urlToImage || "/placeholder-news.jpg"}
                     alt={related.title}
+                    fill
                     className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
