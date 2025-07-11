@@ -3,6 +3,7 @@ import Link from "next/link";
 import { NewsArticle } from '@utils/fetchNews';
 import { cleanImageUrl } from '@utils/cleanImageUrl';
 import Image from "next/image";
+import { AdsterraBanner468x60 } from './AdsterraAds';
 
 export default function HomeNewsGrid({ articles }: { articles: NewsArticle[] }) {
   if (!articles?.length) return null;
@@ -13,6 +14,7 @@ export default function HomeNewsGrid({ articles }: { articles: NewsArticle[] }) 
         <Link href="/world" className="btn btn-secondary">View All News</Link>
       </div>
       <div className="news-grid">
+        <AdsterraBanner468x60 />
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {articles.map((article, idx) => {
             const cleanImage = cleanImageUrl(article.urlToImage);

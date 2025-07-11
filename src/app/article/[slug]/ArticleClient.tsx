@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { sendAnalyticsEvent, fetchRelatedNews } from '../../utils/fetchNews';
 import Link from 'next/link';
+import { AdsterraBanner468x60 } from '@components/AdsterraAds';
 
 export default function ArticleClient({ article, slug }: { article: NewsArticle | null, slug: string }) {
   const [relatedArticles, setRelatedArticles] = useState<NewsArticle[]>([]);
@@ -48,6 +49,7 @@ export default function ArticleClient({ article, slug }: { article: NewsArticle 
     <article className="w-full max-w-screen-xl mx-auto px-2 sm:px-4 py-6 md:py-10">
       <ArticleHeader article={article} />
       <ArticleContent article={article} />
+      <AdsterraBanner468x60 />
       {/* Read Full Article Button */}
       <div className="flex justify-center my-8">
         <a

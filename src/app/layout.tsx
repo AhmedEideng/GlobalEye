@@ -4,6 +4,7 @@ import PwaInstallToast from '@components/PwaInstallToast';
 import DynamicHeader from '@components/DynamicHeader';
 import BreakingNewsTickerController from '@components/BreakingNewsTickerController';
 import ClientLangHead from './ClientLangHead';
+import { AdsterraBanner728x90, AdsterraBanner320x50 } from '@components/AdsterraAds';
 
 export const metadata = {
   metadataBase: new URL('https://globaleye.live'),
@@ -55,6 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <PwaInstallToast />
         <header className="cnn-header"></header>
         <DynamicHeader />
+        <AdsterraBanner728x90 />
         <nav className="cnn-nav">
           <div className="nav-container"></div>
         </nav>
@@ -64,6 +66,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
           <Footer />
         </BreakingNewsTickerController>
+        {/* Sticky mobile ad */}
+        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1000, display: 'flex', justifyContent: 'center' }}>
+          <AdsterraBanner320x50 style={{ maxWidth: '100vw' }} />
+        </div>
       </body>
     </html>
   );
