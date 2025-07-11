@@ -1,10 +1,17 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { sendAnalyticsEvent } from '../app/utils/fetchNews';
 
 export default function ShareButtons({ url, title }: { url: string, title: string }) {
+  const [fullUrl, setFullUrl] = useState(url);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setFullUrl(window.location.origin + url);
+    }
+  }, [url]);
+
   const [copied, setCopied] = useState(false);
-  const fullUrl = typeof window !== 'undefined' ? window.location.origin + url : url;
   const handleCopy = async () => {
     await navigator.clipboard.writeText(fullUrl);
     setCopied(true);
@@ -15,7 +22,7 @@ export default function ShareButtons({ url, title }: { url: string, title: strin
     <div className="flex flex-wrap gap-3 mt-6 mb-8 items-center justify-center">
       {/* WhatsApp - Original App Style */}
       <a 
-        href={`https://wa.me/?text=${encodeURIComponent(title + ' ' + fullUrl)}`} 
+        href={`https://wa.me/?text=${encodeURIComponent(title + ' ' + fullUrl)}`}
         target="_blank" 
         rel="noopener noreferrer" 
         title="Share on WhatsApp" 
@@ -36,43 +43,16 @@ export default function ShareButtons({ url, title }: { url: string, title: strin
       </a>
       {/* X (Twitter) */}
       <a href={`https://x.com/intent/tweet?url=${encodeURIComponent(fullUrl)}&text=${encodeURIComponent(title)}`} target="_blank" rel="noopener noreferrer" title="Share on X" onClick={() => sendAnalyticsEvent('share_article', { method: 'x', url: fullUrl })}>
-        <svg className="w-7 h-7 text-black" viewBox="0 0 1200 1227" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <g clipPath="url(#clip0_87_390)">
-            <rect width="1200" height="1227" fill="white"/>
-            <path d="M908.305 0H1090.7L704.305 521.49L1152 1227H797.305L523.305 813.49L211.305 1227H28.3052L438.305 667.49L0 0H364.305L610.305 375.49L908.305 0ZM845.305 1105H945.305L308.305 114H203.305L845.305 1105Z" fill="black"/>
-          </g>
-          <defs>
-            <clipPath id="clip0_87_390">
-              <rect width="1200" height="1227" fill="white"/>
-            </clipPath>
-          </defs>
-        </svg>
+        <svg className="w-7 h-7 text-black" fill="currentColor" viewBox="0 0 24 24"><path d="M23.954 4.569c-.885.389-1.83.654-2.825.775 1.014-.611 1.794-1.574 2.163-2.724-.951.555-2.005.959-3.127 1.184-.897-.959-2.178-1.555-3.594-1.555-2.717 0-4.924 2.206-4.924 4.917 0 .39.045.765.127 1.124-4.09-.205-7.719-2.165-10.148-5.144-.424.729-.666 1.577-.666 2.476 0 1.708.87 3.216 2.188 4.099-.807-.026-1.566-.248-2.229-.616v.061c0 2.385 1.693 4.374 3.946 4.827-.413.111-.849.171-1.296.171-.314 0-.615-.03-.916-.086.631 1.953 2.445 3.377 4.604 3.417-1.68 1.319-3.809 2.105-6.102 2.105-.39 0-.779-.023-1.17-.067 2.189 1.394 4.768 2.209 7.557 2.209 9.054 0 14-7.496 14-13.986 0-.21 0-.423-.016-.634.962-.689 1.8-1.56 2.46-2.548l-.047-.02z"/></svg>
       </a>
       {/* Instagram */}
-      <a
-        href={`https://www.instagram.com/?url=${encodeURIComponent(fullUrl)}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        title="Share on Instagram"
-        className="group"
-        onClick={() => sendAnalyticsEvent('share_article', { method: 'instagram', url: fullUrl })}
-      >
-        <span className="w-7 h-7 rounded-full flex items-center justify-center bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 p-[2px] transition-transform transform group-hover:scale-110">
-          <svg
-            className="w-5 h-5 text-white"
-            viewBox="0 0 448 512"
-            fill="currentColor"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9 114.9-51.3 114.9-114.9S287.7 141 224.1 141zm0 186c-39.5 0-71.5-32-71.5-71.5s32-71.5 71.5-71.5 71.5 32 71.5 71.5-32 71.5-71.5 71.5zm146.4-194.3c0 14.9-12 26.9-26.9 26.9s-26.9-12-26.9-26.9 12-26.9 26.9-26.9 26.9 12 26.9 26.9zm76.1 27.2c-1.7-35.3-9.9-66.7-36.2-92.9S388.6 1.7 353.3 0C317.8-1.7 130.2-1.7 94.7 0 59.4 1.7 28 9.9 1.7 36.2S1.7 123.4 0 158.7C-1.7 194.2-1.7 381.8 0 417.3c1.7 35.3 9.9 66.7 36.2 92.9s57.6 34.5 92.9 36.2c35.5 1.7 223.1 1.7 258.6 0 35.3-1.7 66.7-9.9 92.9-36.2s34.5-57.6 36.2-92.9c1.7-35.5 1.7-223.1 0-258.6zM398.8 388c-7.8 19.6-22.9 34.7-42.5 42.5-29.4 11.7-99.2 9-132.3 9s-102.9 2.6-132.3-9c-19.6-7.8-34.7-22.9-42.5-42.5-11.7-29.4-9-99.2-9-132.3s-2.6-102.9 9-132.3c7.8-19.6 22.9-34.7 42.5-42.5C121.2 9 191 11.6 224.1 11.6s102.9-2.6 132.3 9c19.6 7.8 34.7 22.9 42.5 42.5 11.7 29.4 9 99.2 9 132.3s2.7 102.9-9 132.3z" />
-          </svg>
-        </span>
+      <a href={`https://www.instagram.com/?url=${encodeURIComponent(fullUrl)}`} target="_blank" rel="noopener noreferrer" title="Share on Instagram" className="group" onClick={() => sendAnalyticsEvent('share_article', { method: 'instagram', url: fullUrl })}>
+        <svg className="w-7 h-7 text-pink-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.334 3.608 1.308.974.974 1.246 2.241 1.308 3.608.058 1.266.069 1.646.069 4.85s-.012 3.584-.07 4.85c-.062 1.366-.334 2.633-1.308 3.608-.974.974-2.241 1.246-3.608 1.308-1.266.058-1.646.069-4.85.069s-3.584-.012-4.85-.07c-1.366-.062-2.633-.334-3.608-1.308-.974-.974-1.246-2.241-1.308-3.608C2.175 15.647 2.163 15.267 2.163 12s.012-3.584.07-4.85c.062-1.366.334-2.633 1.308-3.608.974-.974 2.241-1.246 3.608-1.308C8.416 2.175 8.796 2.163 12 2.163zm0-2.163C8.741 0 8.332.013 7.052.072 5.771.131 4.659.414 3.678 1.395c-.98.98-1.263 2.092-1.322 3.373C2.013 5.668 2 6.077 2 12c0 5.923.013 6.332.072 7.613.059 1.281.342 2.393 1.322 3.373.98.98 2.092 1.263 3.373 1.322C8.332 23.987 8.741 24 12 24s3.668-.013 4.948-.072c1.281-.059 2.393-.342 3.373-1.322.98-.98 1.263-2.092 1.322-3.373.059-1.281.072-1.69.072-7.613 0-5.923-.013-6.332-.072-7.613-.059-1.281-.342-2.393-1.322-3.373-.98-.98-2.092-1.263-3.373-1.322C15.668.013 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zm0 10.162a3.999 3.999 0 1 1 0-7.998 3.999 3.999 0 0 1 0 7.998zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
       </a>
-      {/* Copy Link */}
-      <button onClick={handleCopy} title="Copy link" className="focus:outline-none">
-        <svg className="w-7 h-7 text-gray-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      {/* Copy link */}
+      <button onClick={handleCopy} className="btn btn-secondary" title="Copy link">
+        {copied ? "Copied!" : "Copy Link"}
       </button>
-      {copied && <span className="text-xs text-green-600 ml-2 animate-pulse">Copied!</span>}
     </div>
   );
 } 

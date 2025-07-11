@@ -43,42 +43,25 @@ export const viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  // لا تستخدم window أو usePathname هنا
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <head>
         <ClientLangHead />
-        {/* Meta tags الخاصة فقط */}
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/favicon.ico.jpg" />
         <meta name="theme-color" content="#0a0a0a" />
       </head>
       <body suppressHydrationWarning>
         <PwaInstallToast />
-        {/* CNN Style Header */}
-        <header className="cnn-header">
-          {/* Top Bar */}
-          {/* Removed black bar with breaking news text */}
-          {/* Main Header - Hidden to avoid duplication with DynamicHeader */}
-          {/* <div className="header-main">
-            <div className="cnn-logo">
-              <span>Global</span>Eye
-            </div>
-          </div> */}
-        </header>
-        {/* Dynamic Header - disappears on scroll down, appears on scroll up */}
+        <header className="cnn-header"></header>
         <DynamicHeader />
-        {/* Navigation */}
         <nav className="cnn-nav">
           <div className="nav-container"></div>
         </nav>
-        {/* BreakingNewsTickerController wraps all content for ticker and navbar on all pages */}
         <BreakingNewsTickerController>
-          {/* Main Content */}
           <div className="main-container max-w-screen-xl mx-auto px-2 sm:px-4 pt-4 pb-8 w-full">
             {children}
           </div>
-          {/* Footer */}
           <Footer />
         </BreakingNewsTickerController>
       </body>

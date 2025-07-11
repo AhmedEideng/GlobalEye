@@ -2,7 +2,7 @@ const withPWA = require('next-pwa')({
   dest: 'public',
   register: true,
   skipWaiting: true,
-  disable: process.env.NODE_ENV !== 'production',
+  disable: true, // تم التعطيل نهائيًا
   runtimeCaching: [
     {
       urlPattern: /^https:\/\/.*\.(png|jpg|jpeg|svg|gif|webp)$/,
@@ -78,7 +78,10 @@ module.exports = withPWA({
           { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
           { key: 'Permissions-Policy', value: 'geolocation=(), microphone=(), camera=()' },
           // CSP: Remove 'unsafe-eval' and restrict 'unsafe-inline' to style-src only
-          { key: 'Content-Security-Policy', value: "default-src 'self'; img-src * data: blob:; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src *; frame-ancestors 'self';" },
+          {
+            key: 'Content-Security-Policy',
+            value: "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com;",
+          },
         ],
       },
     ];

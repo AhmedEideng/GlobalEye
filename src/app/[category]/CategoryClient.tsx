@@ -74,10 +74,16 @@ export default function CategoryClient({ category }: { category: string }) {
   const [articles, setArticles] = React.useState<Article[]>([]);
   const [suggestedArticles, setSuggestedArticles] = React.useState<Article[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [timeout, setTimeoutReached] = React.useState(false);
+
+  React.useEffect(() => {
+    const t = setTimeout(() => setTimeoutReached(true), 5000);
+    return () => clearTimeout(t);
+  }, []);
 
   React.useEffect(() => {
     setLoading(true);
-    
+    console.log('بدء جلب الأخبار للتصنيف:', category);
     const fetchData = async () => {
       try {
         const response = await fetch(`/api/news?category=${category}`, {
@@ -86,18 +92,16 @@ export default function CategoryClient({ category }: { category: string }) {
             'Accept': 'application/json',
           }
         });
-        
+        console.log('تم استلام الرد من API:', response.status);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
         const data = await response.json();
-        
+        console.log('تم جلب البيانات:', data);
         if (data.articles && data.articles.length > 0) {
           setArticles(data.articles);
           // Track category visit when page loads
           sendAnalyticsEvent('view_category', { category });
-          
           // Fetch suggested articles from the same category
           if (data.articles.length > 0) {
             const firstArticle = data.articles[0];
@@ -107,13 +111,14 @@ export default function CategoryClient({ category }: { category: string }) {
         } else {
           throw new Error(`No news available in the "${categoryLabel}" category. Please try again.`);
         }
-      } catch {
+      } catch (err) {
+        console.error('خطأ أثناء جلب الأخبار:', err);
         throw new Error('Failed to load news. Please try again.');
       } finally {
         setLoading(false);
+        console.log('انتهى جلب الأخبار للتصنيف:', category);
       }
     };
-
     fetchData();
   }, [category, categoryLabel]);
 
@@ -122,7 +127,7 @@ export default function CategoryClient({ category }: { category: string }) {
   const featuredArticle = limitedArticles.length > 0 ? limitedArticles[0] : null;
   const restArticles = limitedArticles.length > 1 ? limitedArticles.slice(1) : [];
 
-  if (loading) {
+  if (loading && !timeout) {
     return (
       <div className="loading flex items-center justify-center min-h-[400px]">
         <div className="text-center">
@@ -130,6 +135,15 @@ export default function CategoryClient({ category }: { category: string }) {
           <h2 className="text-xl font-semibold text-gray-700">Loading {categoryLabel} news...</h2>
           <p className="text-gray-500 mt-2">Please wait while we fetch the latest updates</p>
         </div>
+      </div>
+    );
+  }
+  if (loading && timeout) {
+    return (
+      <div className="error text-center py-8">
+        <h2 className="text-2xl font-bold text-red-700 mb-4">حدثت مشكلة في تحميل الأخبار</h2>
+        <p className="text-gray-600 mb-6">استغرق التحميل وقتًا طويلاً. حاول تحديث الصفحة أو تحقق من اتصالك بالإنترنت.</p>
+        <button className="btn btn-primary" onClick={() => window.location.reload()}>تحديث الصفحة</button>
       </div>
     );
   }

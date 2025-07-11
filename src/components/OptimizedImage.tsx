@@ -47,15 +47,8 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   // Clean the image URL
   const cleanSrc = cleanImageUrl(src);
   
-  const isExternal = cleanSrc ? /^https?:\/\//.test(cleanSrc) : false;
-  const proxiedSrc = useMemo(() => {
-    if (isExternal) {
-      return cleanSrc ? `/api/image-proxy?url=${encodeURIComponent(cleanSrc)}` : '';
-    }
-    return cleanSrc;
-  }, [cleanSrc, isExternal]);
-  
-  const imageSrc = hasError ? placeholder : proxiedSrc || cleanSrc || '/placeholder-news.jpg' || '';
+  // استخدم الصورة مباشرة من المصدر الخارجي بدون proxy
+  const imageSrc = hasError ? placeholder : cleanSrc || '/placeholder-news.jpg' || '';
 
   if (fill) {
     return (
