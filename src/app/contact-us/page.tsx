@@ -18,7 +18,7 @@ export default function ContactPage() {
       await new Promise((res) => setTimeout(res, 1000));
       setStatus('success');
       form.reset();
-    } catch (_err: unknown) {
+    } catch {
       setError('Failed to send message. Please try again.');
       setStatus('error');
     }

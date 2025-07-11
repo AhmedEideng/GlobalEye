@@ -105,7 +105,7 @@ export default function AdminStatsPage() {
           <div>
             أكثر التصنيفات تكرارًا:
             <ul className="list-disc pl-6">
-              {stats.topCategories.map(([cat, count]: [string, number]) => (
+              {stats.topCategories.map(([cat, count]) => (
                 <li key={cat}>{cat}: {count}</li>
               ))}
             </ul>
