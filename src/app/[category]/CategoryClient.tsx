@@ -109,7 +109,7 @@ export default function CategoryClient({ category }: { category: string }) {
         } else {
           throw new Error(`No news available in the "${categoryLabel}" category. Please try again.`);
         }
-      } catch (err) {
+      } catch {
         throw new Error('Failed to load news. Please try again.');
       } finally {
         setLoading(false);
