@@ -8,17 +8,30 @@ const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const FALLBACK_IMAGE =
   'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect width="100%" height="100%" fill="#eee"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#888" font-size="24">Image not available</text></svg>';
 
+// Whitelist of allowed domains for image proxying
+const ALLOWED_DOMAINS = [
+  'images.unsplash.com',
+  'cdn.cnn.com',
+  'ichef.bbci.co.uk',
+  'static01.nyt.com',
+  'media.guim.co.uk',
+  // Add more trusted domains as needed
+];
+
 export async function GET(req: NextRequest) {
   const url = req.nextUrl.searchParams.get('url');
   if (!url) {
     return fallbackImageResponse();
   }
 
+  // السماح فقط بروابط https
+  if (!/^https:\/\//.test(url)) {
+    return new NextResponse('Only https image URLs are allowed.', { status: 400 });
+  }
+
+  // Remove domain whitelist check
+
   try {
-    // Allow only http/https URLs
-    if (!/^https?:\/\//.test(url)) {
-      return fallbackImageResponse();
-    }
     // Extract domain from URL to add as Referer
     let referer = '';
     try {

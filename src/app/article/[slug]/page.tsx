@@ -1,10 +1,51 @@
 import { getArticleBySlug, NewsArticle } from '../../utils/fetchNews';
 import ArticleClient from './ArticleClient';
+import { Metadata } from 'next';
+import ArticleJsonLdHead from './ArticleJsonLdHead';
 
 export const revalidate = 120;
 
-export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+export async function generateMetadata({ params }: any) {
+  const { slug } = params;
   const article: NewsArticle | null = await getArticleBySlug(slug);
-  return <ArticleClient article={article} slug={slug} />;
+  if (!article) {
+    return {
+      title: 'Article Not Found | GlobalEye News',
+      description: 'Sorry, we could not find the article you are looking for.',
+      alternates: { canonical: `https://globaleye.live/article/${slug}` },
+    };
+  }
+  return {
+    title: `${article.title} | GlobalEye News`,
+    description: article.description || article.title,
+    alternates: { canonical: `https://globaleye.live/article/${article.slug}` },
+    openGraph: {
+      title: article.title,
+      description: article.description || article.title,
+      url: `https://globaleye.live/article/${article.slug}`,
+      siteName: 'GlobalEye News',
+      images: [
+        { url: article.urlToImage || '/placeholder-news.jpg', width: 1200, height: 630, alt: article.title }
+      ],
+      locale: 'en_US',
+      type: 'article',
+      publishedTime: article.publishedAt,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: article.title,
+      description: article.description || article.title,
+      images: [article.urlToImage || '/placeholder-news.jpg'],
+      site: '@globaleyenews',
+    },
+  };
+}
+
+export default async function Page({ params }: any) {
+  const { slug } = params;
+  const article: NewsArticle | null = await getArticleBySlug(slug);
+  return <>
+    <ArticleJsonLdHead article={article} />
+    <ArticleClient article={article} slug={slug} />
+  </>;
 } 

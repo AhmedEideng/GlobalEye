@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { NewsArticle } from '@utils/fetchNews';
 import { cleanImageUrl } from '@utils/cleanImageUrl';
+import Image from "next/image";
 
 export default function HomeNewsGrid({ articles }: { articles: NewsArticle[] }) {
   if (!articles?.length) return null;
@@ -22,10 +23,12 @@ export default function HomeNewsGrid({ articles }: { articles: NewsArticle[] }) 
                 className="article-card group"
               >
                 <div className="relative w-full h-48 overflow-hidden">
-                  <img
+                  <Image
                     src={cleanImage || "/placeholder-news.jpg"}
                     alt={article.title}
+                    fill
                     className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   />
                 </div>
                 <div className="p-4">

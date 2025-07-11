@@ -145,3 +145,26 @@ If you encounter any issues:
 4. Check the debug logs for detailed information
 
 For additional support, please open an issue in the repository.
+
+## الاختبارات التلقائية (Jest)
+
+لتشغيل جميع الاختبارات:
+
+```
+npx jest
+```
+
+---
+
+## مراقبة الأخطاء (Sentry)
+
+1. أنشئ حسابًا في [Sentry.io](https://sentry.io/) واحصل على DSN.
+2. أضف DSN إلى ملف `.env.local`:
+   ```
+   SENTRY_DSN=your_sentry_dsn_here
+   ```
+3. فعّل Sentry عبر تشغيل الأمر:
+   ```
+npx @sentry/wizard -i nextjs
+   ```
+4. سيتم مراقبة جميع الأخطاء تلقائيًا بعد النشر.

@@ -1,5 +1,8 @@
 import { supabase } from '@utils/supabaseClient';
 import { getOrAddCategoryId } from './categoryUtils';
+import { LRUCache } from 'lru-cache';
+
+// Remove the temporary declare module 'lru-cache' fix since types are now installed
 
 // Temporary definition for window.gtag to avoid linter error
 declare global {
@@ -25,10 +28,10 @@ export type NewsArticle = {
 };
 
 // TODO: Move these to environment variables after creating .env.local file
-const NEWS_API_KEY = "7d0558972f474651bd6e8caf39ed7690";
-const GNEWS_API_KEY = "0ca8e593409a10ac2edf9b4926be9896";
-const GUARDIAN_KEY = "dfb1dd37-68b1-4d85-9837-62d1fe12c62d";
-const MEDIASTACK_KEY = "b20e48f1cd7e3cd2ea218f4532c7fd31";
+const NEWS_API_KEY = process.env.NEWS_API_KEY;
+const GNEWS_API_KEY = process.env.GNEWS_API_KEY;
+const GUARDIAN_KEY = process.env.GUARDIAN_KEY;
+const MEDIASTACK_KEY = process.env.MEDIASTACK_KEY;
 
 interface NewsAPIArticle {
   source?: { id?: string; name?: string };
@@ -88,6 +91,23 @@ interface NewsWithCategory {
   categories?: { name: string };
 }
 
+// مدة الكاش (ثواني) قابلة للتعديل عبر متغير بيئة
+const CACHE_TTL = Number(process.env.CACHE_TTL) || 300; // 5 دقائق افتراضيًا
+
+// Set up internal cache for each category for CACHE_TTL seconds
+const newsCache = new LRUCache<string, NewsArticle[]>({
+  max: 32, // Number of cached categories
+  ttl: 1000 * CACHE_TTL, // CACHE_TTL بالمللي ثانية
+});
+
+/**
+ * دالة لتحديث الأخبار يدويًا (force refresh) - يمكن استخدامها في جدولة مستقبلية (cron job)
+ */
+export async function forceRefreshNews(category: string = 'general') {
+  newsCache.delete(category);
+  return await fetchNews(category);
+}
+
 /**
  * Fetches news articles for a given category from the database or APIs, sorted from newest to oldest.
  * If no recent news in the DB, fetches from APIs and saves to DB.
@@ -95,7 +115,11 @@ interface NewsWithCategory {
  * @returns Promise<NewsArticle[]>
  */
 export async function fetchNews(category: string = 'general'): Promise<NewsArticle[]> {
-  // 1. جلب أحدث الأخبار من قاعدة البيانات (مثلاً آخر ساعة)
+  // Check cache first
+  const cached = newsCache.get(category);
+  if (cached) return cached;
+
+  // 1. Fetch latest news from the database (e.g., last hour)
   const { data: dbArticles, error } = await supabase
     .from('news')
     .select('*, categories(name)')
@@ -103,13 +127,13 @@ export async function fetchNews(category: string = 'general'): Promise<NewsArtic
     .order('published_at', { ascending: false })
     .limit(50);
 
-  // إذا وجدنا أخبار حديثة (مثلاً منشورة خلال آخر ساعة)، نرجعها فورًا
+  // If we find recent news (e.g., published within the last hour), return it immediately
   if (!error && dbArticles && dbArticles.length > 0) {
     const now = new Date();
     const latest = new Date(dbArticles[0].published_at);
     const diffMinutes = (now.getTime() - latest.getTime()) / (1000 * 60);
-    if (diffMinutes < 60) { // أقل من ساعة
-      return dbArticles.map((article: NewsWithCategory) => ({
+    if (diffMinutes < 60) { // Less than an hour
+      const result = dbArticles.map((article: NewsWithCategory) => ({
         source: { id: null, name: article.source_name },
         author: article.author,
         title: article.title,
@@ -121,10 +145,12 @@ export async function fetchNews(category: string = 'general'): Promise<NewsArtic
         slug: article.slug,
         category: article.categories?.name || category,
       }) as NewsArticle);
+      newsCache.set(category, result); // Store the result in cache
+      return result;
     }
   }
 
-  // 2. إذا لم نجد أخبار حديثة، جلب من الـ APIs الخارجية وتحديث قاعدة البيانات
+  // 2. If no recent news, fetch from external APIs and update the database
   const sources = [
     { fn: fetchFromNewsAPI, name: 'NewsAPI' },
     { fn: fetchFromGNews, name: 'GNews' },
@@ -136,13 +162,15 @@ export async function fetchNews(category: string = 'general'): Promise<NewsArtic
   );
   const results = await Promise.all(promises);
   const all = results.filter(Boolean).flat() as NewsArticle[];
-  const unique = all.filter((item, idx, arr) => arr.findIndex(a => a.url === item.url) === idx);
-  unique.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
-  if (unique.length > 0) {
-    await saveArticlesToSupabase(unique, category);
+  // ====== دمج الأخبار المتشابهة في مقالات فريدة وطويلة ======
+  const groups = groupSimilarArticles(all, 0.5); // threshold يمكن تعديله حسب الحاجة
+  const mergedArticles = groups.map(group => mergeArticlesGroup(group));
+  mergedArticles.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+  if (mergedArticles.length > 0) {
+    await saveArticlesToSupabase(mergedArticles, category);
   }
 
-  // جلب أحدث الأخبار من قاعدة البيانات بعد التحديث
+  // Fetch latest news from the database after update
   const { data: freshDbArticles, error: freshError } = await supabase
     .from('news')
     .select('*, categories(name)')
@@ -151,7 +179,7 @@ export async function fetchNews(category: string = 'general'): Promise<NewsArtic
     .limit(50);
 
   if (!freshError && freshDbArticles && freshDbArticles.length > 0) {
-    return freshDbArticles.map((article: NewsWithCategory) => ({
+    const result = freshDbArticles.map((article: NewsWithCategory) => ({
       source: { id: null, name: article.source_name },
       author: article.author,
       title: article.title,
@@ -163,44 +191,69 @@ export async function fetchNews(category: string = 'general'): Promise<NewsArtic
       slug: article.slug,
       category: article.categories?.name || category,
     }) as NewsArticle);
+    newsCache.set(category, result); // Store the result in cache
+    return result;
   }
+
+  // Fallback: Fetch or add the category and get its id
+  const { data: oldArticles, error: oldError } = await supabase
+    .from('news')
+    .select('*, categories(name)')
+    .eq('category_id', await getOrAddCategoryId(category))
+    .order('published_at', { ascending: true })
+    .limit(50);
+  if (!oldError && oldArticles && oldArticles.length > 0) {
+    const result = oldArticles.map((article: NewsWithCategory) => ({
+      source: { id: null, name: article.source_name },
+      author: article.author,
+      title: article.title,
+      description: article.description,
+      url: article.url,
+      urlToImage: article.url_to_image,
+      publishedAt: article.published_at,
+      content: article.content,
+      slug: article.slug,
+      category: article.categories?.name || category,
+    }) as NewsArticle);
+    newsCache.set(category, result); // Store the result in cache
+    return result;
+  }
+
+  // If no news, return an empty array (and handle it in the frontend)
   return [];
 }
 
-/**
- * Detects the category of a news article based on its content/title/description.
- * @param article - NewsArticle object
- * @returns category string
- */
-export function detectCategory(article: NewsArticle): string {
-  const title = article.title.toLowerCase();
-  const description = article.description?.toLowerCase() || '';
-  const content = article.content?.toLowerCase() || '';
-  const text = `${title} ${description} ${content}`;
+// قائمة موسعة للكلمات المفتاحية لكل تصنيف
+const CATEGORY_KEYWORDS: Record<string, string[]> = {
+  business: ['business', 'market', 'economy', 'finance', 'stock', 'trade', 'investment', 'bank', 'currency', 'بورصة', 'اقتصاد', 'مال', 'تجارة', 'استثمار', 'مصرف', 'عملة'],
+  technology: ['technology', 'tech', 'ai', 'software', 'hardware', 'internet', 'robot', 'gadget', 'app', 'برمجيات', 'تقنية', 'ذكاء اصطناعي', 'روبوت', 'تطبيق', 'انترنت'],
+  sports: ['sport', 'football', 'basketball', 'tennis', 'match', 'goal', 'league', 'championship', 'olympic', 'رياضي', 'كرة', 'مباراة', 'هدف', 'دوري', 'بطولة', 'أولمبياد'],
+  entertainment: ['entertainment', 'movie', 'music', 'celebrity', 'film', 'drama', 'actor', 'نجوم', 'فن', 'فيلم', 'موسيقى', 'ممثل', 'دراما', 'مشاهير'],
+  health: ['health', 'medical', 'doctor', 'hospital', 'covid', 'virus', 'مرض', 'صحة', 'طبيب', 'مستشفى', 'دواء', 'علاج', 'فيروس'],
+  science: ['science', 'research', 'study', 'discovery', 'space', 'astronomy', 'علم', 'بحث', 'دراسة', 'فضاء', 'اكتشاف', 'فلك'],
+  politics: ['politics', 'government', 'election', 'president', 'minister', 'parliament', 'سياسة', 'حكومة', 'انتخابات', 'رئيس', 'وزير', 'برلمان'],
+  world: ['world', 'international', 'global', 'دولي', 'عالمي', 'عالم', 'خارجية'],
+  general: []
+};
 
-  if (text.includes('business') || text.includes('market') || text.includes('economy') || text.includes('finance')) {
-    return 'business';
+// تصنيف ذكي بناءً على الكلمات المفتاحية الأكثر تكرارًا
+export function detectCategory(article: NewsArticle): string {
+  const text = `${article.title} ${article.description || ''} ${article.content || ''}`.toLowerCase();
+  let bestCategory = 'general';
+  let maxCount = 0;
+  for (const [cat, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
+    let count = 0;
+    for (const kw of keywords) {
+      // دعم العربية والإنجليزية
+      const regex = new RegExp(`\\b${kw.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`, 'gi');
+      count += (text.match(regex) || []).length;
+    }
+    if (count > maxCount) {
+      maxCount = count;
+      bestCategory = cat;
+    }
   }
-  if (text.includes('technology') || text.includes('tech') || text.includes('ai') || text.includes('software')) {
-    return 'technology';
-  }
-  if (text.includes('sport') || text.includes('football') || text.includes('basketball') || text.includes('tennis')) {
-    return 'sports';
-  }
-  if (text.includes('entertainment') || text.includes('movie') || text.includes('music') || text.includes('celebrity')) {
-    return 'entertainment';
-  }
-  if (text.includes('health') || text.includes('medical') || text.includes('doctor') || text.includes('hospital')) {
-    return 'health';
-  }
-  if (text.includes('science') || text.includes('research') || text.includes('study') || text.includes('discovery')) {
-    return 'science';
-  }
-  if (text.includes('politics') || text.includes('government') || text.includes('election') || text.includes('president')) {
-    return 'politics';
-  }
-  
-  return 'general';
+  return bestCategory;
 }
 
 /**
@@ -220,7 +273,7 @@ async function saveArticlesToSupabase(articles: NewsArticle[], category: string)
   if (!filtered.length) return;
 
   try {
-    // جلب أو إضافة القسم والحصول على id
+    // Fetch or add the category and get its id
     const categoryId = await getOrAddCategoryId(category);
     if (!categoryId) return;
     // Prepare data to match the table structure
@@ -668,6 +721,157 @@ async function fetchFromMediastack(category: string): Promise<NewsArticle[]> {
       };
     });
   } catch { return []; }
+}
+
+// ====== Text Similarity & Merging Utilities ======
+// حساب تشابه Jaccard بين مجموعتي كلمات
+function jaccardSimilarity(a: string, b: string): number {
+  const setA = new Set(a.toLowerCase().split(/\W+/));
+  const setB = new Set(b.toLowerCase().split(/\W+/));
+  const intersection = new Set([...setA].filter(x => setB.has(x)));
+  const union = new Set([...setA, ...setB]);
+  return intersection.size / union.size;
+}
+
+// دالة Jaro-Winkler (pure JS)
+function jaroWinklerSimilarity(s1: string, s2: string): number {
+  // Jaro distance
+  const m = Math.max(s1.length, s2.length);
+  if (m === 0) return 1;
+  const matchWindow = Math.floor(Math.max(s1.length, s2.length) / 2) - 1;
+  const s1Matches = new Array(s1.length).fill(false);
+  const s2Matches = new Array(s2.length).fill(false);
+  let matches = 0;
+  for (let i = 0; i < s1.length; i++) {
+    const start = Math.max(0, i - matchWindow);
+    const end = Math.min(i + matchWindow + 1, s2.length);
+    for (let j = start; j < end; j++) {
+      if (!s2Matches[j] && s1[i] === s2[j]) {
+        s1Matches[i] = true;
+        s2Matches[j] = true;
+        matches++;
+        break;
+      }
+    }
+  }
+  if (matches === 0) return 0;
+  let t = 0;
+  let k = 0;
+  for (let i = 0; i < s1.length; i++) {
+    if (s1Matches[i]) {
+      while (!s2Matches[k]) k++;
+      if (s1[i] !== s2[k]) t++;
+      k++;
+    }
+  }
+  t = t / 2;
+  const jaro = (matches / s1.length + matches / s2.length + (matches - t) / matches) / 3;
+  // Winkler boost
+  let l = 0;
+  while (l < 4 && s1[l] && s2[l] && s1[l] === s2[l]) l++;
+  return jaro + l * 0.1 * (1 - jaro);
+}
+
+// دالة لتجميع الأخبار المتشابهة في مجموعات
+function groupSimilarArticles(articles: NewsArticle[], threshold = 0.5): NewsArticle[][] {
+  const groups: NewsArticle[][] = [];
+  const used = new Array(articles.length).fill(false);
+  for (let i = 0; i < articles.length; i++) {
+    if (used[i]) continue;
+    const group = [articles[i]];
+    used[i] = true;
+    for (let j = i + 1; j < articles.length; j++) {
+      if (used[j]) continue;
+      // التشابه بناءً على العنوان + المحتوى
+      const simTitle = jaccardSimilarity(articles[i].title, articles[j].title);
+      const simContent = jaroWinklerSimilarity(
+        (articles[i].content || '') + ' ' + (articles[i].description || ''),
+        (articles[j].content || '') + ' ' + (articles[j].description || '')
+      );
+      if (simTitle > threshold || simContent > threshold) {
+        group.push(articles[j]);
+        used[j] = true;
+      }
+    }
+    groups.push(group);
+  }
+  return groups;
+}
+
+function extractSummary(content: string, maxSentences = 3): string {
+  // تقسيم النص إلى جمل
+  const sentences = content.match(/[^.!؟\n]+[.!؟]?/g) || [];
+  if (sentences.length <= maxSentences) return content;
+  // حساب تكرار الكلمات
+  const wordCounts: Record<string, number> = {};
+  const words = content.toLowerCase().split(/\W+/).filter(Boolean);
+  words.forEach(w => { wordCounts[w] = (wordCounts[w] || 0) + 1; });
+  // تقييم كل جملة بناءً على مجموع تكرار كلماتها وطولها
+  const scored = sentences.map(s => {
+    const sWords = s.toLowerCase().split(/\W+/).filter(Boolean);
+    const score = sWords.reduce((sum, w) => sum + (wordCounts[w] || 0), 0) + sWords.length;
+    return { s, score };
+  });
+  // ترتيب الجمل حسب التقييم
+  scored.sort((a, b) => b.score - a.score);
+  // أخذ أفضل الجمل
+  const summary = scored.slice(0, maxSentences).map(x => x.s.trim()).join(' ');
+  return summary;
+}
+
+function generateMetaDescription(content: string, maxLength = 160): string {
+  // استخدم extractSummary لجملة أو جملتين
+  const summary = extractSummary(content, 2);
+  // قص الوصف إذا كان أطول من الحد المطلوب
+  return summary.length > maxLength ? summary.slice(0, maxLength - 1) + '…' : summary;
+}
+
+// دمج نصوص الأخبار في مجموعة واحدة لمقال طويل وفريد
+function mergeArticlesGroup(group: NewsArticle[]): NewsArticle {
+  if (group.length === 1) return group[0];
+  // ندمج العناوين (نأخذ الأكثر تكرارًا أو الأطول)
+  const title = group.map(a => a.title).sort((a, b) => b.length - a.length)[0];
+  // ندمج الوصف
+  const description = group.map(a => a.description).filter(Boolean).join(' | ');
+  // ندمج المحتوى (نزيل التكرار الذكي للفقرات)
+  const allContents = group.map(a => a.content || '').join('\n\n');
+  let paragraphs = allContents.split(/\n+/).map(p => p.trim()).filter(Boolean);
+  // إزالة الفقرات المتشابهة جدًا باستخدام Jaro-Winkler
+  const uniqueParagraphs: string[] = [];
+  for (let i = 0; i < paragraphs.length; i++) {
+    const para = paragraphs[i];
+    // إذا كانت الفقرة متشابهة جدًا مع فقرة سابقة (>0.88) نتجاهلها
+    if (uniqueParagraphs.some(up => jaroWinklerSimilarity(up, para) > 0.88)) continue;
+    uniqueParagraphs.push(para);
+  }
+  // ترتيب الفقرات: الأطول أولاً (أو لاحقًا يمكن ترتيبها زمنيًا إذا توفر timestamps)
+  uniqueParagraphs.sort((a, b) => b.length - a.length);
+  const content = uniqueParagraphs.join('\n\n');
+  // ====== إضافة خلاصة الخبر في نهاية المقال ======
+  const summary = extractSummary(content, 3);
+  let contentWithSummary = content + '\n\nخلاصة الخبر: ' + summary;
+  // ====== إضافة قائمة المصادر في نهاية المقال ======
+  const sourcesList = group
+    .map(a => `- [${a.source.name || 'مصدر'}](${a.url})`)
+    .filter((v, i, arr) => arr.indexOf(v) === i) // إزالة التكرار
+    .join('\n');
+  contentWithSummary += `\n\nالمصادر:\n${sourcesList}`;
+  // نأخذ أول صورة متوفرة
+  const urlToImage = group.find(a => a.urlToImage)?.urlToImage || null;
+  // نأخذ أول رابط (أو نجمع المصادر)
+  const url = group[0].url;
+  // نأخذ أول مؤلف
+  const author = group.find(a => a.author)?.author || null;
+  // نأخذ أحدث تاريخ نشر
+  const publishedAt = group.map(a => a.publishedAt).sort().reverse()[0];
+  // ندمج أسماء المصادر
+  const sourceNames = Array.from(new Set(group.map(a => a.source.name)));
+  const source = { id: null, name: sourceNames.join(' + ') };
+  // نستخدم slug من أطول عنوان
+  const slug = group.map(a => a.slug).sort((a, b) => b.length - a.length)[0];
+  // نأخذ التصنيف
+  const category = group[0].category;
+  return { source, author, title, description, url, urlToImage, publishedAt, content: contentWithSummary, slug, category };
 }
 
 // Helper function to execute a promise with a timeout

@@ -1,9 +1,9 @@
 import { supabase } from '@utils/supabaseClient';
 
 /**
- * جلب قسم بالاسم من جدول categories
- * @param name اسم القسم
- * @returns بيانات القسم أو null
+ * Fetch a category by name from the categories table
+ * @param name Category name
+ * @returns Category data or null
  */
 export async function getCategoryByName(name: string) {
   const { data, error } = await supabase
@@ -16,15 +16,15 @@ export async function getCategoryByName(name: string) {
 }
 
 /**
- * إضافة قسم جديد إذا لم يكن موجودًا
- * @param name اسم القسم
- * @returns بيانات القسم بعد الإضافة
+ * Add a new category if it doesn't exist
+ * @param name Category name
+ * @returns Category data after adding
  */
 export async function addCategoryIfNotExists(name: string) {
-  // جرب جلب القسم أولاً
+  // Try to fetch the category first
   const category = await getCategoryByName(name);
   if (category) return category;
-  // أضف القسم
+  // Add the category
   const { data, error } = await supabase
     .from('categories')
     .insert([{ name }])
@@ -35,9 +35,9 @@ export async function addCategoryIfNotExists(name: string) {
 }
 
 /**
- * جلب أو إضافة قسم وإرجاع id
- * @param name اسم القسم
- * @returns category_id أو null
+ * Get or add a category and return the id
+ * @param name Category name
+ * @returns category_id or null
  */
 export async function getOrAddCategoryId(name: string): Promise<number|null> {
   const category = await addCategoryIfNotExists(name);

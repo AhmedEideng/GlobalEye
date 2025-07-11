@@ -1,16 +1,17 @@
 import { Metadata } from 'next';
+import ArticlePrivacyJsonLdHead from './ArticlePrivacyJsonLdHead';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy | GlobalEye News',
-  description: 'Read the privacy policy of GlobalEye News. Learn how we protect your data and privacy as you use our global news platform.',
-  alternates: { canonical: 'https://globaleye.news/privacy' },
+  description: 'Read the privacy policy of GlobalEye News to understand how we protect your data and privacy.',
+  alternates: { canonical: 'https://globaleye.live/privacy' },
   openGraph: {
     title: 'Privacy Policy | GlobalEye News',
-    description: 'Read the privacy policy of GlobalEye News. Learn how we protect your data and privacy as you use our global news platform.',
-    url: 'https://globaleye.news/privacy',
+    description: 'Read the privacy policy of GlobalEye News to understand how we protect your data and privacy.',
+    url: 'https://globaleye.live/privacy',
     siteName: 'GlobalEye News',
     images: [
-      { url: '/placeholder-news.jpg', width: 1200, height: 630, alt: 'GlobalEye News' }
+      { url: '/placeholder-news.jpg', width: 1200, height: 630, alt: 'Privacy Policy GlobalEye News' }
     ],
     locale: 'en_US',
     type: 'website',
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Privacy Policy | GlobalEye News',
-    description: 'Read the privacy policy of GlobalEye News. Learn how we protect your data and privacy as you use our global news platform.',
+    description: 'Read the privacy policy of GlobalEye News to understand how we protect your data and privacy.',
     images: ['/placeholder-news.jpg'],
     site: '@globaleyenews',
   },
@@ -30,7 +31,8 @@ export const metadata: Metadata = {
 };
 
 export default function PrivacyPage() {
-  return (
+  return <>
+    <ArticlePrivacyJsonLdHead />
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <h1 className="text-4xl font-bold mb-8">Privacy Policy</h1>
       <div className="prose max-w-none">
@@ -58,5 +60,5 @@ export default function PrivacyPage() {
         </div>
       </div>
     </div>
-  );
+  </>;
 } 

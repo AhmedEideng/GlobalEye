@@ -60,5 +60,27 @@ module.exports = withPWA({
     maxInactiveAge: 25 * 1000,
     pagesBufferLength: 2,
   },
+  // تم تعطيل إعدادات i18n لأنها غير مدعومة في App Router
+  // i18n: {
+  //   locales: ['en', 'ar'],
+  //   defaultLocale: 'en',
+  //   localeDetection: false
+  // },
   // You can add Next.js settings here
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+          { key: 'Permissions-Policy', value: 'geolocation=(), microphone=(), camera=()' },
+          // CSP: Remove 'unsafe-eval' and restrict 'unsafe-inline' to style-src only
+          { key: 'Content-Security-Policy', value: "default-src 'self'; img-src * data: blob:; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src *; frame-ancestors 'self';" },
+        ],
+      },
+    ];
+  },
 }); 

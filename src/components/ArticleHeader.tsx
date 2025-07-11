@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import OptimizedImage from '@components/OptimizedImage';
+import Image from 'next/image';
 import { NewsArticle, sendAnalyticsEvent } from '@utils/fetchNews';
 import { cleanImageUrl } from '@utils/cleanImageUrl';
 import { useAuth } from '@hooks/useAuth';
 import { addFavorite, removeFavorite, isFavorite } from '@services/favorites';
+import Head from 'next/head';
 
 /**
  * ArticleHeader component displays the main image, title, author, source, and published date for an article.
@@ -35,12 +36,37 @@ export default function ArticleHeader({ article }: { article: NewsArticle }) {
     setLoading(false);
   };
 
+  // توليد structured data (JSON-LD)
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'NewsArticle',
+    headline: article.title,
+    description: article.description,
+    datePublished: article.publishedAt,
+    image: article.urlToImage ? [article.urlToImage] : undefined,
+    author: article.author ? [{ '@type': 'Person', name: article.author }] : undefined,
+    publisher: {
+      '@type': 'Organization',
+      name: article.source?.name || 'مصدر',
+      logo: {
+        '@type': 'ImageObject',
+        url: '/favicon.ico.jpg',
+      },
+    },
+    mainEntityOfPage: article.url,
+    url: article.url,
+    // المصادر الإضافية (إن وجدت) في نهاية المقال
+  };
+
   return (
     <>
+      <Head>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      </Head>
       {/* Main Image */}
       {article.urlToImage && (
         <div className="relative w-full aspect-video rounded-2xl overflow-hidden mb-6">
-          <OptimizedImage
+          <Image
             src={cleanImageUrl(article.urlToImage) || '/placeholder-news.jpg'}
             alt={article.title}
             fill

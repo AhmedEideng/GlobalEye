@@ -7,8 +7,6 @@ Allow: /
 Disallow: /admin/
 Disallow: /login/
 
-# Sitemap files
-Sitemap: https://globaleye.live/sitemap.xml
 Sitemap: https://globaleye.live/sitemap-static.xml
 Sitemap: https://globaleye.live/sitemap-categories.xml
 Sitemap: https://globaleye.live/sitemap-articles-world.xml

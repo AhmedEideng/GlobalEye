@@ -5,9 +5,10 @@ import PwaInstallToast from '@components/PwaInstallToast';
 import DynamicHeader from '@components/DynamicHeader';
 import Script from 'next/script';
 import BreakingNewsTickerController from '@components/BreakingNewsTickerController';
+import ClientLangHead from './ClientLangHead';
 
-export const metadata: Metadata = {
-  metadataBase: new URL('https://globaleye.news'),
+export const metadata = {
+  metadataBase: new URL('https://globaleye.live'),
   title: "GlobalEye News - Your Trusted Source for Global News",
   description: "Stay informed with the latest breaking news, business updates, technology trends, sports coverage, and more from around the world.",
   keywords: "news, global news, breaking news, business news, technology news, sports news, world news",
@@ -23,15 +24,22 @@ export const metadata: Metadata = {
     description: "Your trusted source for global news and insights",
     type: "website",
     locale: "en_US",
+    url: 'https://globaleye.live',
+    images: [
+      { url: '/placeholder-news.jpg', width: 1200, height: 630, alt: 'GlobalEye News' }
+    ],
+    siteName: 'GlobalEye News',
   },
   twitter: {
     card: "summary_large_image",
     title: "GlobalEye News",
     description: "Your trusted source for global news and insights",
+    images: ['/placeholder-news.jpg'],
+    site: '@globaleyenews',
   },
 };
 
-export const viewport: Viewport = {
+export const viewport = {
   width: "device-width",
   initialScale: 1,
 };
@@ -39,41 +47,12 @@ export const viewport: Viewport = {
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const lang = 'en';
-  const dir = 'ltr';
-
+  // لا تستخدم window أو usePathname هنا
   return (
-    <html lang={lang} dir={dir} suppressHydrationWarning>
+    <html lang="en" dir="ltr" suppressHydrationWarning>
       <head>
-        {/* SEO Meta Tags */}
-        <title>Global Eye - News from Everywhere</title>
-        <meta name="description" content="Global Eye provides you with the latest news from around the world in one place." />
-        <meta property="og:title" content="Global Eye - News from Everywhere" />
-        <meta property="og:description" content="Global Eye provides you with the latest news from around the world in one place." />
-        <meta property="og:image" content="https://globaleye.live/placeholder-news.jpg" />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Global Eye - News from Everywhere" />
-        <meta name="twitter:description" content="Global Eye provides you with the latest news from around the world in one place." />
-        <meta name="twitter:image" content="https://globaleye.live/placeholder-news.jpg" />
-        {/* Google Analytics */}
-        {GA_MEASUREMENT_ID && (
-          <>
-            <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-              strategy="afterInteractive"
-            />
-            <Script id="google-analytics" strategy="afterInteractive">
-              {`
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', '${GA_MEASUREMENT_ID}');
-              `}
-            </Script>
-          </>
-        )}
-        {/* PWA Meta Tags */}
+        <ClientLangHead />
+        {/* Meta tags الخاصة فقط */}
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/favicon.ico.jpg" />
         <meta name="theme-color" content="#0a0a0a" />

@@ -28,6 +28,7 @@ export default function Footer() {
           <h3 className="text-xl font-bold mb-2">Company</h3>
           <div className="flex flex-col gap-1 mt-2">
             <Link href="/about" className="hover:text-red-500 transition-colors">About Us</Link>
+            <Link href="/about/team" className="hover:text-red-500 transition-colors">Our Editorial Team</Link>
             <Link href="/privacy" className="hover:text-red-500 transition-colors">Privacy Policy</Link>
             <Link href="/terms-and-conditions" className="hover:text-red-500 transition-colors">Terms and Conditions</Link>
             <Link href="/contact-us" className="hover:text-red-500 transition-colors">Contact Us</Link>

@@ -1,24 +1,26 @@
 import { Metadata } from 'next';
+import Head from 'next/head';
+import ArticleAboutJsonLdHead from './ArticleAboutJsonLdHead';
 
 export const metadata: Metadata = {
-  title: 'About | GlobalEye News',
-  description: 'Learn more about GlobalEye News, our mission, and our team. Your trusted source for global news and insights.',
-  alternates: { canonical: 'https://globaleye.news/about' },
+  title: 'About Us | GlobalEye News',
+  description: 'Learn more about GlobalEye News, our mission, and our team dedicated to delivering trusted global news coverage.',
+  alternates: { canonical: 'https://globaleye.live/about' },
   openGraph: {
-    title: 'About | GlobalEye News',
-    description: 'Learn more about GlobalEye News, our mission, and our team. Your trusted source for global news and insights.',
-    url: 'https://globaleye.news/about',
+    title: 'About Us | GlobalEye News',
+    description: 'Learn more about GlobalEye News, our mission, and our team dedicated to delivering trusted global news coverage.',
+    url: 'https://globaleye.live/about',
     siteName: 'GlobalEye News',
     images: [
-      { url: '/placeholder-news.jpg', width: 1200, height: 630, alt: 'GlobalEye News' }
+      { url: '/placeholder-news.jpg', width: 1200, height: 630, alt: 'About GlobalEye News' }
     ],
     locale: 'en_US',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'About | GlobalEye News',
-    description: 'Learn more about GlobalEye News, our mission, and our team. Your trusted source for global news and insights.',
+    title: 'About Us | GlobalEye News',
+    description: 'Learn more about GlobalEye News, our mission, and our team dedicated to delivering trusted global news coverage.',
     images: ['/placeholder-news.jpg'],
     site: '@globaleyenews',
   },
@@ -30,7 +32,8 @@ export const metadata: Metadata = {
 };
 
 export default function AboutPage() {
-  return (
+  return <>
+    <ArticleAboutJsonLdHead />
     <div className="about-page">
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold mb-8">About GlobalEye News</h1>
@@ -62,5 +65,5 @@ export default function AboutPage() {
         </div>
       </div>
     </div>
-  );
+  </>;
 } 

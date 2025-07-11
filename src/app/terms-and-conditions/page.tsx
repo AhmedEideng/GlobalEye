@@ -1,12 +1,33 @@
 import type { Metadata } from 'next';
+import ArticleTermsJsonLdHead from './ArticleTermsJsonLdHead';
 
 export const metadata: Metadata = {
   title: 'Terms and Conditions | GlobalEye News',
-  description: 'Read the terms and conditions for using GlobalEye News. Your use of our website is subject to these terms.'
+  description: 'Read the terms and conditions for using GlobalEye News and our services.',
+  alternates: { canonical: 'https://globaleye.live/terms-and-conditions' },
+  openGraph: {
+    title: 'Terms and Conditions | GlobalEye News',
+    description: 'Read the terms and conditions for using GlobalEye News and our services.',
+    url: 'https://globaleye.live/terms-and-conditions',
+    siteName: 'GlobalEye News',
+    images: [
+      { url: '/placeholder-news.jpg', width: 1200, height: 630, alt: 'Terms and Conditions GlobalEye News' }
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Terms and Conditions | GlobalEye News',
+    description: 'Read the terms and conditions for using GlobalEye News and our services.',
+    images: ['/placeholder-news.jpg'],
+    site: '@globaleyenews',
+  },
 };
 
-export default function TermsAndConditionsPage() {
-  return (
+export default function TermsPage() {
+  return <>
+    <ArticleTermsJsonLdHead />
     <div className="container mx-auto px-4 py-12 max-w-3xl">
       <h1 className="text-3xl font-bold mb-6 text-center">Terms and Conditions</h1>
       <div className="prose prose-lg max-w-none">
@@ -37,5 +58,5 @@ export default function TermsAndConditionsPage() {
         <p>If you have any questions about these Terms and Conditions, please contact us at <a href="mailto:info@globaleye.live">info@globaleye.live</a>.</p>
       </div>
     </div>
-  );
+  </>;
 } 

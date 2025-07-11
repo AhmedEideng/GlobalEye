@@ -1,57 +1,54 @@
-"use client";
-
 import { fetchNews, NewsArticle, sortArticlesByUserPreferences } from './utils/fetchNews';
-import { getFavorites } from '../services/favorites';
-import { useAuth } from '@hooks/useAuth';
 import HomeFeatured from '@components/HomeFeatured';
 import HomeNewsGrid from '@components/HomeNewsGrid';
-import { useEffect, useState } from 'react';
-import { sendAnalyticsEvent } from './utils/fetchNews';
 import BreakingNewsTickerController from '@components/BreakingNewsTickerController';
+import type { Metadata } from 'next';
+import ArticleHomeJsonLdHead from './ArticleHomeJsonLdHead';
 
-export default function HomePage() {
-  return (
-    <BreakingNewsTickerController>
-      <HomePageContent />
-    </BreakingNewsTickerController>
-  );
-}
+export const revalidate = 180; // 3 دقائق
 
-function HomePageContent() {
-  const { user, loading } = useAuth();
-  const [articles, setArticles] = useState<NewsArticle[]>([]);
-  const [featuredArticle, setFeaturedArticle] = useState<NewsArticle | null>(null);
-  const [pageLoading, setPageLoading] = useState(true);
+export const metadata: Metadata = {
+  title: 'GlobalEye News | Breaking News, World Updates & Live Coverage',
+  description: 'Get the latest breaking news, world headlines, business, technology, sports, health, and more. Trusted global news coverage, real-time updates, and in-depth analysis from GlobalEye News.',
+  alternates: { canonical: 'https://globaleye.live/' },
+  openGraph: {
+    title: 'GlobalEye News | Breaking News, World Updates & Live Coverage',
+    description: 'Get the latest breaking news, world headlines, business, technology, sports, health, and more. Trusted global news coverage, real-time updates, and in-depth analysis from GlobalEye News.',
+    url: 'https://globaleye.live/',
+    siteName: 'GlobalEye News',
+    images: [
+      { url: '/placeholder-news.jpg', width: 1200, height: 630, alt: 'GlobalEye News' }
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'GlobalEye News | Breaking News, World Updates & Live Coverage',
+    description: 'Get the latest breaking news, world headlines, business, technology, sports, health, and more. Trusted global news coverage, real-time updates, and in-depth analysis from GlobalEye News.',
+    images: ['/placeholder-news.jpg'],
+    site: '@globaleyenews',
+  },
+};
 
-  useEffect(() => {
-    const fetchAndSort = async () => {
-      setPageLoading(true);
-      const allArticles = await fetchNews();
-      let sortedArticles = allArticles;
-      if (user) {
-        const favSlugs = await getFavorites(user.id);
-        sortedArticles = sortArticlesByUserPreferences(allArticles, favSlugs);
-      }
-      // حدد أول خبر كـ featuredArticle
-      const featured = sortedArticles[0] || null;
-      setFeaturedArticle(featured);
-      // استبعد الخبر الرئيسي من الشبكة
-      const restArticles = featured ? sortedArticles.filter(a => a.slug !== featured.slug) : sortedArticles;
-      setArticles(restArticles.slice(0, 51)); // 51 خبر بجانب الرئيسي ليكون المجموع 52
-      setPageLoading(false);
-      sendAnalyticsEvent('home_view', { userId: user?.id || null });
-    };
-    fetchAndSort();
-  }, [user]);
-
-  if (loading || pageLoading) {
-    return <div className="min-h-[60vh] flex items-center justify-center text-lg">Loading...</div>;
-  }
+export default async function HomePage() {
+  // جلب الأخبار من السيرفر
+  const allArticles: NewsArticle[] = await fetchNews();
+  // ترتيب الأخبار (بدون تخصيص مستخدم هنا)
+  const sortedArticles = allArticles;
+  const featured = sortedArticles[0] || null;
+  const restArticles = featured ? sortedArticles.filter(a => a.slug !== featured.slug) : sortedArticles;
+  const articles = restArticles.slice(0, 51); // 51 خبر بجانب الرئيسي ليكون المجموع 52
 
   return (
-    <main>
-      {featuredArticle && <HomeFeatured article={featuredArticle} />}
-      {articles.length > 0 && <HomeNewsGrid articles={articles} />}
-    </main>
+    <>
+      <ArticleHomeJsonLdHead />
+      <BreakingNewsTickerController>
+        <main>
+          {featured && <HomeFeatured article={featured} />}
+          {articles.length > 0 && <HomeNewsGrid articles={articles} />}
+        </main>
+      </BreakingNewsTickerController>
+    </>
   );
 } 

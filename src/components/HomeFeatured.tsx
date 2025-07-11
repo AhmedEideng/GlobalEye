@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { NewsArticle } from '@utils/fetchNews';
 import { cleanImageUrl } from '@utils/cleanImageUrl';
-import OptimizedImage from "./OptimizedImage";
+import Image from "next/image";
 
 export default function HomeFeatured({ article }: { article: NewsArticle }) {
   if (!article) return null;
@@ -11,7 +11,7 @@ export default function HomeFeatured({ article }: { article: NewsArticle }) {
   return (
     <section className="mb-10">
       <div className="article-card relative w-full h-[320px] md:h-[420px] lg:h-[500px] rounded-2xl overflow-hidden sm:h-[320px]" style={{ height: 'min(60vw, 420px)', minHeight: '220px' }}>
-        <OptimizedImage
+        <Image
           src={cleanImage || "/placeholder-news.jpg"}
           alt={article.title}
           fill

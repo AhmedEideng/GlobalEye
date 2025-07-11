@@ -1,33 +1,32 @@
 'use client';
 import { useState } from 'react';
 import { FaEnvelope, FaUser, FaRegCommentDots } from 'react-icons/fa';
+import ArticleContactJsonLdHead from './ArticleContactJsonLdHead';
 
-export default function ContactUsPage() {
-  const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>("idle");
-  const [error, setError] = useState("");
+export default function ContactPage() {
+  const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+  const [error, setError] = useState<string>('');
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus('sending');
-    setError("");
+    setError('');
     const form = e.currentTarget;
     const formData = new FormData(form);
-    const name = formData.get('name') as string;
-    const email = formData.get('email') as string;
-    const subject = formData.get('subject') as string;
-    const message = formData.get('message') as string;
-    // Here you can connect the form with an external service like EmailJS, Formspree, or your own API
-    // We will use mailto as a simple solution
+    // يمكنك هنا إرسال البيانات إلى API أو بريد إلكتروني
     try {
-      window.location.href = `mailto:info@globaleye.live?subject=${encodeURIComponent(subject || 'Contact from GlobalEye')}&body=${encodeURIComponent('Name: ' + name + '\nEmail: ' + email + '\n\n' + message)}`;
+      // مثال: انتظار 1 ثانية لمحاكاة الإرسال
+      await new Promise((res) => setTimeout(res, 1000));
       setStatus('success');
-    } catch {
+      form.reset();
+    } catch (err: any) {
+      setError('Failed to send message. Please try again.');
       setStatus('error');
-      setError('Something went wrong. Please try again or email us directly.');
     }
-  }
+  };
 
-  return (
+  return <>
+    <ArticleContactJsonLdHead />
     <div className="container mx-auto px-4 py-12 max-w-2xl">
       <h1 className="text-3xl font-bold mb-6 text-center flex items-center justify-center gap-2">
         <FaEnvelope className="text-red-600" /> Contact Us
@@ -72,5 +71,5 @@ export default function ContactUsPage() {
         <p>We aim to respond to all inquiries within 24-48 hours.</p>
       </div>
     </div>
-  );
+  </>;
 } 

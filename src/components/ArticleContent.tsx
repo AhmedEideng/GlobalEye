@@ -1,6 +1,11 @@
 import { NewsArticle } from '@utils/fetchNews';
 
 /**
+ * ⚠️ Security: Do not render any raw HTML from articles here, only plain text.
+ * If you need to render HTML, use a sanitization library like sanitize-html or DOMPurify first.
+ */
+
+/**
  * ArticleContent component displays the description and main content of an article.
  * @param article - NewsArticle object containing article data
  */
