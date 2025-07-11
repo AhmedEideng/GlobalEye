@@ -26,7 +26,6 @@ export function useAuth() {
     // Get current user on load
     const getUser = async () => {
       setLoading(true);
-      console.log('بدء جلب بيانات المستخدم');
       const { data } = await supabase.auth.getUser();
       if (data?.user) {
         setUser({
@@ -35,13 +34,10 @@ export function useAuth() {
           name: data.user.user_metadata?.full_name || data.user.user_metadata?.name || '',
           avatar_url: data.user.user_metadata?.avatar_url || '',
         });
-        console.log('تم جلب بيانات المستخدم:', data.user.email);
       } else {
         setUser(null);
-        console.log('لم يتم العثور على مستخدم مسجل الدخول');
       }
       setLoading(false);
-      console.log('انتهى جلب بيانات المستخدم');
     };
     getUser();
     // Listen to session changes

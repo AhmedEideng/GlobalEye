@@ -83,7 +83,7 @@ export default function CategoryClient({ category }: { category: string }) {
 
   React.useEffect(() => {
     setLoading(true);
-    console.log('بدء جلب الأخبار للتصنيف:', category);
+    // تم حذف جميع أسطر console.log وconsole.error
     const fetchData = async () => {
       try {
         const response = await fetch(`/api/news?category=${category}`, {
@@ -92,12 +92,10 @@ export default function CategoryClient({ category }: { category: string }) {
             'Accept': 'application/json',
           }
         });
-        console.log('تم استلام الرد من API:', response.status);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        console.log('تم جلب البيانات:', data);
         if (data.articles && data.articles.length > 0) {
           setArticles(data.articles);
           // Track category visit when page loads
@@ -112,11 +110,9 @@ export default function CategoryClient({ category }: { category: string }) {
           throw new Error(`No news available in the "${categoryLabel}" category. Please try again.`);
         }
       } catch (err) {
-        console.error('خطأ أثناء جلب الأخبار:', err);
         throw new Error('Failed to load news. Please try again.');
       } finally {
         setLoading(false);
-        console.log('انتهى جلب الأخبار للتصنيف:', category);
       }
     };
     fetchData();

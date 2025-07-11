@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { cleanImageUrl } from '@utils/cleanImageUrl';
 
 // Next.js Image supports WebP and Lazy Loading automatically based on the browser
