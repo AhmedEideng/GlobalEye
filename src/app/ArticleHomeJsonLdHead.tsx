@@ -19,7 +19,10 @@ export default function ArticleHomeJsonLdHead() {
   };
   return (
     <Head>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script 
+        type="application/ld+json" 
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/[^\x00-\x7F]/g, '') }} 
+      />
     </Head>
   );
 } 

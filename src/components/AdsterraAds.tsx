@@ -33,7 +33,7 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
         // Create and append options script
         const scriptOptions = document.createElement("script");
         scriptOptions.type = "text/javascript";
-        scriptOptions.innerHTML = `atOptions = ${JSON.stringify(atOptions)};`;
+        scriptOptions.innerHTML = `atOptions = ${JSON.stringify(atOptions).replace(/[^\x00-\x7F]/g, '')};`;
         currentRef.appendChild(scriptOptions);
 
         // Create and append main script
@@ -41,6 +41,7 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
         script.type = "text/javascript";
         script.src = scriptSrc;
         script.async = true;
+        script.crossOrigin = "anonymous";
         
         // Add event listeners for debugging
         script.onload = () => {
