@@ -80,7 +80,7 @@ module.exports = withPWA({
           // CSP: Remove 'unsafe-eval' and restrict 'unsafe-inline' to style-src only
           {
             key: 'Content-Security-Policy',
-            value: "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com;",
+            value: "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.highperformanceformat.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com;",
           },
         ],
       },
