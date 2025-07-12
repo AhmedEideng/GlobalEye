@@ -27,9 +27,14 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
 
     // Store ref.current in a variable for cleanup
     const currentRef = ref.current;
+    let timeoutId: NodeJS.Timeout;
+    let retryTimeoutId: NodeJS.Timeout;
 
     const loadAd = () => {
       try {
+        // Check if ref still exists
+        if (!ref.current || !currentRef) return;
+        
         // Create and append options script
         const scriptOptions = document.createElement("script");
         scriptOptions.type = "text/javascript";
@@ -45,47 +50,55 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
         
         // Add event listeners for debugging
         script.onload = () => {
-          setAdLoaded(true);
+          if (ref.current) {
+            setAdLoaded(true);
+          }
         };
         
         script.onerror = () => {
-          setAdError(true);
+          if (ref.current) {
+            setAdError(true);
+          }
         };
         
         currentRef.appendChild(script);
 
         // Set timeout to detect if ad doesn't load
-        const timeout = setTimeout(() => {
-          if (!adLoaded && !adError) {
+        timeoutId = setTimeout(() => {
+          if (!adLoaded && !adError && ref.current) {
             setAdError(true);
           }
         }, 10000); // 10 seconds timeout
 
-        return () => {
-          clearTimeout(timeout);
-          if (currentRef) {
-            currentRef.innerHTML = "";
-          }
-        };
-      } catch {
-        setAdError(true);
+      } catch (error) {
+        if (ref.current) {
+          setAdError(true);
+        }
       }
     };
 
     // Initial load
-    const cleanup = loadAd();
+    loadAd();
 
     // Retry mechanism
-    const retryTimeout = setTimeout(() => {
-      if (!adLoaded && !adError && retryCount < 2) {
+    retryTimeoutId = setTimeout(() => {
+      if (!adLoaded && !adError && retryCount < 2 && ref.current) {
         setRetryCount(prev => prev + 1);
         loadAd();
       }
     }, 5000); // Retry after 5 seconds
 
     return () => {
-      clearTimeout(retryTimeout);
-      if (cleanup) cleanup();
+      clearTimeout(timeoutId);
+      clearTimeout(retryTimeoutId);
+      // Only clear innerHTML if the ref still exists and is the same element
+      if (ref.current && ref.current === currentRef) {
+        try {
+          ref.current.innerHTML = "";
+        } catch (error) {
+          // Ignore errors during cleanup
+        }
+      }
     };
   }, [scriptSrc, atOptions, id, retryCount, adLoaded, adError]);
 
@@ -155,26 +168,46 @@ function AdsterraIframe({ id, scriptSrc, width, height, style }: AdProps) {
   useEffect(() => {
     // Create iframe after a short delay to ensure DOM is ready
     const timer = setTimeout(() => {
-      const iframe = document.createElement('iframe');
-      iframe.src = scriptSrc.replace('/invoke.js', '/iframe.html');
-      iframe.width = width.toString();
-      iframe.height = height.toString();
-      iframe.frameBorder = '0';
-      iframe.scrolling = 'no';
-      iframe.style.border = 'none';
-      iframe.style.overflow = 'hidden';
-      
-      iframe.onload = () => setIframeLoaded(true);
-      iframe.onerror = () => setIframeError(true);
-      
-      const container = document.getElementById(id);
-      if (container) {
-        container.innerHTML = '';
-        container.appendChild(iframe);
+      try {
+        const iframe = document.createElement('iframe');
+        iframe.src = scriptSrc.replace('/invoke.js', '/iframe.html');
+        iframe.width = width.toString();
+        iframe.height = height.toString();
+        iframe.frameBorder = '0';
+        iframe.scrolling = 'no';
+        iframe.style.border = 'none';
+        iframe.style.overflow = 'hidden';
+        
+        iframe.onload = () => setIframeLoaded(true);
+        iframe.onerror = () => setIframeError(true);
+        
+        const container = document.getElementById(id);
+        if (container) {
+          try {
+            container.innerHTML = '';
+            container.appendChild(iframe);
+          } catch (error) {
+            // Ignore errors during DOM manipulation
+            setIframeError(true);
+          }
+        }
+      } catch (error) {
+        setIframeError(true);
       }
     }, 1000);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      // Clean up iframe if component unmounts
+      try {
+        const container = document.getElementById(id);
+        if (container) {
+          container.innerHTML = '';
+        }
+      } catch (error) {
+        // Ignore cleanup errors
+      }
+    };
   }, [id, scriptSrc, width, height]);
 
   if (iframeError) {

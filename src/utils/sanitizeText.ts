@@ -33,3 +33,33 @@ export function sanitizeHtml(html: string): string {
     .replace(/\s+/g, ' ')
     .trim();
 } 
+
+/**
+ * Sanitizes SVG path data by removing invalid characters that cause SVG parsing errors
+ */
+export function sanitizeSvgPath(pathData: string): string {
+  if (!pathData) return '';
+  
+  return pathData
+    // Remove any non-printable characters
+    .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
+    // Remove any invalid SVG path characters
+    .replace(/[^\w\s\-\.\,\+\-\*\/\(\)\[\]\{\}\|\&\^\%\#\@\!\?\<\>\=\:\;\"\'\\]/g, '')
+    // Clean up multiple spaces
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Sanitizes SVG content by cleaning path data and other attributes
+ */
+export function sanitizeSvgContent(svgContent: string): string {
+  if (!svgContent) return '';
+  
+  return svgContent
+    // Remove any non-printable characters
+    .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
+    // Clean up multiple spaces
+    .replace(/\s+/g, ' ')
+    .trim();
+} 
