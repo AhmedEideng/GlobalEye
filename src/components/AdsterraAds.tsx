@@ -66,7 +66,7 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
             currentRef.innerHTML = "";
           }
         };
-      } catch (_error) {
+      } catch {
         setAdError(true);
       }
     };
