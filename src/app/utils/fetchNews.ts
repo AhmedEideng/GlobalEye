@@ -91,17 +91,19 @@ interface NewsWithCategory {
   categories?: { name: string };
 }
 
-// مدة الكاش (ثواني) قابلة للتعديل عبر متغير بيئة
-const CACHE_TTL = Number(process.env.CACHE_TTL) || 300; // 5 دقائق افتراضيًا
+// Cache duration (seconds) - configurable via environment variable
+const CACHE_TTL = Number(process.env.CACHE_TTL) || 300; // 5 minutes default
 
 // Set up internal cache for each category for CACHE_TTL seconds
 const newsCache = new LRUCache<string, NewsArticle[]>({
   max: 32, // Number of cached categories
-  ttl: 1000 * CACHE_TTL, // CACHE_TTL بالمللي ثانية
+  ttl: 1000 * CACHE_TTL, // CACHE_TTL in milliseconds
 });
 
 /**
- * دالة لتحديث الأخبار يدويًا (force refresh) - يمكن استخدامها في جدولة مستقبلية (cron job)
+ * Manual news update function (force refresh) - can be used in future scheduling (cron job)
+ * @param category - The news category (default: 'general')
+ * @returns Promise<NewsArticle[]>
  */
 export async function forceRefreshNews(category: string = 'general') {
   newsCache.delete(category);
@@ -162,8 +164,8 @@ export async function fetchNews(category: string = 'general'): Promise<NewsArtic
   );
   const results = await Promise.all(promises);
   const all = results.filter(Boolean).flat() as NewsArticle[];
-  // ====== دمج الأخبار المتشابهة في مقالات فريدة وطويلة ======
-  const groups = groupSimilarArticles(all, 0.5); // threshold يمكن تعديله حسب الحاجة
+  // ====== Merge similar news into unique and long articles ======
+  const groups = groupSimilarArticles(all, 0.5); // threshold can be adjusted as needed
   const mergedArticles = groups.map(group => mergeArticlesGroup(group));
   mergedArticles.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
   if (mergedArticles.length > 0) {
@@ -223,20 +225,20 @@ export async function fetchNews(category: string = 'general'): Promise<NewsArtic
   return [];
 }
 
-// قائمة موسعة للكلمات المفتاحية لكل تصنيف
+// Extended list of keywords for each category
 const CATEGORY_KEYWORDS: Record<string, string[]> = {
-  business: ['business', 'market', 'economy', 'finance', 'stock', 'trade', 'investment', 'bank', 'currency', 'بورصة', 'اقتصاد', 'مال', 'تجارة', 'استثمار', 'مصرف', 'عملة'],
-  technology: ['technology', 'tech', 'ai', 'software', 'hardware', 'internet', 'robot', 'gadget', 'app', 'برمجيات', 'تقنية', 'ذكاء اصطناعي', 'روبوت', 'تطبيق', 'انترنت'],
-  sports: ['sport', 'football', 'basketball', 'tennis', 'match', 'goal', 'league', 'championship', 'olympic', 'رياضي', 'كرة', 'مباراة', 'هدف', 'دوري', 'بطولة', 'أولمبياد'],
-  entertainment: ['entertainment', 'movie', 'music', 'celebrity', 'film', 'drama', 'actor', 'نجوم', 'فن', 'فيلم', 'موسيقى', 'ممثل', 'دراما', 'مشاهير'],
-  health: ['health', 'medical', 'doctor', 'hospital', 'covid', 'virus', 'مرض', 'صحة', 'طبيب', 'مستشفى', 'دواء', 'علاج', 'فيروس'],
-  science: ['science', 'research', 'study', 'discovery', 'space', 'astronomy', 'علم', 'بحث', 'دراسة', 'فضاء', 'اكتشاف', 'فلك'],
-  politics: ['politics', 'government', 'election', 'president', 'minister', 'parliament', 'سياسة', 'حكومة', 'انتخابات', 'رئيس', 'وزير', 'برلمان'],
-  world: ['world', 'international', 'global', 'دولي', 'عالمي', 'عالم', 'خارجية'],
+  business: ['business', 'market', 'economy', 'finance', 'stock', 'trade', 'investment', 'bank', 'currency', 'stock market', 'economy', 'money', 'trade', 'investment', 'bank', 'currency', 'بورصة', 'اقتصاد', 'مال', 'تجارة', 'استثمار', 'مصرف', 'عملة'],
+  technology: ['technology', 'tech', 'ai', 'software', 'hardware', 'internet', 'robot', 'gadget', 'app', 'software', 'technology', 'artificial intelligence', 'robot', 'app', 'internet'],
+  sports: ['sport', 'football', 'basketball', 'tennis', 'match', 'goal', 'league', 'championship', 'olympic', 'sport', 'football', 'basketball', 'tennis', 'match', 'goal', 'league', 'championship', 'olympic', 'رياضي', 'كرة', 'مباراة', 'هدف', 'دوري', 'بطولة', 'أولمبياد'],
+  entertainment: ['entertainment', 'movie', 'music', 'celebrity', 'film', 'drama', 'actor', 'celebrity', 'film', 'music', 'actor', 'دراما', 'مشاهير'],
+  health: ['health', 'medical', 'doctor', 'hospital', 'covid', 'virus', 'health', 'medical', 'doctor', 'hospital', 'covid', 'virus', 'مرض', 'صحة', 'طبيب', 'مستشفى', 'دواء', 'علاج', 'فيروس'],
+  science: ['science', 'research', 'study', 'discovery', 'space', 'astronomy', 'science', 'research', 'study', 'discovery', 'space', 'astronomy', 'علم', 'بحث', 'دراسة', 'فضاء', 'اكتشاف', 'فلك'],
+  politics: ['politics', 'government', 'election', 'president', 'minister', 'parliament', 'politics', 'government', 'election', 'president', 'minister', 'parliament', 'سياسة', 'حكومة', 'انتخابات', 'رئيس', 'وزير', 'برلمان'],
+  world: ['world', 'international', 'global', 'world', 'international', 'global', 'دولي', 'عالمي', 'عالم', 'خارجية'],
   general: []
 };
 
-// تصنيف ذكي بناءً على الكلمات المفتاحية الأكثر تكرارًا
+// Smart categorization based on most frequent keywords
 export function detectCategory(article: NewsArticle): string {
   const text = `${article.title} ${article.description || ''} ${article.content || ''}`.toLowerCase();
   let bestCategory = 'general';
@@ -244,7 +246,7 @@ export function detectCategory(article: NewsArticle): string {
   for (const [cat, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
     let count = 0;
     for (const kw of keywords) {
-      // دعم العربية والإنجليزية
+      // Support Arabic and English
       const regex = new RegExp(`\\b${kw.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`, 'gi');
       count += (text.match(regex) || []).length;
     }
@@ -317,7 +319,7 @@ export async function fetchRelatedNews(currentArticle: NewsArticle, category: st
     const articles = await fetchNews(category);
     return articles
       .filter(article => article.url !== currentArticle.url)
-      .slice(0, 15); // Return up to 15 related articles
+      .slice(0, 40); // Return up to 40 related articles
   } catch {
     return [];
   }
@@ -724,7 +726,7 @@ async function fetchFromMediastack(category: string): Promise<NewsArticle[]> {
 }
 
 // ====== Text Similarity & Merging Utilities ======
-// حساب تشابه Jaccard بين مجموعتي كلمات
+// Calculate Jaccard similarity between two word sets
 function jaccardSimilarity(a: string, b: string): number {
   const setA = new Set(a.toLowerCase().split(/\W+/));
   const setB = new Set(b.toLowerCase().split(/\W+/));
@@ -733,7 +735,7 @@ function jaccardSimilarity(a: string, b: string): number {
   return intersection.size / union.size;
 }
 
-// دالة Jaro-Winkler (pure JS)
+// Jaro-Winkler (pure JS)
 function jaroWinklerSimilarity(s1: string, s2: string): number {
   // Jaro distance
   const m = Math.max(s1.length, s2.length);
@@ -772,7 +774,7 @@ function jaroWinklerSimilarity(s1: string, s2: string): number {
   return jaro + l * 0.1 * (1 - jaro);
 }
 
-// دالة لتجميع الأخبار المتشابهة في مجموعات
+// Function to group similar news into groups
 function groupSimilarArticles(articles: NewsArticle[], threshold = 0.5): NewsArticle[][] {
   const groups: NewsArticle[][] = [];
   const used = new Array(articles.length).fill(false);
@@ -782,7 +784,7 @@ function groupSimilarArticles(articles: NewsArticle[], threshold = 0.5): NewsArt
     used[i] = true;
     for (let j = i + 1; j < articles.length; j++) {
       if (used[j]) continue;
-      // التشابه بناءً على العنوان + المحتوى
+      // Similarity based on title + content
       const simTitle = jaccardSimilarity(articles[i].title, articles[j].title);
       const simContent = jaroWinklerSimilarity(
         (articles[i].content || '') + ' ' + (articles[i].description || ''),
@@ -799,70 +801,70 @@ function groupSimilarArticles(articles: NewsArticle[], threshold = 0.5): NewsArt
 }
 
 function extractSummary(content: string, maxSentences = 3): string {
-  // تقسيم النص إلى جمل
+  // Split text into sentences
   const sentences = content.match(/[^.!؟\n]+[.!؟]?/g) || [];
   if (sentences.length <= maxSentences) return content;
-  // حساب تكرار الكلمات
+  // Calculate word frequency
   const wordCounts: Record<string, number> = {};
   const words = content.toLowerCase().split(/\W+/).filter(Boolean);
   words.forEach(w => { wordCounts[w] = (wordCounts[w] || 0) + 1; });
-  // تقييم كل جملة بناءً على مجموع تكرار كلماتها وطولها
+  // Evaluate each sentence based on sum of word frequencies and length
   const scored = sentences.map(s => {
     const sWords = s.toLowerCase().split(/\W+/).filter(Boolean);
     const score = sWords.reduce((sum, w) => sum + (wordCounts[w] || 0), 0) + sWords.length;
     return { s, score };
   });
-  // ترتيب الجمل حسب التقييم
+  // Sort sentences by score
   scored.sort((a, b) => b.score - a.score);
-  // أخذ أفضل الجمل
+  // Take the best sentences
   const summary = scored.slice(0, maxSentences).map(x => x.s.trim()).join(' ');
   return summary;
 }
 
-// دمج نصوص الأخبار في مجموعة واحدة لمقال طويل وفريد
+// Merge news texts in one group into a long and unique article
 function mergeArticlesGroup(group: NewsArticle[]): NewsArticle {
   if (group.length === 1) return group[0];
-  // ندمج العناوين (نأخذ الأكثر تكرارًا أو الأطول)
+  // Merge titles (take the most frequent or the longest)
   const title = group.map(a => a.title).sort((a, b) => b.length - a.length)[0];
-  // ندمج الوصف
+  // Merge descriptions
   const description = group.map(a => a.description).filter(Boolean).join(' | ');
-  // ندمج المحتوى (نزيل التكرار الذكي للفقرات)
+  // Merge content (remove smart repetition of paragraphs)
   const allContents = group.map(a => a.content || '').join('\n\n');
   const paragraphs = allContents.split(/\n+/).map(p => p.trim()).filter(Boolean);
-  // إزالة الفقرات المتشابهة جدًا باستخدام Jaro-Winkler
+  // Remove very similar paragraphs using Jaro-Winkler
   const uniqueParagraphs: string[] = [];
   for (let i = 0; i < paragraphs.length; i++) {
     const para = paragraphs[i];
-    // إذا كانت الفقرة متشابهة جدًا مع فقرة سابقة (>0.88) نتجاهلها
+    // If the paragraph is very similar to a previous one (>0.88) skip it
     if (uniqueParagraphs.some(up => jaroWinklerSimilarity(up, para) > 0.88)) continue;
     uniqueParagraphs.push(para);
   }
-  // ترتيب الفقرات: الأطول أولاً (أو لاحقًا يمكن ترتيبها زمنيًا إذا توفر timestamps)
+  // Sort paragraphs: longest first (or later chronologically if timestamps are available)
   uniqueParagraphs.sort((a, b) => b.length - a.length);
   const content = uniqueParagraphs.join('\n\n');
-  // ====== إضافة خلاصة الخبر في نهاية المقال ======
+  // ====== Add news summary at the end of the article ======
   const summary = extractSummary(content, 3);
-  let contentWithSummary = content + '\n\nخلاصة الخبر: ' + summary;
-  // ====== إضافة قائمة المصادر في نهاية المقال ======
+  let contentWithSummary = content + '\n\nSummary: ' + summary;
+  // ====== Add sources list at the end of the article ======
   const sourcesList = group
-    .map(a => `- [${a.source.name || 'مصدر'}](${a.url})`)
-    .filter((v, i, arr) => arr.indexOf(v) === i) // إزالة التكرار
+    .map(a => `- [${a.source.name || 'Source'}](${a.url})`)
+    .filter((v, i, arr) => arr.indexOf(v) === i) // Remove duplicates
     .join('\n');
-  contentWithSummary += `\n\nالمصادر:\n${sourcesList}`;
-  // نأخذ أول صورة متوفرة
+  contentWithSummary += `\n\nSources:\n${sourcesList}`;
+  // Take the first available image
   const urlToImage = group.find(a => a.urlToImage)?.urlToImage || null;
-  // نأخذ أول رابط (أو نجمع المصادر)
+  // Take the first link (or combine sources)
   const url = group[0].url;
-  // نأخذ أول مؤلف
+  // Take the first author
   const author = group.find(a => a.author)?.author || null;
-  // نأخذ أحدث تاريخ نشر
+  // Take the latest publication date
   const publishedAt = group.map(a => a.publishedAt).sort().reverse()[0];
-  // ندمج أسماء المصادر
+  // Combine source names
   const sourceNames = Array.from(new Set(group.map(a => a.source.name)));
   const source = { id: null, name: sourceNames.join(' + ') };
-  // نستخدم slug من أطول عنوان
+  // Use slug from longest title
   const slug = group.map(a => a.slug).sort((a, b) => b.length - a.length)[0];
-  // نأخذ التصنيف
+  // Take the category
   const category = group[0].category;
   return { source, author, title, description, url, urlToImage, publishedAt, content: contentWithSummary, slug, category };
 }

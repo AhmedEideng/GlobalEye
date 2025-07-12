@@ -8,6 +8,10 @@ import Image from 'next/image';
 import { sendAnalyticsEvent, fetchRelatedNews } from '../../utils/fetchNews';
 import Link from 'next/link';
 import { AdsterraBanner468x60 } from '@components/AdsterraAds';
+import { AdsterraBanner300x250 } from '@components/AdsterraAds';
+import { AdsterraBanner728x90 } from '@components/AdsterraAds';
+import { AdsterraBanner160x300 } from '@components/AdsterraAds';
+import { AdsterraBanner320x50 } from '@components/AdsterraAds';
 
 export default function ArticleClient({ article, slug }: { article: NewsArticle | null, slug: string }) {
   const [relatedArticles, setRelatedArticles] = useState<NewsArticle[]>([]);
@@ -47,8 +51,11 @@ export default function ArticleClient({ article, slug }: { article: NewsArticle 
 
   return (
     <article className="w-full max-w-screen-xl mx-auto px-2 sm:px-4 py-6 md:py-10">
+      <AdsterraBanner728x90 />
       <ArticleHeader article={article} />
       <ArticleContent article={article} />
+      <AdsterraBanner300x250 />
+      <AdsterraBanner160x300 />
       <AdsterraBanner468x60 />
       {/* Read Full Article Button */}
       <div className="flex justify-center my-8">
@@ -97,6 +104,7 @@ export default function ArticleClient({ article, slug }: { article: NewsArticle 
           </div>
         </section>
       )}
+      <AdsterraBanner320x50 />
     </article>
   );
 } 

@@ -14,7 +14,7 @@ const categoryLabels: { [key: string]: string } = {
 
 export default function CategoryServer({ category, articles }: { category: string, articles: NewsArticle[] }) {
   const categoryLabel = categoryLabels[category] || category;
-  // حدد أول 52 خبر فقط
+  // Limit to first 52 articles only
   const limitedArticles = articles.slice(0, 52);
   const featuredArticle = limitedArticles.length > 0 ? limitedArticles[0] : null;
   const restArticles = limitedArticles.length > 1 ? limitedArticles.slice(1) : [];

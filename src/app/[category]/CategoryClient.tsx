@@ -83,7 +83,7 @@ export default function CategoryClient({ category }: { category: string }) {
 
   React.useEffect(() => {
     setLoading(true);
-    // تم حذف جميع أسطر console.log وconsole.error
+    // Removed all console.log and console.error lines
     const fetchData = async () => {
       try {
         const response = await fetch(`/api/news?category=${category}`, {
@@ -118,7 +118,7 @@ export default function CategoryClient({ category }: { category: string }) {
     fetchData();
   }, [category, categoryLabel]);
 
-  // حدد أول 52 خبر فقط
+  // Limit to first 52 articles only
   const limitedArticles = articles.slice(0, 52);
   const featuredArticle = limitedArticles.length > 0 ? limitedArticles[0] : null;
   const restArticles = limitedArticles.length > 1 ? limitedArticles.slice(1) : [];
@@ -137,9 +137,9 @@ export default function CategoryClient({ category }: { category: string }) {
   if (loading && timeout) {
     return (
       <div className="error text-center py-8">
-        <h2 className="text-2xl font-bold text-red-700 mb-4">حدثت مشكلة في تحميل الأخبار</h2>
-        <p className="text-gray-600 mb-6">استغرق التحميل وقتًا طويلاً. حاول تحديث الصفحة أو تحقق من اتصالك بالإنترنت.</p>
-        <button className="btn btn-primary" onClick={() => window.location.reload()}>تحديث الصفحة</button>
+        <h2 className="text-2xl font-bold text-red-700 mb-4">Failed to load news</h2>
+        <p className="text-gray-600 mb-6">Loading took too long. Try refreshing the page or check your internet connection.</p>
+        <button className="btn btn-primary" onClick={() => window.location.reload()}>Refresh Page</button>
       </div>
     );
   }

@@ -47,7 +47,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   // Clean the image URL
   const cleanSrc = cleanImageUrl(src);
   
-  // استخدم الصورة مباشرة من المصدر الخارجي بدون proxy
+  // Use image directly from external source without proxy
   const imageSrc = hasError ? placeholder : cleanSrc || '/placeholder-news.jpg' || '';
 
   if (fill) {

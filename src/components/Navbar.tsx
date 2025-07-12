@@ -65,24 +65,82 @@ export default function Navbar({ isMenuOpen, setIsMenuOpen }: NavbarProps) {
       {/* Mobile sidebar */}
       {isMenuOpen && (
         <div className="mobile-nav fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50 flex justify-start">
-          <div className="bg-white w-64 h-full p-6 flex flex-col gap-4 shadow-lg rounded-r-2xl relative">
-            {/* Login button at the top */}
-            <div className="mb-4">
-              <LoginButton />
+          <div className="bg-white w-80 h-full p-6 flex flex-col shadow-lg rounded-r-2xl relative overflow-y-auto">
+            {/* Logo at the top */}
+            <div className="mb-6 pb-4 border-b border-gray-200">
+              <Link href="/" className="site-logo flex items-center text-2xl font-extrabold select-none text-red-600 tracking-tight drop-shadow-lg" onClick={() => setIsMenuOpen(false)}>
+                <svg className="w-8 h-8 mr-2" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="url(#paint0_linear)"/><defs><linearGradient id="paint0_linear" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse"><stop stopColor="#dc2626"/><stop offset="1" stopColor="#f59e42"/></linearGradient></defs></svg>
+                <span className="text-red-600">Global</span><span className="text-gradient-eye">Eye</span>
+              </Link>
             </div>
-            <ul className="mobile-nav-menu flex flex-col gap-2">
-              {categories.map((category) => (
-                <li key={category.name} className="mobile-nav-item">
+            
+            {/* Login button */}
+            <div className="mb-6 pb-4 border-b border-gray-200">
+              <div className="flex items-center justify-center">
+                <LoginButton />
+              </div>
+            </div>
+            
+            {/* Categories */}
+            <div className="mb-6">
+              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3 px-2">Categories</h3>
+              <ul className="mobile-nav-menu flex flex-col gap-1">
+                {categories.map((category) => (
+                  <li key={category.name} className="mobile-nav-item">
+                    <Link
+                      href={category.path}
+                      className={`mobile-nav-link px-4 py-3 font-medium transition-colors duration-200 rounded-lg ${pathname === category.path ? 'text-red-600 bg-red-50' : 'text-gray-700 hover:text-red-600 hover:bg-gray-50'}`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {category.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            
+            {/* Legal Pages */}
+            <div className="mt-auto">
+              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3 px-2">Legal Pages</h3>
+              <ul className="flex flex-col gap-1">
+                <li>
                   <Link
-                    href={category.path}
-                    className={`mobile-nav-link px-4 py-2 font-medium transition-colors duration-200 ${pathname === category.path ? 'text-red-600' : 'text-gray-700 hover:text-red-600'}`}
+                    href="/about"
+                    className="mobile-nav-link px-4 py-3 font-medium transition-colors duration-200 rounded-lg text-gray-700 hover:text-red-600 hover:bg-gray-50"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    {category.label}
+                    About Us
                   </Link>
                 </li>
-              ))}
-            </ul>
+                <li>
+                  <Link
+                    href="/privacy"
+                    className="mobile-nav-link px-4 py-3 font-medium transition-colors duration-200 rounded-lg text-gray-700 hover:text-red-600 hover:bg-gray-50"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Privacy Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/terms-and-conditions"
+                    className="mobile-nav-link px-4 py-3 font-medium transition-colors duration-200 rounded-lg text-gray-700 hover:text-red-600 hover:bg-gray-50"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Terms & Conditions
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/contact-us"
+                    className="mobile-nav-link px-4 py-3 font-medium transition-colors duration-200 rounded-lg text-gray-700 hover:text-red-600 hover:bg-gray-50"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Contact Us
+                  </Link>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       )}

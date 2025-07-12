@@ -2,7 +2,7 @@ import { supabase } from '@utils/supabaseClient';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  // جلب جميع الأقسام من قاعدة البيانات
+  // Get all categories from database
   const { data: categories, error } = await supabase
     .from('categories')
     .select('slug');

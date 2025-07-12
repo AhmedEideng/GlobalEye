@@ -103,4 +103,42 @@ export function AdsterraBanner320x50(props: { style?: React.CSSProperties }) {
       {...props}
     />
   );
+}
+
+export function AdsterraBanner300x250(props: { style?: React.CSSProperties }) {
+  return (
+    <AdsterraScript
+      id="adsterra-300x250"
+      scriptSrc="//www.highperformanceformat.com/854324fb9e09c1fb4415dc816b41ce77/invoke.js"
+      atOptions={{
+        key: "854324fb9e09c1fb4415dc816b41ce77",
+        format: "iframe",
+        height: 250,
+        width: 300,
+        params: {},
+      }}
+      width={300}
+      height={250}
+      {...props}
+    />
+  );
+}
+
+export function AdsterraBanner160x300(props: { style?: React.CSSProperties }) {
+  return (
+    <AdsterraScript
+      id="adsterra-160x300"
+      scriptSrc="//www.highperformanceformat.com/dc7f1c37b029fa1984d76552f99edaa6/invoke.js"
+      atOptions={{
+        key: "dc7f1c37b029fa1984d76552f99edaa6",
+        format: "iframe",
+        height: 300,
+        width: 160,
+        params: {},
+      }}
+      width={160}
+      height={300}
+      {...props}
+    />
+  );
 } 
