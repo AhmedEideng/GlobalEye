@@ -65,10 +65,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
           <Footer />
         </BreakingNewsTickerController>
-        {/* Sticky mobile ad */}
-        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1000, display: 'flex', justifyContent: 'center' }}>
-          <AdsterraBanner320x50 style={{ maxWidth: '100vw' }} />
-        </div>
       </body>
     </html>
   );
