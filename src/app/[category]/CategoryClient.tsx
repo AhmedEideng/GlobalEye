@@ -4,6 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import { sendAnalyticsEvent, fetchRelatedNews } from '../utils/fetchNews';
 import Link from 'next/link';
+import { AdsterraBanner728x90 } from '@components/AdsterraAds';
 
 // Helper function to generate slug (updated version)
 function generateSlug(title: string, url: string): string {
@@ -161,6 +162,7 @@ export default function CategoryClient({ category }: { category: string }) {
 
   return (
     <div className="category-page max-w-screen-xl mx-auto px-2 sm:px-4">
+      <AdsterraBanner728x90 />
       <div className="category-header text-center mb-6">
         <h1
           className="category-title text-3xl sm:text-4xl md:text-6xl font-extrabold mb-2 tracking-tight text-red-700 break-words"
@@ -243,29 +245,36 @@ export default function CategoryClient({ category }: { category: string }) {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {suggestedArticles.map((article, idx) => (
-              <Link
-                key={article.slug + idx}
-                href={`/article/${article.slug}`}
-                className="article-card group"
-              >
-                <div className="relative w-full h-48 overflow-hidden">
-                  <Image
-                    src={article.urlToImage || "/placeholder-news.jpg"}
-                    alt={article.title}
-                    fill
-                    className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-                <div className="p-4">
-                  <div className="article-category text-xs font-bold mb-1 bg-red-600 text-white rounded-full px-3 py-1 inline-block">{article.source?.name}</div>
-                  <h3 className="article-title text-lg font-bold mb-2 line-clamp-2">{article.title}</h3>
-                  <p className="article-excerpt text-gray-600 text-sm mb-2 line-clamp-2">{article.description}</p>
-                  <div className="article-meta text-xs flex flex-wrap gap-2 text-gray-400">
-                    <span className="flex items-center gap-1 text-gray-400">{new Date(article.publishedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
-                    {article.author && <span>by {article.author}</span>}
+              <React.Fragment key={article.slug + idx}>
+                <Link
+                  href={`/article/${article.slug}`}
+                  className="article-card group"
+                >
+                  <div className="relative w-full h-48 overflow-hidden">
+                    <Image
+                      src={article.urlToImage || "/placeholder-news.jpg"}
+                      alt={article.title}
+                      fill
+                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                    />
                   </div>
-                </div>
-              </Link>
+                  <div className="p-4">
+                    <div className="article-category text-xs font-bold mb-1 bg-red-600 text-white rounded-full px-3 py-1 inline-block">{article.source?.name}</div>
+                    <h3 className="article-title text-lg font-bold mb-2 line-clamp-2">{article.title}</h3>
+                    <p className="article-excerpt text-gray-600 text-sm mb-2 line-clamp-2">{article.description}</p>
+                    <div className="article-meta text-xs flex flex-wrap gap-2 text-gray-400">
+                      <span className="flex items-center gap-1 text-gray-400">{new Date(article.publishedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                      {article.author && <span>by {article.author}</span>}
+                    </div>
+                  </div>
+                </Link>
+                {/* Add ad every 10 articles */}
+                {(idx + 1) % 10 === 0 && idx < suggestedArticles.length - 1 && (
+                  <div className="col-span-full">
+                    <AdsterraBanner728x90 />
+                  </div>
+                )}
+              </React.Fragment>
             ))}
           </div>
         </section>

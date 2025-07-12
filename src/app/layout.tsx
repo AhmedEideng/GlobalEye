@@ -4,7 +4,7 @@ import PwaInstallToast from '@components/PwaInstallToast';
 import DynamicHeader from '@components/DynamicHeader';
 import BreakingNewsTickerController from '@components/BreakingNewsTickerController';
 import ClientLangHead from './ClientLangHead';
-import { AdsterraBanner728x90, AdsterraBanner320x50 } from '@components/AdsterraAds';
+import { AdsterraBanner320x50 } from '@components/AdsterraAds';
 
 export const metadata = {
   metadataBase: new URL('https://globaleye.live'),
@@ -56,7 +56,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <PwaInstallToast />
         <header className="cnn-header"></header>
         <DynamicHeader />
-        <AdsterraBanner728x90 />
         <nav className="cnn-nav">
           <div className="nav-container"></div>
         </nav>

@@ -6,6 +6,8 @@ import type { Metadata } from 'next';
 import ArticleHomeJsonLdHead from './ArticleHomeJsonLdHead';
 import Link from 'next/link';
 import Image from 'next/image';
+import React from 'react'; // Added missing import for React
+import { AdsterraBanner728x90 } from '@components/AdsterraAds';
 
 export const revalidate = 180; // 3 دقائق
 
@@ -48,6 +50,7 @@ export default async function HomePage() {
       <ArticleHomeJsonLdHead />
       <BreakingNewsTickerController>
         <main>
+          <AdsterraBanner728x90 />
           {featured && <HomeFeatured article={featured} />}
           {articles.length > 0 && <HomeNewsGrid articles={articles} />}
           {/* قسم الأخبار المقترحة */}
@@ -62,29 +65,36 @@ export default async function HomePage() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                 {suggestedArticles.map((article, idx) => (
-                  <Link
-                    key={article.slug + idx}
-                    href={`/article/${article.slug}`}
-                    className="article-card group transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl rounded-xl bg-white shadow-md overflow-hidden"
-                  >
-                    <div className="relative w-full h-48 overflow-hidden">
-                      <Image
-                        src={article.urlToImage || "/placeholder-news.jpg"}
-                        alt={article.title}
-                        fill
-                        className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                    <div className="p-4">
-                      <div className="article-category text-xs font-bold mb-1 bg-red-600 text-white rounded-full px-3 py-1 inline-block">{article.source?.name}</div>
-                      <h3 className="article-title text-lg font-bold mb-2 line-clamp-2 group-hover:text-red-700 transition-colors duration-200">{article.title}</h3>
-                      <p className="article-excerpt text-gray-600 text-sm mb-2 line-clamp-2">{article.description}</p>
-                      <div className="article-meta text-xs flex flex-wrap gap-2 text-gray-400">
-                        <span className="flex items-center gap-1 text-gray-400">{new Date(article.publishedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
-                        {article.author && <span>by {article.author}</span>}
+                  <React.Fragment key={article.slug + idx}>
+                    <Link
+                      href={`/article/${article.slug}`}
+                      className="article-card group transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl rounded-xl bg-white shadow-md overflow-hidden"
+                    >
+                      <div className="relative w-full h-48 overflow-hidden">
+                        <Image
+                          src={article.urlToImage || "/placeholder-news.jpg"}
+                          alt={article.title}
+                          fill
+                          className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                        />
                       </div>
-                    </div>
-                  </Link>
+                      <div className="p-4">
+                        <div className="article-category text-xs font-bold mb-1 bg-red-600 text-white rounded-full px-3 py-1 inline-block">{article.source?.name}</div>
+                        <h3 className="article-title text-lg font-bold mb-2 line-clamp-2 group-hover:text-red-700 transition-colors duration-200">{article.title}</h3>
+                        <p className="article-excerpt text-gray-600 text-sm mb-2 line-clamp-2">{article.description}</p>
+                        <div className="article-meta text-xs flex flex-wrap gap-2 text-gray-400">
+                          <span className="flex items-center gap-1 text-gray-400">{new Date(article.publishedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                          {article.author && <span>by {article.author}</span>}
+                        </div>
+                      </div>
+                    </Link>
+                    {/* Add ad every 10 articles */}
+                    {(idx + 1) % 10 === 0 && idx < suggestedArticles.length - 1 && (
+                      <div className="col-span-full">
+                        <AdsterraBanner728x90 />
+                      </div>
+                    )}
+                  </React.Fragment>
                 ))}
               </div>
             </section>
