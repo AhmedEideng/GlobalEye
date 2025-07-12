@@ -44,18 +44,10 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
         
         // Add event listeners for debugging
         script.onload = () => {
-          // Only log in development
-          if (process.env.NODE_ENV === 'development') {
-            console.log(`Ad loaded successfully: ${id}`);
-          }
           setAdLoaded(true);
         };
         
         script.onerror = () => {
-          // Only log in development
-          if (process.env.NODE_ENV === 'development') {
-            console.error(`Failed to load ad: ${id}`);
-          }
           setAdError(true);
         };
         
@@ -64,9 +56,6 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
         // Set timeout to detect if ad doesn't load
         const timeout = setTimeout(() => {
           if (!adLoaded && !adError) {
-            if (process.env.NODE_ENV === 'development') {
-              console.warn(`Ad timeout: ${id}`);
-            }
             setAdError(true);
           }
         }, 10000); // 10 seconds timeout
@@ -78,10 +67,6 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
           }
         };
       } catch (error) {
-        // Only log in development
-        if (process.env.NODE_ENV === 'development') {
-          console.error(`Error setting up ad ${id}:`, error);
-        }
         setAdError(true);
       }
     };
@@ -93,9 +78,6 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
     const retryTimeout = setTimeout(() => {
       if (!adLoaded && !adError && retryCount < 2) {
         setRetryCount(prev => prev + 1);
-        if (process.env.NODE_ENV === 'development') {
-          console.log(`Retrying ad: ${id}, attempt ${retryCount + 1}`);
-        }
         loadAd();
       }
     }, 5000); // Retry after 5 seconds
@@ -104,7 +86,7 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
       clearTimeout(retryTimeout);
       if (cleanup) cleanup();
     };
-  }, [scriptSrc, atOptions, id, retryCount]);
+  }, [scriptSrc, atOptions, id, retryCount, adLoaded, adError]);
 
   // Show fallback if ad fails to load
   if (adError) {
@@ -165,7 +147,7 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
 }
 
 // Alternative ad component using direct iframe
-function AdsterraIframe({ id, scriptSrc, atOptions, width, height, style }: AdProps) {
+function AdsterraIframe({ id, scriptSrc, width, height, style }: AdProps) {
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const [iframeError, setIframeError] = useState(false);
 

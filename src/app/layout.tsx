@@ -4,7 +4,6 @@ import PwaInstallToast from '@components/PwaInstallToast';
 import DynamicHeader from '@components/DynamicHeader';
 import BreakingNewsTickerController from '@components/BreakingNewsTickerController';
 import ClientLangHead from './ClientLangHead';
-import { AdsterraBanner320x50 } from '@components/AdsterraAds';
 
 export const metadata = {
   metadataBase: new URL('https://globaleye.live'),
