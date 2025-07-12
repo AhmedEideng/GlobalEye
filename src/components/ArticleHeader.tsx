@@ -4,6 +4,7 @@ import { NewsArticle, sendAnalyticsEvent } from '@utils/fetchNews';
 import { cleanImageUrl } from '@utils/cleanImageUrl';
 import { useAuth } from '@hooks/useAuth';
 import { addFavorite, removeFavorite, isFavorite } from '@services/favorites';
+import { sanitizeText } from '../utils/sanitizeText';
 import Head from 'next/head';
 
 /**
@@ -36,18 +37,18 @@ export default function ArticleHeader({ article }: { article: NewsArticle }) {
     setLoading(false);
   };
 
-  // توليد structured data (JSON-LD)
+  // Generate structured data (JSON-LD)
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'NewsArticle',
-    headline: article.title,
-    description: article.description,
+    headline: sanitizeText(article.title),
+    description: sanitizeText(article.description),
     datePublished: article.publishedAt,
     image: article.urlToImage ? [article.urlToImage] : undefined,
-    author: article.author ? [{ '@type': 'Person', name: article.author }] : undefined,
+    author: article.author ? [{ '@type': 'Person', name: sanitizeText(article.author) }] : undefined,
     publisher: {
       '@type': 'Organization',
-      name: article.source?.name || 'مصدر',
+      name: sanitizeText(article.source?.name) || 'Source',
       logo: {
         '@type': 'ImageObject',
         url: '/favicon.ico.jpg',
@@ -55,7 +56,6 @@ export default function ArticleHeader({ article }: { article: NewsArticle }) {
     },
     mainEntityOfPage: article.url,
     url: article.url,
-    // المصادر الإضافية (إن وجدت) في نهاية المقال
   };
 
   return (
@@ -82,7 +82,7 @@ export default function ArticleHeader({ article }: { article: NewsArticle }) {
       {/* Title & Meta */}
       <div className="flex items-center gap-2 mb-4">
         <h1 className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-gray-900 leading-tight break-words text-balance w-full">
-          {article.title}
+          {sanitizeText(article.title)}
         </h1>
         {user && (
           <button
@@ -100,11 +100,11 @@ export default function ArticleHeader({ article }: { article: NewsArticle }) {
         )}
       </div>
       <div className="flex flex-wrap items-center gap-4 mb-6 text-sm text-gray-500">
-        <span className="font-semibold text-red-600">{article.source.name}</span>
+        <span className="font-semibold text-red-600">{sanitizeText(article.source.name)}</span>
         {article.author && (
           <span className="flex items-center gap-1 text-gray-700 bg-gray-100 rounded px-2 py-1">
             <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-4.418 0-8 1.79-8 4v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2c0-2.21-3.582-4-8-4z"/></svg>
-            <span className="font-medium">{article.author}</span>
+            <span className="font-medium">{sanitizeText(article.author)}</span>
           </span>
         )}
         <span>{formatDate(article.publishedAt)}</span>
