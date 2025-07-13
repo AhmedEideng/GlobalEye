@@ -16,7 +16,7 @@ export default function BreakingNewsTicker({ showTicker = true }: { showTicker?:
     const interval = setInterval(() => {
       setScrollPosition((prev) => {
         const newPosition = prev + (animationSpeed / 60); // 60fps
-        const maxScroll = news.length * 300; // approximate width
+        const maxScroll = news.length * 500; // approximate width
         return newPosition >= maxScroll ? 0 : newPosition;
       });
     }, 16); // ~60fps
@@ -64,17 +64,17 @@ export default function BreakingNewsTicker({ showTicker = true }: { showTicker?:
                 className="ticker-items flex items-center"
                 style={{
                   transform: `translateX(-${scrollPosition}px)`,
-                  width: `${news.length * 300}px`
+                  width: `${news.length * 500}px`
                 }}
               >
                 {news.map((newsItem: BreakingNewsItem) => (
                   <div
                     key={newsItem.id || `news-${newsItem.url}`}
                     className="ticker-item flex-shrink-0 flex items-center"
-                    style={{ width: '300px', marginRight: '50px' }}
+                    style={{ width: '400px', marginRight: '100px' }}
                   >
                     {/* Yellow dot at the start of each news */}
-                    <div className="separator-dot mr-2 flex-shrink-0">
+                    <div className="separator-dot mr-3 flex-shrink-0">
                       <div className="w-3 h-3 bg-yellow-300 rounded-full"></div>
                     </div>
                     <Link 
@@ -85,6 +85,10 @@ export default function BreakingNewsTicker({ showTicker = true }: { showTicker?:
                         {newsItem.title}
                       </span>
                     </Link>
+                    {/* Separator line */}
+                    <div className="separator-line ml-4 flex-shrink-0">
+                      <div className="w-px h-4 bg-yellow-300 opacity-50"></div>
+                    </div>
                   </div>
                 ))}
               </div>
