@@ -69,7 +69,7 @@ export default function BreakingNewsTicker({ showTicker = true }: { showTicker?:
                   width: `${news.length * 100}%`
                 }}
               >
-                {news.slice(0, newsCount).map((newsItem: BreakingNewsItem, index: number) => (
+                {news.slice(0, newsCount).map((newsItem: BreakingNewsItem) => (
                   <div
                     key={newsItem.id || `news-${newsItem.url}`}
                     className="ticker-item flex-shrink-0 flex items-center"

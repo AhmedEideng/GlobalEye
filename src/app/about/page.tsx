@@ -56,7 +56,7 @@ export default function AboutPage() {
           <h2 className="text-2xl font-semibold mb-4">Technology and Innovation</h2>
           <p className="mb-6">GlobalEye News leverages the latest technology to bring you news faster and more efficiently, ensuring you never miss a story that matters.</p>
           <h2 className="text-2xl font-semibold mb-4">Contact Us</h2>
-          <p className="mb-6">Have questions, feedback, or story tips? Reach out to our team at contact@globaleye.news. We value your input and strive to improve your news experience.</p>
+          <p className="mb-6">Have questions, feedback, or story tips? Reach out to our team at contact@globaleye.live. We value your input and strive to improve your news experience.</p>
           <div className="bg-gray-100 p-6 rounded-lg">
             <h3 className="text-xl font-semibold mb-3">Stay Connected</h3>
             <p>Follow us on social media and subscribe to our newsletter for the latest updates and exclusive content.</p>

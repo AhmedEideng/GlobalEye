@@ -6,9 +6,9 @@ const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
 export default function ClientLangHead() {
   const pathname = usePathname() || '/';
-  const canonical = `https://globaleye.news${pathname}`;
-  const hrefEn = `https://globaleye.news${pathname.replace(/^\/ar/, '')}`;
-  const hrefAr = `https://globaleye.news/ar${pathname.replace(/^\/ar/, '')}`;
+  const canonical = `https://globaleye.live${pathname}`;
+  const hrefEn = `https://globaleye.live${pathname.replace(/^\/ar/, '')}`;
+  const hrefAr = `https://globaleye.live/ar${pathname.replace(/^\/ar/, '')}`;
 
   return (
     <>

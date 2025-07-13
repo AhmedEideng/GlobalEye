@@ -48,11 +48,11 @@ export default function PrivacyPage() {
         <h2 className="text-2xl font-semibold mb-4">Cookies and Tracking</h2>
         <p className="mb-6">We use cookies and similar technologies to enhance your experience, analyze usage, and deliver personalized content. You can control cookies through your browser settings.</p>
         <h2 className="text-2xl font-semibold mb-4">Your Rights</h2>
-        <p className="mb-6">You have the right to access, correct, or delete your personal information. Contact us at privacy@globaleye.news for any privacy-related requests.</p>
+        <p className="mb-6">You have the right to access, correct, or delete your personal information. Contact us at privacy@globaleye.live for any privacy-related requests.</p>
         <h2 className="text-2xl font-semibold mb-4">Changes to This Policy</h2>
         <p className="mb-6">We may update this privacy policy from time to time. We encourage you to review this page regularly for any changes.</p>
         <h2 className="text-2xl font-semibold mb-4">Contact Us</h2>
-        <p className="mb-6">If you have any questions or concerns about our privacy practices, please contact us at privacy@globaleye.news.</p>
+        <p className="mb-6">If you have any questions or concerns about our privacy practices, please contact us at privacy@globaleye.live.</p>
         <div className="bg-gray-100 p-6 rounded-lg">
           <p className="text-sm text-gray-600">
             <strong>Last Updated:</strong> December 2024
