@@ -281,7 +281,7 @@
   }
 
   .btn-primary {
-    @apply bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary;
+    @apply bg-primary text-primary-foreground focus:ring-primary;
     background-color: var(--cnn-red);
     color: white;
   }
