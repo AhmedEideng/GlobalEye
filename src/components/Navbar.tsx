@@ -19,13 +19,14 @@ const categories = [
 interface NavbarProps {
   isMenuOpen: boolean;
   setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  style?: React.CSSProperties;
 }
 
-export default function Navbar({ isMenuOpen, setIsMenuOpen }: NavbarProps) {
+export default function Navbar({ isMenuOpen, setIsMenuOpen, style }: NavbarProps) {
   const pathname = usePathname();
 
   return (
-    <div className="navbar-container flex items-center justify-between py-2 px-4 bg-white fixed left-0 w-full z-50" style={{ top: '48px' }}>
+    <div className="navbar-container flex items-center justify-between py-2 px-4 bg-white fixed left-0 w-full z-50" style={style}>
       {/* Mobile menu button and logo left (mobile only) */}
       <div className="flex-1 flex items-center gap-2 md:hidden">
         <button className="mobile-menu-btn" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">

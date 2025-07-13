@@ -115,7 +115,7 @@
     overflow-x: hidden;
     background-color: var(--background);
     color: var(--cnn-text);
-    padding-top: 96px; /* Fixed padding for sticky header */
+    /* padding-top: 96px;  تم إلغاء المساحة العلوية */
   }
 
   /* Ensure proper display for body */
@@ -129,7 +129,22 @@
 @layer components {
   /* Header and Navigation Components */
   .sticky-header {
-    @apply fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border px-4 lg:px-8 py-3 flex justify-between items-center transition-all duration-200;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background-color: var(--background, #fff);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--cnn-border, #e5e7eb);
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s;
   }
 
   .logo {
@@ -605,9 +620,18 @@
 
   /* Breaking News Ticker */
   .breaking-news-ticker {
-    @apply fixed top-0 left-0 right-0 z-50 bg-red-600 text-white py-2 px-4;
+    /* @apply fixed top-0 left-0 right-0 z-50 bg-red-600 text-white py-2 px-4; */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
     background-color: var(--cnn-red);
     color: white;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
     font-family: 'Poppins', sans-serif;
     font-weight: 600;
     font-size: 14px;
@@ -721,7 +745,11 @@
 
   @media (max-width: 768px) {
     .breaking-news-ticker {
-      @apply py-1 px-2;
+      /* @apply py-1 px-2; */
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
     }
 
     .news-link {
@@ -761,6 +789,15 @@
   .main-container, .category-page, .max-w-3xl {
     @apply max-w-7xl mx-auto px-4 lg:px-8;
     margin-top: 0;
+  }
+
+  .mobile-nav {
+    z-index: 1050 !important;
+  }
+
+  .navbar-container {
+    /* border-bottom: 1px solid #e5e7eb; */
+    /* box-shadow: 0 2px 8px rgba(0,0,0,0.04); */
   }
 }
 

@@ -24,16 +24,10 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
       
       // Clear existing content safely
       try {
-        while (currentRef.firstChild) {
-          const child: ChildNode | null = currentRef.firstChild;
-          if (child && child.parentNode === currentRef) {
-            currentRef.removeChild(child);
-          } else {
-            break; // Exit if child is no longer a child of currentRef
-          }
-        }
-      } catch {
-        // TODO: handle ad container clear error
+        currentRef.innerHTML = '';
+      } catch (err) {
+        // Log the error for debugging
+        console.error('Ad container clear error:', err);
       }
       
       // Create and append options script
@@ -109,16 +103,10 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
       if (currentRef) {
         try {
           // Remove all child nodes safely
-          while (currentRef.firstChild) {
-            const child: ChildNode | null = currentRef.firstChild;
-            if (child && child.parentNode === currentRef) {
-              currentRef.removeChild(child);
-            } else {
-              break; // Exit if child is no longer a child of currentRef
-            }
-          }
-        } catch {
+          currentRef.innerHTML = '';
+        } catch (err) {
           // TODO: handle ad cleanup error
+          console.error('Ad cleanup error:', err);
         }
       }
     };
@@ -191,16 +179,10 @@ function AdsterraIframe({ id, scriptSrc, width, height, style }: AdProps) {
 
         // Clear existing content safely
         try {
-          while (container.firstChild) {
-            const child: ChildNode | null = container.firstChild;
-            if (child && child.parentNode === container) {
-              container.removeChild(child);
-            } else {
-              break; // Exit if child is no longer a child of container
-            }
-          }
-        } catch {
-          // TODO: handle iframe container clear error
+          container.innerHTML = '';
+        } catch (err) {
+          // Log the error for debugging
+          console.error('Iframe container clear error:', err);
         }
 
         const iframe = document.createElement('iframe');
@@ -231,17 +213,11 @@ function AdsterraIframe({ id, scriptSrc, width, height, style }: AdProps) {
         const container = document.getElementById(id);
         if (container && container.parentNode) {
           // Remove all child nodes safely
-          while (container.firstChild) {
-            const child: ChildNode | null = container.firstChild;
-            if (child && child.parentNode === container) {
-              container.removeChild(child);
-            } else {
-              break; // Exit if child is no longer a child of container
-            }
-          }
+          container.innerHTML = '';
         }
-      } catch {
+      } catch (err) {
         // TODO: handle iframe cleanup error
+        console.error('Iframe cleanup error:', err);
       }
     };
   }, [id, scriptSrc, width, height]);
@@ -317,7 +293,7 @@ function AdsterraEnhanced({ id, scriptSrc, atOptions, width, height, style }: Ad
 
 // Main export component
 export default function AdsterraAds({ id, scriptSrc, atOptions, width, height, style }: AdProps) {
-  return <AdsterraEnhanced id={id} scriptSrc={scriptSrc} atOptions={atOptions} width={width} height={height} style={style} />;
+  return <AdsterraIframe id={id} scriptSrc={scriptSrc} atOptions={atOptions} width={width} height={height} style={style} />;
 }
 
 // Specific ad banner components

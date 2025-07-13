@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import BreakingNewsTickerController from '@/components/BreakingNewsTickerController';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -101,9 +102,11 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <ErrorBoundary>
-          <main className="min-h-screen bg-gray-50">
-            {children}
-          </main>
+          <BreakingNewsTickerController>
+            <main className="min-h-screen bg-gray-50 pt-24">
+              {children}
+            </main>
+          </BreakingNewsTickerController>
         </ErrorBoundary>
       </body>
     </html>

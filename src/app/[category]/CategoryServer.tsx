@@ -32,7 +32,7 @@ export default function CategoryServer({ category, articles }: { category: strin
 
   return (
     <div className="category-page max-w-screen-xl mx-auto px-2 sm:px-4">
-      <AdsterraBanner728x90 />
+      {/* <AdsterraBanner728x90 /> */}
       <div className="category-header text-center mb-6">
         <h1
           className="category-title text-3xl sm:text-4xl md:text-6xl font-extrabold mb-2 tracking-tight text-red-700 break-words"

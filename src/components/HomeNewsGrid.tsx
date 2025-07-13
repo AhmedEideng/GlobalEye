@@ -13,7 +13,7 @@ export default function HomeNewsGrid({ articles }: { articles: NewsArticle[] }) 
         <h2 className="section-title text-lg sm:text-xl font-bold">Latest News</h2>
         <Link href="/world" className="btn btn-secondary">View All News</Link>
       </div>
-      <AdsterraBanner468x60 />
+      {/* <AdsterraBanner468x60 /> */}
       <div className="news-grid">
         {articles.map((article, idx) => {
           const cleanImage = cleanImageUrl(article.urlToImage);

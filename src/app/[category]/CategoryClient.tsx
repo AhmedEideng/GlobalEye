@@ -5,6 +5,8 @@ import Image from 'next/image';
 import { sendAnalyticsEvent, fetchRelatedNews } from '../utils/fetchNews';
 import Link from 'next/link';
 import { AdsterraBanner728x90 } from '@components/AdsterraAds';
+import HomeFeatured from '@components/HomeFeatured';
+import HomeNewsGrid from '@components/HomeNewsGrid';
 
 // Helper function to generate slug (updated version)
 function generateSlug(title: string, url: string): string {
@@ -121,8 +123,16 @@ export default function CategoryClient({ category }: { category: string }) {
 
   // Limit to first 52 articles only
   const limitedArticles = articles.slice(0, 52);
-  const featuredArticle = limitedArticles.length > 0 ? limitedArticles[0] : null;
-  const restArticles = limitedArticles.length > 1 ? limitedArticles.slice(1) : [];
+  const featured = limitedArticles[0] || null;
+  const restArticles = featured ? limitedArticles.filter(a => a.slug !== featured.slug) : limitedArticles;
+  const mainArticles = restArticles.slice(0, 51);
+  const suggested = suggestedArticles.slice(0, 40);
+
+  // تحويل Article[] إلى NewsArticle[] بإضافة content فارغ إذا لم يكن موجودًا
+  const toNewsArticle = (a: any) => ({ content: '', ...a });
+  const featuredNews = featured ? toNewsArticle(featured) : null;
+  const mainNews = mainArticles.map(toNewsArticle);
+  const suggestedNews = suggested.map(toNewsArticle);
 
   if (loading && !timeout) {
     return (
@@ -145,7 +155,7 @@ export default function CategoryClient({ category }: { category: string }) {
     );
   }
 
-  if (!featuredArticle && articles.length === 0) {
+  if (!featured && articles.length === 0) {
     return (
       <div className="error text-center py-8">
         <h2 className="text-2xl font-bold text-gray-700 mb-4">No news available in {categoryLabel}</h2>
@@ -162,7 +172,7 @@ export default function CategoryClient({ category }: { category: string }) {
 
   return (
     <div className="category-page max-w-screen-xl mx-auto px-2 sm:px-4">
-      <AdsterraBanner728x90 />
+      {/* <AdsterraBanner728x90 /> */}
       <div className="category-header text-center mb-6">
         <h1
           className="category-title text-3xl sm:text-4xl md:text-6xl font-extrabold mb-2 tracking-tight text-red-700 break-words"
@@ -179,76 +189,26 @@ export default function CategoryClient({ category }: { category: string }) {
         </p>
       </div>
 
-      {featuredArticle && (
-        <a href={`/article/${featuredArticle.slug || generateSlug(featuredArticle.title, featuredArticle.url)}`} className="article-card block featured-article mb-6 group cursor-pointer">
-          <div className="relative w-full h-[400px] md:h-[500px] rounded-2xl overflow-hidden group-hover:opacity-90 transition-opacity duration-200">
-            <Image
-              src={featuredArticle.urlToImage || '/placeholder-news.svg'}
-              alt={featuredArticle.title}
-              fill
-              className="object-cover w-full h-full"
-              priority
-              sizes="100vw"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-          </div>
-          <div className="featured-content">
-            <div className="article-category">{categoryLabel.toUpperCase()}</div>
-            <h1 className="featured-title text-xl sm:text-2xl md:text-3xl font-bold mb-2">
-              {featuredArticle.title}
-            </h1>
-            <p className="featured-excerpt text-base sm:text-lg mb-2">{featuredArticle.description}</p>
-            <div className="article-meta text-xs sm:text-sm flex flex-wrap gap-2 text-gray-500">
-              <span>{featuredArticle.source.name}</span>
-              <span>{new Date(featuredArticle.publishedAt).toLocaleDateString('en-GB')}</span>
-            </div>
-          </div>
-        </a>
-      )}
-
-      {restArticles.length > 0 && (
-        <section>
-          <div className="section-header flex flex-col sm:flex-row items-center justify-between mb-4 gap-2">
-            <h2 className="section-title text-lg sm:text-xl font-bold">All {categoryLabel} News</h2>
-            <span className="article-count text-xs text-gray-400">{restArticles.length} articles</span>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full">
-            {restArticles.map((article, index) => (
-                <a key={article.slug || `article-${index}-${article.url}`} href={`/article/${article.slug || generateSlug(article.title, article.url)}`} className="article-card group">
-                  <div className="relative w-full h-48 overflow-hidden">
-                    <Image
-                      src={article.urlToImage || '/placeholder-news.svg'}
-                      alt={article.title}
-                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <div className="flex flex-col justify-between h-full p-4">
-                    <h2 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-red-700 transition-colors duration-200">{article.title}</h2>
-                    <p className="text-sm text-gray-600 mb-3 line-clamp-3">{article.description}</p>
-                    <div className="flex items-center justify-between text-xs text-gray-400 mt-auto pt-2 border-t border-gray-100">
-                      <span className="truncate max-w-[60%]">{article.source.name}</span>
-                      <span>{new Date(article.publishedAt).toLocaleDateString('en-GB')}</span>
-                    </div>
-                  </div>
-                </a>
-            ))}
-          </div>
-        </section>
-      )}
-      
+      {/* Featured Article */}
+      {featuredNews && <HomeFeatured article={featuredNews} />}
+      {/* Main News Grid */}
+      {mainNews.length > 0 && <HomeNewsGrid articles={mainNews} />}
       {/* Suggested Articles Section */}
-      {suggestedArticles.length > 0 && (
-        <section className="mt-12">
-          <div className="section-header flex flex-col sm:flex-row items-center justify-between mb-6 gap-2">
-            <h2 className="section-title text-xl sm:text-2xl font-bold">Suggested Articles</h2>
-            <span className="article-count text-xs text-gray-400">{suggestedArticles.length} articles</span>
+      {suggestedNews.length > 0 && (
+        <section className="mt-12 bg-gradient-to-br from-gray-100 via-white to-gray-50 rounded-2xl p-6 shadow-lg">
+          <div className="mb-4">
+            <h2 className="text-3xl font-extrabold mb-2 text-red-800 flex items-center gap-2">
+              <span role="img" aria-label="newspaper">📰</span>
+              Selected Articles for You
+            </h2>
+            <p className="text-gray-500 text-base border-b pb-2">We select the latest and most important news from our trusted sources for you</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {suggestedArticles.map((article, idx) => (
-              <React.Fragment key={article.slug || `suggested-${idx}-${article.url}`}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            {suggestedNews.map((article, idx) => (
+              <React.Fragment key={article.slug || `suggested-${idx}-${article.url}`}> 
                 <Link
                   href={`/article/${article.slug}`}
-                  className="article-card group"
+                  className="article-card group transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl rounded-xl bg-white shadow-md overflow-hidden"
                 >
                   <div className="relative w-full h-48 overflow-hidden">
                     <Image
@@ -260,7 +220,7 @@ export default function CategoryClient({ category }: { category: string }) {
                   </div>
                   <div className="p-4">
                     <div className="article-category text-xs font-bold mb-1 bg-red-600 text-white rounded-full px-3 py-1 inline-block">{article.source?.name}</div>
-                    <h3 className="article-title text-lg font-bold mb-2 line-clamp-2">{article.title}</h3>
+                    <h3 className="article-title text-lg font-bold mb-2 line-clamp-2 group-hover:text-red-700 transition-colors duration-200">{article.title}</h3>
                     <p className="article-excerpt text-gray-600 text-sm mb-2 line-clamp-2">{article.description}</p>
                     <div className="article-meta text-xs flex flex-wrap gap-2 text-gray-400">
                       <span className="flex items-center gap-1 text-gray-400">{new Date(article.publishedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
@@ -268,12 +228,6 @@ export default function CategoryClient({ category }: { category: string }) {
                     </div>
                   </div>
                 </Link>
-                {/* Add ad every 10 articles */}
-                {(idx + 1) % 10 === 0 && idx < suggestedArticles.length - 1 && (
-                  <div className="col-span-full">
-                    <AdsterraBanner728x90 />
-                  </div>
-                )}
               </React.Fragment>
             ))}
           </div>
