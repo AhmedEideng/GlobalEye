@@ -26,6 +26,17 @@ const withPWA = require('next-pwa')({
         },
       },
     },
+    {
+      urlPattern: /^https:\/\/.*\/api\/news-rotation/,
+      handler: 'StaleWhileRevalidate',
+      options: {
+        cacheName: 'news-rotation-api',
+        expiration: {
+          maxEntries: 20,
+          maxAgeSeconds: 5 * 60, // 5 minutes
+        },
+      },
+    },
   ],
 });
 
@@ -38,7 +49,7 @@ module.exports = withPWA({
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 300, // Increased to 5 minutes
+    minimumCacheTTL: 300, // 5 minutes
     domains: [
       'images.unsplash.com',
       'cdn.cnn.com',
@@ -51,17 +62,43 @@ module.exports = withPWA({
   experimental: {
     optimizeCss: true,
     optimizePackageImports: ['react-icons'],
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      },
+    },
   },
-  // Performance improvement
+  // Performance improvements
   compress: true,
   poweredByHeader: false,
   generateEtags: true,
+  swcMinify: true,
   // Improve caching
   onDemandEntries: {
     maxInactiveAge: 25 * 1000,
     pagesBufferLength: 2,
   },
-  // You can add Next.js settings here
+  // Bundle analyzer for performance monitoring
+  webpack: (config, { dev, isServer }) => {
+    // Optimize bundle size
+    if (!dev && !isServer) {
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+          },
+        },
+      };
+    }
+    return config;
+  },
+  // Security headers
   async headers() {
     return [
       {
@@ -72,7 +109,7 @@ module.exports = withPWA({
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
           { key: 'Permissions-Policy', value: 'geolocation=(), microphone=(), camera=()' },
-          // Updated CSP to allow necessary resources and prevent warnings
+          // Updated CSP to allow necessary resources
           {
             key: 'Content-Security-Policy',
             value: [

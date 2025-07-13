@@ -2,11 +2,20 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { sendAnalyticsEvent, fetchRelatedNews } from '../utils/fetchNews';
+import { sendAnalyticsEvent } from '../utils/fetchNews';
 import Link from 'next/link';
 import HomeFeatured from '@components/HomeFeatured';
 import HomeNewsGrid from '@components/HomeNewsGrid';
 import { NewsArticle } from '../utils/fetchNews';
+
+// Professional error logger for category client
+function logCategoryError(...args: unknown[]) {
+  if (process.env.NODE_ENV === 'development') {
+    // eslint-disable-next-line no-console
+    console.error('[CategoryClient]', ...args);
+  }
+  // In production, you can send errors to a monitoring service here
+}
 
 interface Article {
   title: string;
@@ -31,63 +40,118 @@ const categoryLabels: { [key: string]: string } = {
   'science': 'Science'
 };
 
-export default function CategoryClient({ category }: { category: string }) {
+interface CategoryClientProps {
+  category: string;
+  initialFeatured?: NewsArticle | null;
+  initialArticles?: NewsArticle[];
+  initialSuggested?: NewsArticle[];
+}
+
+export default function CategoryClient({ 
+  category, 
+  initialFeatured, 
+  initialArticles, 
+  initialSuggested 
+}: CategoryClientProps) {
   const categoryLabel = categoryLabels[category] || category;
-  const [articles, setArticles] = React.useState<Article[]>([]);
-  const [suggestedArticles, setSuggestedArticles] = React.useState<Article[]>([]);
-  const [loading, setLoading] = React.useState(true);
+  const [articles, setArticles] = React.useState<Article[]>(initialArticles?.map(toArticle) || []);
+  const [suggestedArticles, setSuggestedArticles] = React.useState<Article[]>(initialSuggested?.map(toArticle) || []);
+  const [featured, setFeatured] = React.useState<Article | null>(initialFeatured ? toArticle(initialFeatured) : null);
+  const [loading, setLoading] = React.useState(false);
   const [timeout, setTimeoutReached] = React.useState(false);
+  const [lastRotation, setLastRotation] = React.useState<number>(Date.now());
+
+  // Convert NewsArticle to Article interface
+  function toArticle(newsArticle: NewsArticle): Article {
+    return {
+      title: newsArticle.title,
+      description: newsArticle.description,
+      url: newsArticle.url,
+      urlToImage: newsArticle.urlToImage,
+      publishedAt: newsArticle.publishedAt,
+      source: { name: newsArticle.source?.name || '' },
+      category: newsArticle.category,
+      slug: newsArticle.slug,
+      author: newsArticle.author
+    };
+  }
+
+  // Function to fetch rotated news
+  const fetchRotatedNews = React.useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/news-rotation?category=${category}`, {
+        cache: 'no-store',
+        headers: {
+          'Accept': 'application/json',
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.success && data.data) {
+        const newFeatured = data.data.featured ? toArticle(data.data.featured) : null;
+        const newArticles = data.data.mainArticles?.map(toArticle) || [];
+        const newSuggested = data.data.suggestedArticles?.map(toArticle) || [];
+        
+        setFeatured(newFeatured);
+        setArticles(newArticles);
+        setSuggestedArticles(newSuggested);
+        setLastRotation(data.lastUpdate || Date.now());
+        
+        // Track category visit when news rotates
+        sendAnalyticsEvent('view_category', { category });
+      }
+    } catch (error) {
+      logCategoryError('Failed to fetch rotated news:', error);
+      // Keep existing data if rotation fails
+    } finally {
+      setLoading(false);
+    }
+  }, [category]);
 
   React.useEffect(() => {
     const t = setTimeout(() => setTimeoutReached(true), 5000);
     return () => clearTimeout(t);
   }, []);
 
+  // Check for rotation every 3 hours (3 * 60 * 60 * 1000 ms)
   React.useEffect(() => {
-    setLoading(true);
-    // Removed all console.log and console.error lines
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`/api/news?category=${category}`, {
-          cache: 'default', // Use browser cache
-          headers: {
-            'Accept': 'application/json',
-          }
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        if (data.articles && data.articles.length > 0) {
-          setArticles(data.articles);
-          // Track category visit when page loads
-          sendAnalyticsEvent('view_category', { category });
-          // Fetch suggested articles from the same category
-          if (data.articles.length > 0) {
-            const firstArticle = data.articles[0];
-            const relatedArticles = await fetchRelatedNews(firstArticle, category);
-            setSuggestedArticles(relatedArticles.slice(0, 20)); // Get up to 20 suggested articles
-          }
-        } else {
-          throw new Error(`No news available in the "${categoryLabel}" category. Please try again.`);
-        }
-      } catch {
-        throw new Error('Failed to load news. Please try again.');
-      } finally {
-        setLoading(false);
+    const checkRotation = () => {
+      const now = Date.now();
+      const threeHours = 3 * 60 * 60 * 1000;
+      
+      if (now - lastRotation >= threeHours) {
+        fetchRotatedNews();
       }
     };
-    fetchData();
-  }, [category, categoryLabel]);
+
+    // Check immediately
+    checkRotation();
+    
+    // Set up interval to check every hour
+    const interval = setInterval(checkRotation, 60 * 60 * 1000);
+    
+    return () => clearInterval(interval);
+  }, [lastRotation, fetchRotatedNews]);
+
+  // Initial load if no data provided
+  React.useEffect(() => {
+    if (!initialFeatured && !initialArticles?.length) {
+      fetchRotatedNews();
+    }
+  }, [fetchRotatedNews, initialFeatured, initialArticles?.length]);
 
   // Limit to first 52 articles only
   const limitedArticles = articles.slice(0, 52);
-  const featured = limitedArticles[0] || null;
-  const restArticles = featured ? limitedArticles.filter(a => a.slug !== featured.slug) : limitedArticles;
-  const mainArticles = restArticles.slice(0, 51);
+  const mainArticles = limitedArticles.slice(0, 51);
   const suggested = suggestedArticles.slice(0, 40);
 
-  // تحويل Article[] إلى NewsArticle[] بإضافة content فارغ إذا لم يكن موجودًا
+  // Convert Article[] to NewsArticle[] for components
   const toNewsArticle = (a: Article): NewsArticle => ({
     source: { id: null, name: a.source?.name || '' },
     author: a.author || '',
@@ -100,6 +164,7 @@ export default function CategoryClient({ category }: { category: string }) {
     slug: a.slug,
     category: a.category || '',
   });
+
   const featuredNews = featured ? toNewsArticle(featured) : null;
   const mainNews = mainArticles.map(toNewsArticle);
   const suggestedNews = suggested.map(toNewsArticle);
@@ -115,6 +180,7 @@ export default function CategoryClient({ category }: { category: string }) {
       </div>
     );
   }
+
   if (loading && timeout) {
     return (
       <div className="error text-center py-8">
@@ -157,6 +223,10 @@ export default function CategoryClient({ category }: { category: string }) {
         <p className="category-description text-base sm:text-lg md:text-xl text-gray-500 mt-3 font-medium max-w-2xl mx-auto">
           Stay updated with the latest, most important, and trending news in <span className="text-red-600 font-semibold">{categoryLabel}</span> from trusted sources around the world.
         </p>
+        {/* Rotation indicator */}
+        <div className="text-xs text-gray-400 mt-2">
+          News automatically updates every 3 hours
+        </div>
       </div>
 
       {/* Featured Article */}

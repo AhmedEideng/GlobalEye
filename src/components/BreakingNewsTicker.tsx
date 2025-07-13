@@ -17,7 +17,7 @@ export default function BreakingNewsTicker({ showTicker = true }: { showTicker?:
   if (!showTicker) return null;
 
   return (
-    <div className="breaking-news-ticker bg-red-800 text-white w-full overflow-hidden relative fixed left-0 top-14 z-40">
+    <div className="breaking-news-ticker bg-red-800 text-white w-full overflow-hidden relative fixed left-0 top-12 md:top-14 z-40">
       <div 
         className="ticker-container flex items-center py-2 px-4"
       >

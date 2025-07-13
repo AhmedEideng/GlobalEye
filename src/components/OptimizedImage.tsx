@@ -1,106 +1,102 @@
-'use client';
-
+"use client";
 import Image from 'next/image';
 import { useState } from 'react';
-import { cleanImageUrl } from '@utils/cleanImageUrl';
-
-// Next.js Image supports WebP and Lazy Loading automatically based on the browser
 
 interface OptimizedImageProps {
   src: string;
   alt: string;
-  className?: string;
-  placeholder?: string;
   width?: number;
   height?: number;
+  className?: string;
   priority?: boolean;
   fill?: boolean;
   sizes?: string;
+  quality?: number;
 }
 
-const BLUR_PLACEHOLDER =
-  "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q==";
-
-const OptimizedImage: React.FC<OptimizedImageProps> = ({ 
-  src, 
-  alt, 
-  className = '', 
-  placeholder = '/placeholder-news.jpg',
+export default function OptimizedImage({
+  src,
+  alt,
   width,
   height,
+  className = '',
   priority = false,
   fill = false,
-  sizes = '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
-}) => {
-  const [hasError, setHasError] = useState(false);
+  sizes = '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw',
+  quality = 75
+}: OptimizedImageProps) {
   const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+
+  // Fallback image for errors
+  const fallbackSrc = '/placeholder-news.jpg';
+
+  const handleLoad = () => {
+    setIsLoading(false);
+  };
 
   const handleError = () => {
     setHasError(true);
     setIsLoading(false);
   };
 
-  const handleLoad = () => {
-    setIsLoading(false);
-  };
-
-  // Clean the image URL
-  const cleanSrc = cleanImageUrl(src);
-  
-  // Use image directly from external source without proxy
-  const imageSrc = hasError ? placeholder : cleanSrc || '/placeholder-news.jpg' || '';
-
-  // Only set priority for above-the-fold images
-  const shouldPrioritize = priority && typeof window !== 'undefined' && window.scrollY < window.innerHeight;
-
-  if (fill) {
+  // If there's an error, show fallback
+  if (hasError) {
     return (
-      <div className={`relative overflow-hidden ${className}`}>
-        {isLoading && (
-          <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 animate-pulse" />
-        )}
+      <div className={`relative bg-gray-200 flex items-center justify-center ${className}`}>
         <Image
-          src={imageSrc}
+          src={fallbackSrc}
           alt={alt}
-          fill
-          className={`object-cover transition-opacity duration-300 ${
-            isLoading ? 'opacity-0' : 'opacity-100'
-          }`}
+          width={width || 400}
+          height={height || 300}
+          className="object-cover"
+          priority={priority}
           sizes={sizes}
-          priority={shouldPrioritize}
+          quality={quality}
           onLoad={handleLoad}
           onError={handleError}
-          placeholder="blur"
-          blurDataURL={BLUR_PLACEHOLDER}
-          loading={shouldPrioritize ? 'eager' : 'lazy'}
         />
       </div>
     );
   }
 
   return (
-    <div className={`relative overflow-hidden ${className}`}>
+    <div className={`relative ${className}`}>
       {isLoading && (
-        <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 animate-pulse" />
+        <div className="absolute inset-0 bg-gray-200 animate-pulse rounded-lg" />
       )}
-      <Image
-        src={imageSrc}
-        alt={alt}
-        width={width || 800}
-        height={height || 600}
-        className={`object-cover transition-opacity duration-300 ${
-          isLoading ? 'opacity-0' : 'opacity-100'
-        }`}
-        sizes={sizes}
-        priority={shouldPrioritize}
-        onLoad={handleLoad}
-        onError={handleError}
-        placeholder="blur"
-        blurDataURL={BLUR_PLACEHOLDER}
-        loading={shouldPrioritize ? 'eager' : 'lazy'}
-      />
+      {fill ? (
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          className={`object-cover transition-opacity duration-300 ${
+            isLoading ? 'opacity-0' : 'opacity-100'
+          }`}
+          priority={priority}
+          sizes={sizes}
+          quality={quality}
+          onLoad={handleLoad}
+          onError={handleError}
+          loading={priority ? 'eager' : 'lazy'}
+        />
+      ) : (
+        <Image
+          src={src}
+          alt={alt}
+          width={width || 400}
+          height={height || 300}
+          className={`object-cover transition-opacity duration-300 ${
+            isLoading ? 'opacity-0' : 'opacity-100'
+          }`}
+          priority={priority}
+          sizes={sizes}
+          quality={quality}
+          onLoad={handleLoad}
+          onError={handleError}
+          loading={priority ? 'eager' : 'lazy'}
+        />
+      )}
     </div>
   );
-};
-
-export default OptimizedImage; 
+} 

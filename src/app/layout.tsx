@@ -4,7 +4,11 @@ import './globals.css';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import BreakingNewsTickerController from '@/components/BreakingNewsTickerController';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ 
+  subsets: ['latin'],
+  display: 'swap',
+  preload: true
+});
 
 export const metadata: Metadata = {
   title: {
@@ -87,7 +91,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="icon" href="/favicon.ico.jpg" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="theme-color" content="#dc2626" />
         <meta name="msapplication-TileColor" content="#dc2626" />
         <meta name="mobile-web-app-capable" content="yes" />
@@ -99,11 +103,14 @@ export default function RootLayout({
         <meta name="application-name" content="GlobalEye News" />
         <meta name="msapplication-TileImage" content="/favicon.ico.jpg" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
+        {/* Preload critical resources */}
+        <link rel="preload" href="/fonts.css" as="style" />
+        <link rel="preload" href="/favicon.ico.jpg" as="image" />
       </head>
       <body className={inter.className}>
         <ErrorBoundary>
           <BreakingNewsTickerController>
-            <main className="min-h-screen bg-gray-50 pt-24">
+            <main className="min-h-screen bg-gray-50 pt-16 md:pt-20">
               {children}
             </main>
           </BreakingNewsTickerController>

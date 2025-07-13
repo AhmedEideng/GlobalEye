@@ -7,7 +7,16 @@ import Link from 'next/link';
 import Image from 'next/image';
 import React from 'react'; // Added missing import for React
 
-export const revalidate = 180; // 3 دقائق
+export const revalidate = 180; // 3 minutes - will be overridden by rotation system
+
+// Professional error logger for home page
+function logHomeError(...args: unknown[]) {
+  if (process.env.NODE_ENV === 'development') {
+    // eslint-disable-next-line no-console
+    console.error('[HomePage]', ...args);
+  }
+  // In production, you can send errors to a monitoring service here
+}
 
 export const metadata: Metadata = {
   title: 'GlobalEye News | Breaking News, World Updates & Live Coverage',
@@ -33,15 +42,56 @@ export const metadata: Metadata = {
   },
 };
 
+// Function to fetch rotated news
+async function fetchRotatedNews(): Promise<{
+  featured: NewsArticle | null;
+  articles: NewsArticle[];
+  suggestedArticles: NewsArticle[];
+}> {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/news-rotation?category=general`, {
+      next: { revalidate: 180 }, // 3 minutes cache
+      headers: {
+        'Accept': 'application/json',
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    if (data.success && data.data) {
+      return {
+        featured: data.data.featured || null,
+        articles: data.data.mainArticles || [],
+        suggestedArticles: data.data.suggestedArticles || []
+      };
+    }
+    
+    throw new Error('Invalid response format');
+  } catch (error) {
+    logHomeError('Failed to fetch rotated news:', error);
+    // Fallback to direct fetch
+    const allArticles: NewsArticle[] = await fetchNews();
+    const sortedArticles = allArticles;
+    const featured = sortedArticles[0] || null;
+    const restArticles = featured ? sortedArticles.filter(a => a.slug !== featured.slug) : sortedArticles;
+    const articles = restArticles.slice(0, 51);
+    const suggestedArticles = restArticles.slice(0, 40);
+    
+    return {
+      featured,
+      articles,
+      suggestedArticles
+    };
+  }
+}
+
 export default async function HomePage() {
-  // جلب الأخبار من السيرفر
-  const allArticles: NewsArticle[] = await fetchNews();
-  // ترتيب الأخبار (بدون تخصيص مستخدم هنا)
-  const sortedArticles = allArticles;
-  const featured = sortedArticles[0] || null;
-  const restArticles = featured ? sortedArticles.filter(a => a.slug !== featured.slug) : sortedArticles;
-  const articles = restArticles.slice(0, 51); // 51 خبر بجانب الرئيسي ليكون المجموع 52
-  const suggestedArticles = restArticles.slice(0, 40); // 40 خبر مقترح
+  // Fetch rotated news with automatic 3-hour rotation
+  const { featured, articles, suggestedArticles } = await fetchRotatedNews();
 
   return (
     <>
