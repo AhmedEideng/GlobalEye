@@ -26,7 +26,7 @@ export default function Navbar({ isMenuOpen, setIsMenuOpen, style }: NavbarProps
   const pathname = usePathname();
 
   return (
-    <div className="navbar-container flex items-center justify-between py-2 px-4 bg-white fixed left-0 w-full z-50" style={style}>
+    <div className="navbar-container flex items-center justify-between py-2 px-4 bg-white fixed left-0 w-full z-50 top-0" style={style}>
       {/* Mobile menu button and logo left (mobile only) */}
       <div className="flex-1 flex items-center gap-2 md:hidden">
         <button className="mobile-menu-btn" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">

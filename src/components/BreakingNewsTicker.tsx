@@ -3,10 +3,12 @@ import Link from 'next/link';
 import { FaNewspaper, FaSync } from 'react-icons/fa';
 import { useBreakingNews, BreakingNewsItem } from '@hooks/useBreakingNews';
 import { useWindowSize } from '@hooks/useWindowSize';
+import { useEffect, useState } from 'react';
 
 export default function BreakingNewsTicker({ showTicker = true }: { showTicker?: boolean }) {
   const { news, loading, error, refreshNews } = useBreakingNews();
   const { width } = useWindowSize();
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   let newsCount = 5;
   if (width < 500) newsCount = 1;
@@ -14,10 +16,21 @@ export default function BreakingNewsTicker({ showTicker = true }: { showTicker?:
   else if (width < 900) newsCount = 3;
   else if (width < 1200) newsCount = 4;
 
+  // Auto-scroll through news items
+  useEffect(() => {
+    if (news.length === 0) return;
+    
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % news.length);
+    }, 5000); // Change news every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [news.length]);
+
   if (!showTicker) return null;
 
   return (
-    <div className="breaking-news-ticker bg-red-800 text-white w-full overflow-hidden relative fixed left-0 top-12 md:top-14 z-40">
+    <div className="breaking-news-ticker bg-red-800 text-white w-full overflow-hidden relative fixed left-0 top-16 md:top-20 z-30">
       <div 
         className="ticker-container flex items-center py-2 px-4"
       >
@@ -48,26 +61,35 @@ export default function BreakingNewsTicker({ showTicker = true }: { showTicker?:
               </button>
             </div>
           ) : news.length > 0 ? (
-            <div className="ticker-items flex items-center">
-              {news.slice(0, newsCount).map((newsItem: BreakingNewsItem) => (
-                <div
-                  key={newsItem.id || `news-${newsItem.url}`}
-                  className="ticker-item flex-shrink-0 flex items-center"
-                >
-                  {/* Yellow dot at the start of each news */}
-                  <div className="separator-dot mr-2 flex-shrink-0">
-                    <div className="w-3 h-3 bg-yellow-300 rounded-full"></div>
-                  </div>
-                  <Link 
-                    href={newsItem.url}
-                    className="news-link flex items-center"
+            <div className="ticker-items-container overflow-hidden">
+              <div 
+                className="ticker-items flex items-center transition-transform duration-1000 ease-in-out"
+                style={{
+                  transform: `translateX(-${currentIndex * 100}%)`,
+                  width: `${news.length * 100}%`
+                }}
+              >
+                {news.slice(0, newsCount).map((newsItem: BreakingNewsItem, index: number) => (
+                  <div
+                    key={newsItem.id || `news-${newsItem.url}`}
+                    className="ticker-item flex-shrink-0 flex items-center"
+                    style={{ width: `${100 / news.length}%` }}
                   >
-                    <span className="news-title text-sm font-medium">
-                      {newsItem.title}
-                    </span>
-                  </Link>
-                </div>
-              ))}
+                    {/* Yellow dot at the start of each news */}
+                    <div className="separator-dot mr-2 flex-shrink-0">
+                      <div className="w-3 h-3 bg-yellow-300 rounded-full"></div>
+                    </div>
+                    <Link 
+                      href={newsItem.url}
+                      className="news-link flex items-center"
+                    >
+                      <span className="news-title text-sm font-medium">
+                        {newsItem.title}
+                      </span>
+                    </Link>
+                  </div>
+                ))}
+              </div>
             </div>
           ) : (
             <div className="flex items-center justify-center py-2">

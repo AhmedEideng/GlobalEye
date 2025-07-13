@@ -579,8 +579,9 @@
     overflow: hidden;
     position: fixed;
     left: 0;
-    z-index: 40;
+    z-index: 30;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 48px;
   }
 
   .ticker-container {
@@ -588,6 +589,7 @@
     align-items: center;
     padding: 8px 16px;
     min-height: 48px;
+    height: 100%;
   }
 
   .breaking-label {
@@ -610,12 +612,19 @@
   .ticker-content {
     flex: 1;
     overflow: hidden;
+    position: relative;
+  }
+
+  .ticker-items-container {
+    overflow: hidden;
+    width: 100%;
   }
 
   .ticker-items {
     display: flex;
     align-items: center;
     gap: 16px;
+    height: 100%;
   }
 
   .ticker-items::-webkit-scrollbar {
@@ -688,8 +697,14 @@
 
   @media (max-width: 768px) {
     .breaking-news-ticker {
-      top: 48px;
+      top: 64px;
       min-height: 40px;
+      height: 40px;
+    }
+
+    .ticker-container {
+      min-height: 40px;
+      padding: 6px 12px;
     }
 
     .news-link {

@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import BreakingNewsTickerController from '@/components/BreakingNewsTickerController';
+import ScrollToTopWrapper from '@/components/ScrollToTopWrapper';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -110,9 +111,11 @@ export default function RootLayout({
       <body className={inter.className}>
         <ErrorBoundary>
           <BreakingNewsTickerController>
-            <main className="min-h-screen bg-gray-50 pt-16 md:pt-20">
-              {children}
-            </main>
+            <ScrollToTopWrapper>
+              <main className="min-h-screen bg-gray-50 pt-24 md:pt-28">
+                {children}
+              </main>
+            </ScrollToTopWrapper>
           </BreakingNewsTickerController>
         </ErrorBoundary>
       </body>
