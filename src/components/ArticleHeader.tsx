@@ -1,24 +1,18 @@
-import React, { useEffect } from 'react';
-import Image from 'next/image';
-import { NewsArticle, sendAnalyticsEvent } from '@utils/fetchNews';
-import { useAuth } from '@hooks/useAuth';
-import { addFavorite, removeFavorite, isFavorite } from '@services/favorites';
-import { sanitizeText, sanitizeJson } from '../utils/sanitizeText';
+import React from 'react';
 import Head from 'next/head';
+import Image from 'next/image';
+import { NewsArticle } from '@utils/fetchNews';
+import { useAuth } from '@hooks/useAuth';
+import { isFavorite } from '@services/favorites';
+import { sanitizeText, sanitizeJson } from '../utils/sanitizeText';
 
-/**
- * ArticleHeader component displays the main image, title, author, source, and published date for an article.
- * @param article - NewsArticle object containing article data
- */
 export default function ArticleHeader({ article }: { article: NewsArticle }) {
   const { user } = useAuth();
-  const [favorite, setFavorite] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (user) {
       const checkFavorite = async () => {
-        const isFav = await isFavorite(user.id, article.slug);
-        setFavorite(isFav);
+        await isFavorite(user.id, article.slug);
       };
       checkFavorite();
     }

@@ -79,7 +79,6 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
 
     // Store ref.current in a variable for cleanup
     const currentRef = ref.current;
-    let timeoutId: NodeJS.Timeout;
     const retryTimeoutId: NodeJS.Timeout = setTimeout(() => {
       if (!adLoaded && !adError && retryCount < 2 && ref.current) {
         setRetryCount(prev => prev + 1);
@@ -91,7 +90,7 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
     loadAd();
 
     // Set timeout to detect if ad doesn't load
-    timeoutId = setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       if (!adLoaded && !adError && ref.current) {
         setAdError(true);
       }
