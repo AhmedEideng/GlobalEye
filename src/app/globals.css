@@ -667,11 +667,11 @@
   }
 
   .breaking-news-ticker .absolute.top-0.right-0 {
-    @apply hidden;
+    display: none;
   }
 
   .breaking-news-ticker .absolute.top-0.left-0 {
-    @apply hidden;
+    display: none;
   }
 
   /* News Link Styles */
