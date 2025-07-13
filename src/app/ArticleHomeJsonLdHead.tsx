@@ -1,16 +1,17 @@
 "use client";
 import Head from 'next/head';
+import { sanitizeText } from '@/utils/sanitizeText';
 
 export default function ArticleHomeJsonLdHead() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "GlobalEye News",
+    "name": sanitizeText("GlobalEye News"),
     "url": "https://globaleye.live/",
-    "description": "Get the latest breaking news, world headlines, business, technology, sports, health, and more. Trusted global news coverage, real-time updates, and in-depth analysis from GlobalEye News.",
+    "description": sanitizeText("Get the latest breaking news, world headlines, business, technology, sports, health, and more. Trusted global news coverage, real-time updates, and in-depth analysis from GlobalEye News."),
     "publisher": {
       "@type": "Organization",
-      "name": "GlobalEye News",
+      "name": sanitizeText("GlobalEye News"),
       "logo": {
         "@type": "ImageObject",
         "url": "https://globaleye.live/favicon.ico.jpg"

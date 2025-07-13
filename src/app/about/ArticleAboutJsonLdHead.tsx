@@ -1,12 +1,13 @@
 "use client";
 import Head from 'next/head';
+import { sanitizeText } from '@/utils/sanitizeText';
 
 export default function ArticleAboutJsonLdHead() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "AboutPage",
-    "name": "About Us | GlobalEye News",
-    "description": "Learn more about GlobalEye News, our mission, and our team dedicated to delivering trusted global news coverage.",
+    "name": sanitizeText("About Us | GlobalEye News"),
+    "description": sanitizeText("Learn more about GlobalEye News, our mission, and our team dedicated to delivering trusted global news coverage."),
     "url": "https://globaleye.live/about",
     "mainEntityOfPage": "https://globaleye.live/about",
   };

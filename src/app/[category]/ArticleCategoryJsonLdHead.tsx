@@ -1,5 +1,6 @@
 "use client";
 import Head from 'next/head';
+import { sanitizeText } from '@/utils/sanitizeText';
 
 const categoryLabels: { [key: string]: string } = {
   'world': 'World News',
@@ -18,8 +19,8 @@ export default function ArticleCategoryJsonLdHead({ category }: { category: stri
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    "name": label,
-    "description": `Stay updated with the latest, most important, and trending news in ${label} from trusted sources around the world.`,
+    "name": sanitizeText(label),
+    "description": sanitizeText(`Stay updated with the latest, most important, and trending news in ${label} from trusted sources around the world.`),
     "url": url,
     "mainEntityOfPage": url,
   };

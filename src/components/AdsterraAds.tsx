@@ -20,8 +20,13 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
   useEffect(() => {
     if (!ref.current) return;
     
-    // Clear previous content
-    ref.current.innerHTML = "";
+    // Clear previous content safely
+    try {
+      ref.current.innerHTML = "";
+    } catch {
+      // Ignore errors during initial cleanup
+    }
+    
     setAdLoaded(false);
     setAdError(false);
 
@@ -37,14 +42,18 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
 
     const loadAd = () => {
       try {
-        // Check if ref still exists
-        if (!ref.current || !currentRef) return;
+        // Check if ref still exists and is the same element
+        if (!ref.current || !currentRef || ref.current !== currentRef) return;
         
         // Create and append options script
         const scriptOptions = document.createElement("script");
         scriptOptions.type = "text/javascript";
         scriptOptions.innerHTML = `atOptions = ${JSON.stringify(atOptions).replace(/[^\x00-\x7F]/g, '')};`;
-        currentRef.appendChild(scriptOptions);
+        
+        // Check if element still exists before appending
+        if (currentRef && currentRef.parentNode) {
+          currentRef.appendChild(scriptOptions);
+        }
 
         // Create and append main script
         const script = document.createElement("script");
@@ -55,28 +64,31 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
         
         // Add event listeners for debugging
         script.onload = () => {
-          if (ref.current) {
+          if (ref.current && ref.current === currentRef) {
             setAdLoaded(true);
           }
         };
         
         script.onerror = () => {
-          if (ref.current) {
+          if (ref.current && ref.current === currentRef) {
             setAdError(true);
           }
         };
         
-        currentRef.appendChild(script);
+        // Check if element still exists before appending
+        if (currentRef && currentRef.parentNode) {
+          currentRef.appendChild(script);
+        }
 
         // Set timeout to detect if ad doesn't load
         timeoutId = setTimeout(() => {
-          if (!adLoaded && !adError && ref.current) {
+          if (!adLoaded && !adError && ref.current && ref.current === currentRef) {
             setAdError(true);
           }
         }, 10000); // 10 seconds timeout
 
       } catch {
-        if (ref.current) {
+        if (ref.current && ref.current === currentRef) {
           setAdError(true);
         }
       }
@@ -91,7 +103,10 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
       // Only clear innerHTML if the ref still exists and is the same element
       if (ref.current && ref.current === currentRef) {
         try {
-          ref.current.innerHTML = "";
+          // Remove all child nodes safely
+          while (ref.current.firstChild) {
+            ref.current.removeChild(ref.current.firstChild);
+          }
         } catch {
           // Ignore errors during cleanup
         }
@@ -179,9 +194,12 @@ function AdsterraIframe({ id, scriptSrc, width, height, style }: AdProps) {
         iframe.onerror = () => setIframeError(true);
         
         const container = document.getElementById(id);
-        if (container) {
+        if (container && container.parentNode) {
           try {
-            container.innerHTML = '';
+            // Remove all child nodes safely
+            while (container.firstChild) {
+              container.removeChild(container.firstChild);
+            }
             container.appendChild(iframe);
           } catch {
             // Ignore errors during DOM manipulation
@@ -198,8 +216,11 @@ function AdsterraIframe({ id, scriptSrc, width, height, style }: AdProps) {
       // Clean up iframe if component unmounts
       try {
         const container = document.getElementById(id);
-        if (container) {
-          container.innerHTML = '';
+        if (container && container.parentNode) {
+          // Remove all child nodes safely
+          while (container.firstChild) {
+            container.removeChild(container.firstChild);
+          }
         }
       } catch {
         // Ignore cleanup errors
