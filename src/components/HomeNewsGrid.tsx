@@ -19,7 +19,7 @@ export default function HomeNewsGrid({ articles }: { articles: NewsArticle[] }) 
           const cleanImage = cleanImageUrl(article.urlToImage);
           return (
             <Link
-              key={article.slug + idx}
+              key={article.slug || `article-${idx}-${article.url}`}
               href={`/article/${article.slug}`}
               className="article-card group"
             >

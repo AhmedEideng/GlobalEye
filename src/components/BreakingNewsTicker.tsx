@@ -51,7 +51,7 @@ export default function BreakingNewsTicker({ showTicker = true }: { showTicker?:
             <div className="ticker-items flex items-center">
               {news.slice(0, newsCount).map((newsItem: BreakingNewsItem) => (
                 <div
-                  key={newsItem.id}
+                  key={newsItem.id || `news-${newsItem.url}`}
                   className="ticker-item flex-shrink-0 flex items-center"
                 >
                   {/* Yellow dot at the start of each news */}

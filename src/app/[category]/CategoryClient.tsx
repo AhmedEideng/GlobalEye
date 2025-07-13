@@ -214,7 +214,7 @@ export default function CategoryClient({ category }: { category: string }) {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full">
             {restArticles.map((article, index) => (
-                <a key={index} href={`/article/${article.slug || generateSlug(article.title, article.url)}`} className="article-card group">
+                <a key={article.slug || `article-${index}-${article.url}`} href={`/article/${article.slug || generateSlug(article.title, article.url)}`} className="article-card group">
                   <div className="relative w-full h-48 overflow-hidden">
                     <Image
                       src={article.urlToImage || '/placeholder-news.svg'}
@@ -245,7 +245,7 @@ export default function CategoryClient({ category }: { category: string }) {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {suggestedArticles.map((article, idx) => (
-              <React.Fragment key={article.slug + idx}>
+              <React.Fragment key={article.slug || `suggested-${idx}-${article.url}`}>
                 <Link
                   href={`/article/${article.slug}`}
                   className="article-card group"

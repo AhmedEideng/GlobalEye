@@ -65,7 +65,7 @@ export default async function HomePage() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                 {suggestedArticles.map((article, idx) => (
-                  <React.Fragment key={article.slug + idx}>
+                  <React.Fragment key={article.slug || `suggested-${idx}-${article.url}`}>
                     <Link
                       href={`/article/${article.slug}`}
                       className="article-card group transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl rounded-xl bg-white shadow-md overflow-hidden"

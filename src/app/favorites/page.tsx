@@ -48,7 +48,7 @@ export default function FavoritesPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {articles.map((article) => (
-            <div key={article.slug} className="relative group">
+            <div key={article.slug || `favorite-${article.url}`} className="relative group">
               <Link href={`/article/${article.slug}`} className="article-card">
                 <div className="relative w-full h-40 overflow-hidden">
                   <OptimizedImage

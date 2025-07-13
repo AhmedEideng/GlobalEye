@@ -78,7 +78,7 @@ export default function ArticleClient({ article, slug }: { article: NewsArticle 
           <h2 className="text-xl font-bold mb-4">Suggested Articles</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {relatedArticles.map((related, idx) => (
-              <React.Fragment key={related.slug + idx}>
+              <React.Fragment key={related.slug || `related-${idx}-${related.url}`}>
                 <Link
                   href={`/article/${related.slug}`}
                   className="article-card group"
