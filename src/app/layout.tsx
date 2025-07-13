@@ -65,6 +65,16 @@ export const metadata: Metadata = {
   verification: {
     google: 'your-google-verification-code',
   },
+  other: {
+    'mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'default',
+    'apple-mobile-web-app-title': 'GlobalEye News',
+    'application-name': 'GlobalEye News',
+    'msapplication-TileColor': '#dc2626',
+    'msapplication-TileImage': '/favicon.ico.jpg',
+    'msapplication-config': '/browserconfig.xml',
+  },
 };
 
 export default function RootLayout({
@@ -79,6 +89,7 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#dc2626" />
         <meta name="msapplication-TileColor" content="#dc2626" />
+        <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="GlobalEye News" />
@@ -91,9 +102,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <ErrorBoundary>
           <main className="min-h-screen bg-gray-50">
-            <ErrorBoundary>
-              {children}
-            </ErrorBoundary>
+            {children}
           </main>
         </ErrorBoundary>
       </body>

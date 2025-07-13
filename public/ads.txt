@@ -1,12 +1,16 @@
-#Ads.txt globaleye.live
-#Ads.txt managed by AdsTxtManager.com - the free ads.txt management tool for publishers
-ownerdomain=globaleye.live
-contact=directsales@ezoic.com
-managerdomain=ezoic.ai
-ezoic.ai, c7f0e58ca51792922133c1b8ef843221, DIRECT
-# 35
-themediagrid.com, 4M5PGT, DIRECT, 35d5010d7789b49d
-themediagrid.com, Q19AKF, DIRECT, 35d5010d7789b49d
-sonobi.com, 192ecdea01, RESELLER, d1a215d9eb5aee9e
-google.com, pub-6644558441501035, DIRECT, f08c47fec0942fa0
-google.com, pub-1175987143200523, RESELLER, f08c47fec0942fa0 
+# GlobalEye News Ads.txt
+# This file helps prevent unauthorized inventory sales
+
+# Adsterra Network
+highperformanceformat.com, 660754a78fda06e644a6817ff0427a41, DIRECT
+highperformanceformat.com, f466ceb9ca7e3d951fb4a66e512052a3, DIRECT
+highperformanceformat.com, 6105c06808151fd21ece64b116af7aa4, DIRECT
+highperformanceformat.com, 854324fb9e09c1fb4415dc816b41ce77, DIRECT
+highperformanceformat.com, dc7f1c37b029fa1984d76552f99edaa6, DIRECT
+
+# Google AdSense (if you plan to use it)
+google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0
+
+# Add other ad networks here as needed
+# Example:
+# adnetwork.com, publisher_id, DIRECT 

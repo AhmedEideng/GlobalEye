@@ -3,17 +3,26 @@
 User-agent: *
 Allow: /
 
-# Block admin and login pages
-Disallow: /admin/
-Disallow: /login/
-
+# Sitemaps
+Sitemap: https://globaleye.live/sitemap.xml
 Sitemap: https://globaleye.live/sitemap-static.xml
 Sitemap: https://globaleye.live/sitemap-categories.xml
-Sitemap: https://globaleye.live/sitemap-articles-world.xml
-Sitemap: https://globaleye.live/sitemap-articles-politics.xml
-Sitemap: https://globaleye.live/sitemap-articles-business.xml
-Sitemap: https://globaleye.live/sitemap-articles-technology.xml
-Sitemap: https://globaleye.live/sitemap-articles-sports.xml
-Sitemap: https://globaleye.live/sitemap-articles-entertainment.xml
-Sitemap: https://globaleye.live/sitemap-articles-health.xml
-Sitemap: https://globaleye.live/sitemap-articles-science.xml
+
+# Disallow admin and API routes
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /login
+Disallow: /profile
+Disallow: /favorites
+
+# Allow important pages
+Allow: /
+Allow: /article/
+Allow: /about/
+Allow: /contact-us/
+Allow: /privacy/
+Allow: /terms-and-conditions/
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1

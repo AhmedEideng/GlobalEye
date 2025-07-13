@@ -60,12 +60,6 @@ module.exports = withPWA({
     maxInactiveAge: 25 * 1000,
     pagesBufferLength: 2,
   },
-  // تم تعطيل إعدادات i18n لأنها غير مدعومة في App Router
-  // i18n: {
-  //   locales: ['en', 'ar'],
-  //   defaultLocale: 'en',
-  //   localeDetection: false
-  // },
   // You can add Next.js settings here
   async headers() {
     return [
@@ -77,10 +71,24 @@ module.exports = withPWA({
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
           { key: 'Permissions-Policy', value: 'geolocation=(), microphone=(), camera=()' },
-          // CSP: Remove 'unsafe-eval' and restrict 'unsafe-inline' to style-src only
+          // Updated CSP to allow necessary resources and prevent warnings
           {
             key: 'Content-Security-Policy',
-            value: "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.highperformanceformat.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com;",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.highperformanceformat.com https://www.google-analytics.com",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "font-src 'self' data: https://fonts.gstatic.com",
+              "img-src 'self' data: blob: https: http:",
+              "media-src 'self' https:",
+              "connect-src 'self' https: wss:",
+              "frame-src 'self' https:",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+              "frame-ancestors 'self'",
+              "upgrade-insecure-requests"
+            ].join('; '),
           },
         ],
       },

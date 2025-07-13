@@ -50,6 +50,9 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   // Use image directly from external source without proxy
   const imageSrc = hasError ? placeholder : cleanSrc || '/placeholder-news.jpg' || '';
 
+  // Only set priority for above-the-fold images
+  const shouldPrioritize = priority && typeof window !== 'undefined' && window.scrollY < window.innerHeight;
+
   if (fill) {
     return (
       <div className={`relative overflow-hidden ${className}`}>
@@ -64,11 +67,12 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
             isLoading ? 'opacity-0' : 'opacity-100'
           }`}
           sizes={sizes}
-          priority={priority}
+          priority={shouldPrioritize}
           onLoad={handleLoad}
           onError={handleError}
           placeholder="blur"
           blurDataURL={BLUR_PLACEHOLDER}
+          loading={shouldPrioritize ? 'eager' : 'lazy'}
         />
       </div>
     );
@@ -88,11 +92,12 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
           isLoading ? 'opacity-0' : 'opacity-100'
         }`}
         sizes={sizes}
-        priority={priority}
+        priority={shouldPrioritize}
         onLoad={handleLoad}
         onError={handleError}
         placeholder="blur"
         blurDataURL={BLUR_PLACEHOLDER}
+        loading={shouldPrioritize ? 'eager' : 'lazy'}
       />
     </div>
   );

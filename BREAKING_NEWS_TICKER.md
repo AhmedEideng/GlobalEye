@@ -1,144 +1,243 @@
-# Breaking News Ticker Implementation
+# Breaking News Ticker Documentation
 
 ## Overview
-A horizontal breaking news ticker has been implemented at the top of the GlobalEye news website. The ticker displays urgent news headlines with auto-scrolling functionality and clickable news items.
+
+The Breaking News Ticker is a real-time scrolling news component that displays the latest breaking news at the top of the website. It provides users with immediate access to the most recent and important news updates.
 
 ## Features
 
-### 🔴 Core Features
-- **Horizontal ticker bar** positioned at the top of the page
-- **Auto-scrolling** news headlines every 4 seconds
-- **Clickable news items** that navigate to full article pages
-- **Pause on hover** functionality for better user experience
-- **Navigation dots** for manual control
-- **Responsive design** that works on all screen sizes
+### 🚨 Real-time Updates
+- Automatically fetches latest news from multiple sources
+- Updates every 5 minutes to ensure fresh content
+- Displays breaking news with timestamps
+
+### 📱 Responsive Design
+- Adapts to all screen sizes
+- Mobile-optimized with touch-friendly controls
+- Hides on mobile when scrolling down for better UX
 
 ### 🎨 Visual Design
-- **Red background** (`bg-red-600`) matching the site's color scheme
-- **Yellow accents** for breaking news label and active elements
-- **Smooth animations** with fade and slide transitions
-- **Gradient overlays** for smooth edges
-- **Pulsing animation** on the breaking news icon
+- CNN-inspired red gradient background
+- Smooth scrolling animation
+- Pulsing "BREAKING" label for attention
+- Professional typography and spacing
 
-### ⚡ Technical Features
-- **Real-time data updates** every 5 minutes
-- **Loading states** with spinner animation
-- **Error handling** with retry functionality
-- **Priority indicators** for high-priority news
-- **Accessibility features** with proper ARIA labels
+## Technical Implementation
 
-## Components
+### Components
 
-### BreakingNewsTicker.tsx
-Main ticker component with the following features:
-- Auto-scrolling with configurable interval
-- Pause on hover functionality
-- Navigation dots for manual control
-- Loading and error states
-- Responsive design
+#### BreakingNewsTicker.tsx
+Main ticker component that handles:
+- News data fetching
+- Scrolling animation
+- Responsive behavior
+- Error handling
 
-### useBreakingNews.ts
-Custom hook for managing breaking news data:
-- Fetches news from API (currently mocked)
-- Handles loading and error states
-- Auto-refreshes every 5 minutes
-- Provides refresh functionality
+#### BreakingNewsTickerController.tsx
+Controller component that manages:
+- Ticker visibility
+- Mobile scroll behavior
+- Menu state integration
 
-## CSS Classes
+### Styling
 
-### Key Styles
-- `.breaking-news-ticker` - Main container with fixed positioning
-- `.ticker-container` - Flex container for layout
-- `.ticker-item` - Individual news items with animations
-- `.news-link` - Clickable news links with hover effects
-- `.ticker-dots` - Navigation dots container
+The ticker uses custom CSS classes defined in `globals.css`:
 
-### Animations
-- **Fade and slide transitions** for news items
-- **Pulsing animation** for breaking news icon
-- **Smooth hover effects** for interactive elements
-- **Scale animations** for navigation dots
-
-## Integration
-
-### Layout Integration
-The ticker is integrated into the main layout (`src/app/layout.tsx`):
-- Positioned at the very top of the page
-- Fixed positioning with high z-index
-- Proper spacing with navbar below
-
-### Responsive Design
-- **Desktop**: Full ticker with all features
-- **Tablet**: Reduced font sizes and spacing
-- **Mobile**: Compact design with smaller elements
-
-## Usage
-
-### Basic Usage
-```tsx
-import BreakingNewsTicker from '@components/BreakingNewsTicker';
-
-// In your layout or page
-<BreakingNewsTicker />
+```css
+.breaking-news-ticker {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: linear-gradient(90deg, var(--cnn-red) 0%, var(--cnn-dark-red) 100%);
+  color: white;
+  padding: 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
 ```
 
-### Customization
-The ticker can be customized by:
-- Modifying the `useBreakingNews` hook for different data sources
-- Adjusting CSS variables for colors and animations
-- Changing the auto-scroll interval in the component
-- Adding more interactive features
+### Animation
 
-## Data Structure
+The ticker uses CSS keyframes for smooth scrolling:
 
-### BreakingNewsItem Interface
-```typescript
-interface BreakingNewsItem {
-  id: string;
-  title: string;
-  url: string;
-  category: string;
-  timestamp: string;
-  priority?: 'high' | 'medium' | 'low';
+```css
+@keyframes scroll-left-to-right {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
 }
+```
+
+## Configuration
+
+### Data Source
+The ticker fetches news from the same API endpoints as the main news feed, but with specific filtering for breaking news.
+
+### Update Frequency
+- **Development**: Updates every 30 seconds
+- **Production**: Updates every 5 minutes
+- **Cache**: 15-minute cache for API responses
+
+### Mobile Behavior
+- **Scroll Down**: Ticker hides to save space
+- **Scroll Up**: Ticker reappears
+- **Menu Open**: Ticker hides to prevent overlap
+
+## Customization
+
+### Colors
+Update CSS custom properties in `globals.css`:
+
+```css
+:root {
+  --cnn-red: #c00;
+  --cnn-dark-red: #b30000;
+}
+```
+
+### Animation Speed
+Modify the animation duration in the CSS:
+
+```css
+.ticker-items {
+  animation: scroll-left-to-right 30s linear infinite;
+}
+```
+
+### Content Format
+The ticker displays:
+- News title
+- Source name
+- Publication time
+- Category (if available)
+
+## Performance Considerations
+
+### Optimization
+- Uses `transform` for smooth animations
+- Implements `will-change` for better performance
+- Lazy loads news data
+- Caches API responses
+
+### Memory Management
+- Cleans up event listeners
+- Removes DOM elements safely
+- Prevents memory leaks
+
+## Accessibility
+
+### Screen Readers
+- Proper ARIA labels
+- Semantic HTML structure
+- Keyboard navigation support
+
+### Visual Accessibility
+- High contrast colors
+- Readable font sizes
+- Clear visual hierarchy
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Ticker Not Scrolling**
+   - Check if news data is loading
+   - Verify CSS animations are enabled
+   - Ensure container has proper dimensions
+
+2. **Mobile Not Hiding**
+   - Check scroll event listeners
+   - Verify mobile detection logic
+   - Test touch interactions
+
+3. **Performance Issues**
+   - Reduce animation complexity
+   - Optimize image loading
+   - Check for memory leaks
+
+### Debug Mode
+Enable debug logging by setting:
+
+```javascript
+const DEBUG_TICKER = process.env.NODE_ENV === 'development';
 ```
 
 ## Future Enhancements
 
-### Potential Improvements
-1. **Real API Integration** - Connect to actual news API
-2. **WebSocket Support** - Real-time updates
-3. **Sound Notifications** - Audio alerts for breaking news
-4. **Push Notifications** - Browser notifications
-5. **Category Filtering** - Filter by news category
-6. **Custom Themes** - Different color schemes
-7. **Analytics Integration** - Track user interactions
+### Planned Features
+- [ ] Sound notifications for breaking news
+- [ ] Push notifications
+- [ ] Custom news categories
+- [ ] User preferences
+- [ ] Social media integration
 
-### Accessibility Improvements
-1. **Screen Reader Support** - Better ARIA labels
-2. **Keyboard Navigation** - Full keyboard support
-3. **High Contrast Mode** - Better visibility options
-4. **Reduced Motion** - Respect user preferences
+### Performance Improvements
+- [ ] Virtual scrolling for large news lists
+- [ ] WebSocket for real-time updates
+- [ ] Service Worker for offline support
+- [ ] Progressive loading
 
-## Browser Support
-- ✅ Chrome/Chromium
-- ✅ Firefox
-- ✅ Safari
-- ✅ Edge
-- ✅ Mobile browsers
+## API Integration
 
-## Performance
-- **Lightweight** - Minimal impact on page load
-- **Efficient animations** - CSS transforms and opacity
-- **Memory management** - Proper cleanup of intervals
-- **Lazy loading** - Only loads when needed
+### News Sources
+The ticker integrates with multiple news APIs:
+- NewsAPI
+- GNews
+- The Guardian
+- Mediastack
+
+### Error Handling
+- Graceful fallback to cached content
+- Retry mechanism for failed requests
+- User-friendly error messages
 
 ## Testing
-The ticker has been tested for:
-- ✅ Auto-scrolling functionality
-- ✅ Pause on hover
-- ✅ Click navigation
-- ✅ Responsive design
-- ✅ Loading states
-- ✅ Error handling
-- ✅ Accessibility features 
+
+### Unit Tests
+```bash
+npm test -- --testPathPattern=BreakingNewsTicker
+```
+
+### Integration Tests
+```bash
+npm run test:integration
+```
+
+### Manual Testing
+1. Check ticker visibility on different screen sizes
+2. Test scroll behavior on mobile
+3. Verify animation smoothness
+4. Test error scenarios
+
+## Deployment
+
+### Production Build
+```bash
+npm run build
+npm start
+```
+
+### Environment Variables
+```env
+NEXT_PUBLIC_NEWS_API_KEY=your_api_key
+NEXT_PUBLIC_DEBUG_TICKER=false
+```
+
+## Support
+
+For issues related to the breaking news ticker:
+1. Check browser console for errors
+2. Verify API keys are set correctly
+3. Test on different devices and browsers
+4. Review network requests in DevTools
+
+---
+
+**Note**: The breaking news ticker is a critical component for user engagement. Always test thoroughly before deploying changes. 

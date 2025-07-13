@@ -1,15 +1,15 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 
-type AdProps = {
+interface AdProps {
   id: string;
   scriptSrc: string;
-  atOptions: object;
+  atOptions: any;
   width: number;
   height: number;
   style?: React.CSSProperties;
-};
+}
 
 function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdProps) {
   const [adLoaded, setAdLoaded] = useState(false);
@@ -20,7 +20,16 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
   const loadAd = useCallback(() => {
     try {
       const currentRef = ref.current;
-      if (!currentRef) return;
+      if (!currentRef || !currentRef.parentNode) return;
+      
+      // Clear existing content safely
+      try {
+        while (currentRef.firstChild) {
+          currentRef.removeChild(currentRef.firstChild);
+        }
+      } catch (error) {
+        console.warn('Error clearing ad container:', error);
+      }
       
       // Create and append options script
       const scriptOptions = document.createElement("script");
@@ -57,7 +66,8 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
         currentRef.appendChild(script);
       }
 
-    } catch {
+    } catch (error) {
+      console.warn('Error loading ad:', error);
       if (ref.current) {
         setAdError(true);
       }
@@ -66,13 +76,6 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
 
   useEffect(() => {
     if (!ref.current) return;
-    
-    // Clear previous content safely
-    try {
-      ref.current.innerHTML = "";
-    } catch {
-      // Ignore errors during initial cleanup
-    }
     
     setAdLoaded(false);
     setAdError(false);
@@ -106,34 +109,32 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
           while (ref.current.firstChild) {
             ref.current.removeChild(ref.current.firstChild);
           }
-        } catch {
-          // Ignore errors during cleanup
+        } catch (error) {
+          console.warn('Error during ad cleanup:', error);
         }
       }
     };
   }, [loadAd, retryCount, adLoaded, adError]);
 
-  // Show fallback if ad fails to load
   if (adError) {
     return (
-      <div
+      <div 
         id={id}
-        ref={ref}
         style={{
-          width,
-          height,
-          margin: "16px auto",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          border: "1px dashed #ccc",
-          backgroundColor: "#f9f9f9",
-          ...style,
+          width: `${width}px`,
+          height: `${height}px`,
+          backgroundColor: '#f3f4f6',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          border: '1px solid #e5e7eb',
+          borderRadius: '8px',
+          ...style
         }}
       >
-        <div style={{ textAlign: "center", color: "#666", fontSize: "12px" }}>
+        <div style={{ textAlign: 'center', color: '#6b7280', fontSize: '12px' }}>
           <div>Advertisement</div>
-          <div style={{ fontSize: "10px" }}>Ad failed to load</div>
+          <div style={{ fontSize: '10px', marginTop: '4px' }}>Unable to load</div>
         </div>
       </div>
     );
@@ -141,30 +142,24 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
 
   return (
     <div
-      id={id}
       ref={ref}
+      id={id}
       style={{
-        width,
-        height,
-        margin: "16px auto",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: height,
-        ...style,
+        width: `${width}px`,
+        height: `${height}px`,
+        backgroundColor: adLoaded ? 'transparent' : '#f3f4f6',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        border: '1px solid #e5e7eb',
+        borderRadius: '8px',
+        ...style
       }}
     >
-      {!adLoaded && (
-        <div style={{ 
-          textAlign: "center", 
-          color: "#666", 
-          fontSize: "12px",
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)"
-        }}>
-          Loading ad...
+      {!adLoaded && !adError && (
+        <div style={{ textAlign: 'center', color: '#6b7280', fontSize: '12px' }}>
+          <div>Advertisement</div>
+          <div style={{ fontSize: '10px', marginTop: '4px' }}>Loading...</div>
         </div>
       )}
     </div>
@@ -180,6 +175,21 @@ function AdsterraIframe({ id, scriptSrc, width, height, style }: AdProps) {
     // Create iframe after a short delay to ensure DOM is ready
     const timer = setTimeout(() => {
       try {
+        const container = document.getElementById(id);
+        if (!container || !container.parentNode) {
+          setIframeError(true);
+          return;
+        }
+
+        // Clear existing content safely
+        try {
+          while (container.firstChild) {
+            container.removeChild(container.firstChild);
+          }
+        } catch (error) {
+          console.warn('Error clearing iframe container:', error);
+        }
+
         const iframe = document.createElement('iframe');
         iframe.src = scriptSrc.replace('/invoke.js', '/iframe.html');
         iframe.width = width.toString();
@@ -192,20 +202,11 @@ function AdsterraIframe({ id, scriptSrc, width, height, style }: AdProps) {
         iframe.onload = () => setIframeLoaded(true);
         iframe.onerror = () => setIframeError(true);
         
-        const container = document.getElementById(id);
         if (container && container.parentNode) {
-          try {
-            // Remove all child nodes safely
-            while (container.firstChild) {
-              container.removeChild(container.firstChild);
-            }
-            container.appendChild(iframe);
-          } catch {
-            // Ignore errors during DOM manipulation
-            setIframeError(true);
-          }
+          container.appendChild(iframe);
         }
-      } catch {
+      } catch (error) {
+        console.warn('Error creating iframe:', error);
         setIframeError(true);
       }
     }, 1000);
@@ -221,31 +222,31 @@ function AdsterraIframe({ id, scriptSrc, width, height, style }: AdProps) {
             container.removeChild(container.firstChild);
           }
         }
-      } catch {
-        // Ignore cleanup errors
+      } catch (error) {
+        console.warn('Error during iframe cleanup:', error);
       }
     };
   }, [id, scriptSrc, width, height]);
 
   if (iframeError) {
     return (
-      <div
+      <div 
         id={id}
         style={{
-          width,
-          height,
-          margin: "16px auto",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          border: "1px dashed #ccc",
-          backgroundColor: "#f9f9f9",
-          ...style,
+          width: `${width}px`,
+          height: `${height}px`,
+          backgroundColor: '#f3f4f6',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          border: '1px solid #e5e7eb',
+          borderRadius: '8px',
+          ...style
         }}
       >
-        <div style={{ textAlign: "center", color: "#666", fontSize: "12px" }}>
+        <div style={{ textAlign: 'center', color: '#6b7280', fontSize: '12px' }}>
           <div>Advertisement</div>
-          <div style={{ fontSize: "10px" }}>Ad failed to load</div>
+          <div style={{ fontSize: '10px', marginTop: '4px' }}>Unable to load</div>
         </div>
       </div>
     );
@@ -255,27 +256,21 @@ function AdsterraIframe({ id, scriptSrc, width, height, style }: AdProps) {
     <div
       id={id}
       style={{
-        width,
-        height,
-        margin: "16px auto",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: height,
-        ...style,
+        width: `${width}px`,
+        height: `${height}px`,
+        backgroundColor: iframeLoaded ? 'transparent' : '#f3f4f6',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        border: '1px solid #e5e7eb',
+        borderRadius: '8px',
+        ...style
       }}
     >
-      {!iframeLoaded && (
-        <div style={{ 
-          textAlign: "center", 
-          color: "#666", 
-          fontSize: "12px",
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)"
-        }}>
-          Loading ad...
+      {!iframeLoaded && !iframeError && (
+        <div style={{ textAlign: 'center', color: '#6b7280', fontSize: '12px' }}>
+          <div>Advertisement</div>
+          <div style={{ fontSize: '10px', marginTop: '4px' }}>Loading...</div>
         </div>
       )}
     </div>
@@ -302,97 +297,7 @@ function AdsterraEnhanced({ id, scriptSrc, atOptions, width, height, style }: Ad
   return <AdsterraScript id={id} scriptSrc={scriptSrc} atOptions={atOptions} width={width} height={height} style={style} />;
 }
 
-export function AdsterraBanner728x90(props: { style?: React.CSSProperties }) {
-  return (
-    <AdsterraEnhanced
-      id="adsterra-728x90"
-      scriptSrc="//www.highperformanceformat.com/660754a78fda06e644a6817ff0427a41/invoke.js"
-      atOptions={{
-        key: "660754a78fda06e644a6817ff0427a41",
-        format: "iframe",
-        height: 90,
-        width: 728,
-        params: {},
-      }}
-      width={728}
-      height={90}
-      {...props}
-    />
-  );
-}
-
-export function AdsterraBanner468x60(props: { style?: React.CSSProperties }) {
-  return (
-    <AdsterraEnhanced
-      id="adsterra-468x60"
-      scriptSrc="//www.highperformanceformat.com/f466ceb9ca7e3d951fb4a66e512052a3/invoke.js"
-      atOptions={{
-        key: "f466ceb9ca7e3d951fb4a66e512052a3",
-        format: "iframe",
-        height: 60,
-        width: 468,
-        params: {},
-      }}
-      width={468}
-      height={60}
-      {...props}
-    />
-  );
-}
-
-export function AdsterraBanner320x50(props: { style?: React.CSSProperties }) {
-  return (
-    <AdsterraEnhanced
-      id="adsterra-320x50"
-      scriptSrc="//www.highperformanceformat.com/6105c06808151fd21ece64b116af7aa4/invoke.js"
-      atOptions={{
-        key: "6105c06808151fd21ece64b116af7aa4",
-        format: "iframe",
-        height: 50,
-        width: 320,
-        params: {},
-      }}
-      width={320}
-      height={50}
-      {...props}
-    />
-  );
-}
-
-export function AdsterraBanner300x250(props: { style?: React.CSSProperties }) {
-  return (
-    <AdsterraEnhanced
-      id="adsterra-300x250"
-      scriptSrc="//www.highperformanceformat.com/854324fb9e09c1fb4415dc816b41ce77/invoke.js"
-      atOptions={{
-        key: "854324fb9e09c1fb4415dc816b41ce77",
-        format: "iframe",
-        height: 250,
-        width: 300,
-        params: {},
-      }}
-      width={300}
-      height={250}
-      {...props}
-    />
-  );
-}
-
-export function AdsterraBanner160x300(props: { style?: React.CSSProperties }) {
-  return (
-    <AdsterraEnhanced
-      id="adsterra-160x300"
-      scriptSrc="//www.highperformanceformat.com/dc7f1c37b029fa1984d76552f99edaa6/invoke.js"
-      atOptions={{
-        key: "dc7f1c37b029fa1984d76552f99edaa6",
-        format: "iframe",
-        height: 300,
-        width: 160,
-        params: {},
-      }}
-      width={160}
-      height={300}
-      {...props}
-    />
-  );
+// Main export component
+export default function AdsterraAds({ id, scriptSrc, atOptions, width, height, style }: AdProps) {
+  return <AdsterraEnhanced id={id} scriptSrc={scriptSrc} atOptions={atOptions} width={width} height={height} style={style} />;
 } 

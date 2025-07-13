@@ -1,65 +1,33 @@
 # GlobalEye News
 
-A modern, responsive news website built with Next.js, featuring real-time news from multiple sources with optimized performance and caching.
+A modern, responsive news website built with Next.js 15, TypeScript, and Tailwind CSS. Features real-time news updates, breaking news ticker, and PWA capabilities.
 
 ## 🚀 Features
 
-- **Multi-Source News**: Aggregates news from NewsAPI, GNews, The Guardian, and Mediastack
-- **Responsive Design**: Optimized for all devices with mobile-first approach
-- **Fast Performance**: Advanced caching and optimization strategies
-- **Category Pages**: Dedicated pages for different news categories
-- **Image Optimization**: Automatic image optimization with fallbacks
-- **PWA Support**: Progressive Web App capabilities
-- **Real-time Updates**: Fresh news with intelligent caching
+- **Real-time News**: Latest breaking news from multiple sources
+- **Breaking News Ticker**: Live scrolling news ticker
+- **Responsive Design**: Mobile-first approach with Tailwind CSS
+- **PWA Support**: Progressive Web App with offline capabilities
+- **SEO Optimized**: Meta tags, sitemaps, and structured data
+- **Dark Mode**: Automatic theme switching
+- **Performance**: Optimized images and lazy loading
+- **Security**: CSP headers and security best practices
 
-## 🛠️ Performance Optimizations
+## 🛠️ Tech Stack
 
-### Caching Strategy
-- **Server-side caching**: 5-minute revalidation for news data
-- **API route caching**: Intelligent caching for category pages
-- **Image caching**: 30-day cache for images with fallback handling
-- **Browser caching**: Optimized cache headers for static assets
+- **Framework**: Next.js 15 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Database**: Supabase
+- **Deployment**: Vercel
+- **PWA**: next-pwa
+- **Icons**: React Icons
 
-### Loading Improvements
-- **Increased timeouts**: 8-second timeout for API calls (up from 3 seconds)
-- **Better error handling**: Comprehensive error states with retry options
-- **Loading states**: Professional loading animations and spinners
-- **Image fallbacks**: Automatic fallback to placeholder images
-
-### Database Optimization
-- **Smart data fetching**: Database-first approach with API fallback
-- **Batch processing**: Efficient article saving and retrieval
-- **Duplicate prevention**: URL-based deduplication
-
-## 📱 Mobile Responsiveness
-
-- **Responsive grid layouts**: Adapts to all screen sizes
-- **Touch-friendly navigation**: Optimized for mobile interaction
-- **Fast mobile loading**: Optimized images and assets for mobile
-- **PWA installation**: Easy app-like installation on mobile devices
-
-## 🎨 UI/UX Improvements
-
-- **Professional design**: CNN-inspired news layout
-- **Hover effects**: Smooth transitions and animations
-- **Loading states**: Clear feedback during data loading
-- **Error handling**: User-friendly error messages with retry options
-- **Image optimization**: High-quality images with fallback handling
-
-## 🔧 Technical Stack
-
-- **Framework**: Next.js 14 with App Router
-- **Styling**: Tailwind CSS with custom components
-- **Database**: Supabase for data persistence
-- **APIs**: NewsAPI, GNews, The Guardian, Mediastack
-- **PWA**: Next-PWA for progressive web app features
-- **Image Optimization**: Next.js Image component with fallbacks
-
-## 🚀 Getting Started
+## 📦 Installation
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/yourusername/globaleye.git
    cd globaleye
    ```
 
@@ -69,102 +37,126 @@ A modern, responsive news website built with Next.js, featuring real-time news f
    ```
 
 3. **Set up environment variables**
-   Create a `.env.local` file with your API keys:
+   ```bash
+   cp .env.example .env.local
    ```
-   NEWS_API_KEY=your_news_api_key
-   GNEWS_API_KEY=your_gnews_api_key
-   GUARDIAN_KEY=your_guardian_api_key
-   MEDIASTACK_KEY=your_mediastack_api_key
-   SUPABASE_URL=your_supabase_url
-   SUPABASE_ANON_KEY=your_supabase_anon_key
+   
+   Add your environment variables:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
    ```
 
 4. **Run the development server**
-```bash
-npm run dev
+   ```bash
+   npm run dev
    ```
 
 5. **Open your browser**
-   Navigate to `http://localhost:3000`
+   Navigate to [http://localhost:3000](http://localhost:3000)
 
-## 📊 Performance Metrics
+## 🏗️ Build for Production
 
-- **Page Load Time**: Optimized for sub-3 second loads
-- **Image Loading**: Automatic optimization with WebP/AVIF support
-- **Caching Efficiency**: 95%+ cache hit rate for static assets
-- **Mobile Performance**: Lighthouse score >90 for mobile
+```bash
+npm run build
+npm start
+```
 
-## 🔍 Debugging
+## 🔧 Configuration
 
-The application includes comprehensive logging for debugging:
+### PWA Configuration
+The app includes PWA support with:
+- Service worker for offline functionality
+- Web app manifest
+- Install prompt
+- Background sync
 
-- **API calls**: Detailed logging of all API requests and responses
-- **Image loading**: Tracking of image load success/failure
-- **Database operations**: Logging of data fetching and saving
-- **Performance metrics**: Loading times and cache hits
+### Image Optimization
+- Next.js Image component with WebP support
+- Automatic image optimization
+- Lazy loading for better performance
 
-Check the browser console for detailed debug information.
+### Security Headers
+- Content Security Policy (CSP)
+- X-Frame-Options
+- X-Content-Type-Options
+- Strict-Transport-Security
 
-## 🐛 Recent Fixes
+## 🐛 Troubleshooting
 
-- **Fixed mobile responsiveness**: Updated container widths and grid layouts
-- **Resolved image display issues**: Improved image loading with fallbacks
-- **Fixed slug generation**: Corrected article URL generation
-- **Resolved hydration errors**: Standardized date formatting
-- **Improved performance**: Enhanced caching and timeout handling
-- **Added comprehensive logging**: Better debugging capabilities
+### Common Issues
 
-## 📈 Future Improvements
+1. **DOM Manipulation Errors**
+   - Fixed with improved ErrorBoundary
+   - Better null checks in components
+   - Safer DOM operations
 
-- [ ] Add search functionality
-- [ ] Implement user preferences
-- [ ] Add dark mode toggle
-- [ ] Implement news notifications
-- [ ] Add social sharing features
-- [ ] Implement news bookmarking
+2. **Image Preload Warnings**
+   - Optimized image loading strategy
+   - Proper priority settings
+   - Lazy loading for non-critical images
+
+3. **Meta Tag Deprecation**
+   - Updated to use `mobile-web-app-capable`
+   - Proper PWA meta tags
+   - Browser compatibility
+
+4. **CSP Violations**
+   - Updated Content Security Policy
+   - Allowed necessary resources
+   - Proper script and style sources
+
+### Development Tips
+
+- Use `npm run lint` to check for code issues
+- Check browser console for any remaining warnings
+- Test PWA functionality in production build
+- Verify all meta tags are properly set
+
+## 📁 Project Structure
+
+```
+globaleye/
+├── src/
+│   ├── app/                 # Next.js App Router
+│   ├── components/          # React components
+│   ├── hooks/              # Custom React hooks
+│   ├── services/           # API services
+│   ├── types/              # TypeScript types
+│   └── utils/              # Utility functions
+├── public/                 # Static assets
+├── tailwind.config.js      # Tailwind configuration
+└── next.config.js          # Next.js configuration
+```
+
+## 🚀 Deployment
+
+### Vercel (Recommended)
+1. Connect your GitHub repository
+2. Set environment variables
+3. Deploy automatically
+
+### Manual Deployment
+```bash
+npm run build
+npm start
+```
+
+## 📄 License
+
+This project is licensed under the MIT License.
 
 ## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+4. Submit a pull request
 
-## 📄 License
+## 📞 Support
 
-This project is licensed under the MIT License.
-
-## 🆘 Support
-
-If you encounter any issues:
-
-1. Check the browser console for error messages
-2. Verify your API keys are correctly set
-3. Ensure your internet connection is stable
-4. Check the debug logs for detailed information
-
-For additional support, please open an issue in the repository.
-
-## الاختبارات التلقائية (Jest)
-
-لتشغيل جميع الاختبارات:
-
-```
-npx jest
-```
+For support, email support@globaleye.live or create an issue on GitHub.
 
 ---
 
-## مراقبة الأخطاء (Sentry)
-
-1. أنشئ حسابًا في [Sentry.io](https://sentry.io/) واحصل على DSN.
-2. أضف DSN إلى ملف `.env.local`:
-   ```
-   SENTRY_DSN=your_sentry_dsn_here
-   ```
-3. فعّل Sentry عبر تشغيل الأمر:
-   ```
-npx @sentry/wizard -i nextjs
-   ```
-4. سيتم مراقبة جميع الأخطاء تلقائيًا بعد النشر.
+**Note**: This project is actively maintained and updated regularly. Make sure to keep dependencies updated for the best performance and security.
