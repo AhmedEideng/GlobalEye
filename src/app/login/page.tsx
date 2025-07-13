@@ -31,12 +31,13 @@ export default function LoginPage() {
   const handleGoogleSignIn = async () => {
     try {
       await signOut();
+      const options: Record<string, unknown> = { skipBrowserRedirect: true };
+      if (typeof window !== 'undefined') {
+        options.redirectTo = window.location.origin + '/profile';
+      }
       const { data } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        options: {
-          redirectTo: typeof window !== 'undefined' ? window.location.origin + '/profile' : undefined,
-          skipBrowserRedirect: true
-        }
+        options
       });
       if (data?.url) {
         window.location.href = data.url;

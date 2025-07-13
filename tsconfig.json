@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2015",
     "lib": ["dom", "dom.iterable", "es6"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -22,7 +22,7 @@
     "paths": {
       "@/*": ["./src/*"],
       "@components/*": ["./src/components/*"],
-      "@utils/*": ["./src/utils/*"],
+      "@utils/*": ["./src/app/utils/*", "./src/utils/*"],
       "@hooks/*": ["./src/hooks/*"],
       "@services/*": ["./src/services/*"],
       "@types/*": ["./src/types/*"]

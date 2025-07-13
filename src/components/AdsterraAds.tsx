@@ -5,10 +5,10 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 interface AdProps {
   id: string;
   scriptSrc: string;
-  atOptions: any;
+  atOptions: Record<string, unknown>;
   width: number;
   height: number;
-  style?: React.CSSProperties;
+  style?: React.CSSProperties | undefined;
 }
 
 function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdProps) {
@@ -27,8 +27,8 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
         while (currentRef.firstChild) {
           currentRef.removeChild(currentRef.firstChild);
         }
-      } catch (error) {
-        console.warn('Error clearing ad container:', error);
+      } catch {
+        // TODO: handle ad container clear error
       }
       
       // Create and append options script
@@ -66,8 +66,8 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
         currentRef.appendChild(script);
       }
 
-    } catch (error) {
-      console.warn('Error loading ad:', error);
+    } catch {
+      // TODO: handle ad loading error
       if (ref.current) {
         setAdError(true);
       }
@@ -75,8 +75,6 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
   }, [scriptSrc, atOptions]);
 
   useEffect(() => {
-    if (!ref.current) return;
-    
     setAdLoaded(false);
     setAdError(false);
 
@@ -102,15 +100,15 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
     return () => {
       clearTimeout(timeoutId);
       clearTimeout(retryTimeoutId);
-      // Only clear innerHTML if the ref still exists and is the same element
-      if (ref.current && ref.current === currentRef) {
+      // Use the stored ref value instead of ref.current
+      if (currentRef) {
         try {
           // Remove all child nodes safely
-          while (ref.current.firstChild) {
-            ref.current.removeChild(ref.current.firstChild);
+          while (currentRef.firstChild) {
+            currentRef.removeChild(currentRef.firstChild);
           }
-        } catch (error) {
-          console.warn('Error during ad cleanup:', error);
+        } catch {
+          // TODO: handle ad cleanup error
         }
       }
     };
@@ -186,8 +184,8 @@ function AdsterraIframe({ id, scriptSrc, width, height, style }: AdProps) {
           while (container.firstChild) {
             container.removeChild(container.firstChild);
           }
-        } catch (error) {
-          console.warn('Error clearing iframe container:', error);
+        } catch {
+          // TODO: handle iframe container clear error
         }
 
         const iframe = document.createElement('iframe');
@@ -205,8 +203,8 @@ function AdsterraIframe({ id, scriptSrc, width, height, style }: AdProps) {
         if (container && container.parentNode) {
           container.appendChild(iframe);
         }
-      } catch (error) {
-        console.warn('Error creating iframe:', error);
+      } catch {
+        // TODO: handle iframe creation error
         setIframeError(true);
       }
     }, 1000);
@@ -222,8 +220,8 @@ function AdsterraIframe({ id, scriptSrc, width, height, style }: AdProps) {
             container.removeChild(container.firstChild);
           }
         }
-      } catch (error) {
-        console.warn('Error during iframe cleanup:', error);
+      } catch {
+        // TODO: handle iframe cleanup error
       }
     };
   }, [id, scriptSrc, width, height]);
@@ -300,4 +298,100 @@ function AdsterraEnhanced({ id, scriptSrc, atOptions, width, height, style }: Ad
 // Main export component
 export default function AdsterraAds({ id, scriptSrc, atOptions, width, height, style }: AdProps) {
   return <AdsterraEnhanced id={id} scriptSrc={scriptSrc} atOptions={atOptions} width={width} height={height} style={style} />;
+}
+
+// Specific ad banner components
+export function AdsterraBanner728x90(props: { style?: React.CSSProperties }) {
+  return (
+    <AdsterraEnhanced
+      id="adsterra-728x90"
+      scriptSrc="//www.highperformanceformat.com/660754a78fda06e644a6817ff0427a41/invoke.js"
+      atOptions={{
+        key: "660754a78fda06e644a6817ff0427a41",
+        format: "iframe",
+        height: 90,
+        width: 728,
+        params: {},
+      }}
+      width={728}
+      height={90}
+      style={props.style}
+    />
+  );
+}
+
+export function AdsterraBanner468x60(props: { style?: React.CSSProperties }) {
+  return (
+    <AdsterraEnhanced
+      id="adsterra-468x60"
+      scriptSrc="//www.highperformanceformat.com/f466ceb9ca7e3d951fb4a66e512052a3/invoke.js"
+      atOptions={{
+        key: "f466ceb9ca7e3d951fb4a66e512052a3",
+        format: "iframe",
+        height: 60,
+        width: 468,
+        params: {},
+      }}
+      width={468}
+      height={60}
+      style={props.style}
+    />
+  );
+}
+
+export function AdsterraBanner320x50(props: { style?: React.CSSProperties }) {
+  return (
+    <AdsterraEnhanced
+      id="adsterra-320x50"
+      scriptSrc="//www.highperformanceformat.com/6105c06808151fd21ece64b116af7aa4/invoke.js"
+      atOptions={{
+        key: "6105c06808151fd21ece64b116af7aa4",
+        format: "iframe",
+        height: 50,
+        width: 320,
+        params: {},
+      }}
+      width={320}
+      height={50}
+      style={props.style}
+    />
+  );
+}
+
+export function AdsterraBanner300x250(props: { style?: React.CSSProperties }) {
+  return (
+    <AdsterraEnhanced
+      id="adsterra-300x250"
+      scriptSrc="//www.highperformanceformat.com/854324fb9e09c1fb4415dc816b41ce77/invoke.js"
+      atOptions={{
+        key: "854324fb9e09c1fb4415dc816b41ce77",
+        format: "iframe",
+        height: 250,
+        width: 300,
+        params: {},
+      }}
+      width={300}
+      height={250}
+      style={props.style}
+    />
+  );
+}
+
+export function AdsterraBanner160x300(props: { style?: React.CSSProperties }) {
+  return (
+    <AdsterraEnhanced
+      id="adsterra-160x300"
+      scriptSrc="//www.highperformanceformat.com/dc7f1c37b029fa1984d76552f99edaa6/invoke.js"
+      atOptions={{
+        key: "dc7f1c37b029fa1984d76552f99edaa6",
+        format: "iframe",
+        height: 300,
+        width: 160,
+        params: {},
+      }}
+      width={160}
+      height={300}
+      style={props.style}
+    />
+  );
 } 

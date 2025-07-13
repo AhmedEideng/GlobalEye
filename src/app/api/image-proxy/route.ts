@@ -62,8 +62,7 @@ export async function GET(req: NextRequest) {
     }
     // If content-length is not available, read buffer and measure size
     const arrayBuffer = await response.arrayBuffer();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const imageBuffer = Buffer.from(new Uint8Array(arrayBuffer) as any);
+    const imageBuffer = Buffer.from(new Uint8Array(arrayBuffer));
     if (imageBuffer.length > MAX_IMAGE_SIZE) {
       return fallbackImageResponse();
     }

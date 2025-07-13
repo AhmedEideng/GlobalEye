@@ -2,7 +2,7 @@ const withPWA = require('next-pwa')({
   dest: 'public',
   register: true,
   skipWaiting: true,
-  disable: true, // تم التعطيل نهائيًا
+  disable: process.env.NODE_ENV === 'development',
   runtimeCaching: [
     {
       urlPattern: /^https:\/\/.*\.(png|jpg|jpeg|svg|gif|webp)$/,
@@ -30,6 +30,7 @@ const withPWA = require('next-pwa')({
 });
 
 module.exports = withPWA({
+  output: 'standalone',
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '**' },

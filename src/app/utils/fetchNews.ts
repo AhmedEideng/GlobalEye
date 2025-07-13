@@ -163,7 +163,7 @@ export async function fetchNews(category: string = 'general'): Promise<NewsArtic
     withTimeout(fn(category).then(result => result), 8000)
   );
   const results = await Promise.all(promises);
-  const all = results.filter(Boolean).flat() as NewsArticle[];
+  const all = results.filter(Boolean).flat().filter((article): article is NewsArticle => article !== null && article !== undefined) as NewsArticle[];
   // ====== Merge similar news into unique and long articles ======
   const groups = groupSimilarArticles(all, 0.5); // threshold can be adjusted as needed
   const mergedArticles = groups.map(group => mergeArticlesGroup(group));
@@ -780,18 +780,24 @@ function groupSimilarArticles(articles: NewsArticle[], threshold = 0.5): NewsArt
   const used = new Array(articles.length).fill(false);
   for (let i = 0; i < articles.length; i++) {
     if (used[i]) continue;
-    const group = [articles[i]];
+    const currentArticle = articles[i];
+    if (!currentArticle) continue;
+    
+    const group = [currentArticle];
     used[i] = true;
     for (let j = i + 1; j < articles.length; j++) {
       if (used[j]) continue;
+      const compareArticle = articles[j];
+      if (!compareArticle) continue;
+      
       // Similarity based on title + content
-      const simTitle = jaccardSimilarity(articles[i].title, articles[j].title);
+      const simTitle = jaccardSimilarity(currentArticle.title, compareArticle.title);
       const simContent = jaroWinklerSimilarity(
-        (articles[i].content || '') + ' ' + (articles[i].description || ''),
-        (articles[j].content || '') + ' ' + (articles[j].description || '')
+        (currentArticle.content || '') + ' ' + (currentArticle.description || ''),
+        (compareArticle.content || '') + ' ' + (compareArticle.description || '')
       );
       if (simTitle > threshold || simContent > threshold) {
-        group.push(articles[j]);
+        group.push(compareArticle);
         used[j] = true;
       }
     }
@@ -823,9 +829,24 @@ function extractSummary(content: string, maxSentences = 3): string {
 
 // Merge news texts in one group into a long and unique article
 function mergeArticlesGroup(group: NewsArticle[]): NewsArticle {
-  if (group.length === 1) return group[0];
+  if (group.length === 1) return group[0]!;
+  if (group.length === 0) {
+    // Return a default article if group is empty
+    return {
+      source: { id: null, name: 'Unknown' },
+      author: null,
+      title: '',
+      description: null,
+      url: '',
+      urlToImage: null,
+      publishedAt: new Date().toISOString(),
+      content: null,
+      slug: '',
+      category: 'general'
+    };
+  }
   // Merge titles (take the most frequent or the longest)
-  const title = group.map(a => a.title).sort((a, b) => b.length - a.length)[0];
+  const title = group.map(a => a.title).sort((a, b) => b.length - a.length)[0] || '';
   // Merge descriptions
   const description = group.map(a => a.description).filter(Boolean).join(' | ');
   // Merge content (remove smart repetition of paragraphs)
@@ -834,9 +855,9 @@ function mergeArticlesGroup(group: NewsArticle[]): NewsArticle {
   // Remove very similar paragraphs using Jaro-Winkler
   const uniqueParagraphs: string[] = [];
   for (let i = 0; i < paragraphs.length; i++) {
-    const para = paragraphs[i];
+    const para = paragraphs[i] ?? '';
     // If the paragraph is very similar to a previous one (>0.88) skip it
-    if (uniqueParagraphs.some(up => jaroWinklerSimilarity(up, para) > 0.88)) continue;
+    if (uniqueParagraphs.filter(Boolean).some(up => jaroWinklerSimilarity(up, para) > 0.88)) continue;
     uniqueParagraphs.push(para);
   }
   // Sort paragraphs: longest first (or later chronologically if timestamps are available)
@@ -854,18 +875,18 @@ function mergeArticlesGroup(group: NewsArticle[]): NewsArticle {
   // Take the first available image
   const urlToImage = group.find(a => a.urlToImage)?.urlToImage || null;
   // Take the first link (or combine sources)
-  const url = group[0].url;
+  const url = group[0]?.url || '';
   // Take the first author
   const author = group.find(a => a.author)?.author || null;
   // Take the latest publication date
-  const publishedAt = group.map(a => a.publishedAt).sort().reverse()[0];
+  const publishedAt = group.map(a => a.publishedAt).sort().reverse()[0] || '';
   // Combine source names
   const sourceNames = Array.from(new Set(group.map(a => a.source.name)));
   const source = { id: null, name: sourceNames.join(' + ') };
   // Use slug from longest title
-  const slug = group.map(a => a.slug).sort((a, b) => b.length - a.length)[0];
+  const slug = group.map(a => a.slug).sort((a, b) => b.length - a.length)[0] || '';
   // Take the category
-  const category = group[0].category;
+  const category = group[0]?.category || 'general';
   return { source, author, title, description, url, urlToImage, publishedAt, content: contentWithSummary, slug, category };
 }
 
