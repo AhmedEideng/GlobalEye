@@ -25,7 +25,12 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
       // Clear existing content safely
       try {
         while (currentRef.firstChild) {
-          currentRef.removeChild(currentRef.firstChild);
+          const child: ChildNode | null = currentRef.firstChild;
+          if (child && child.parentNode === currentRef) {
+            currentRef.removeChild(child);
+          } else {
+            break; // Exit if child is no longer a child of currentRef
+          }
         }
       } catch {
         // TODO: handle ad container clear error
@@ -105,7 +110,12 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
         try {
           // Remove all child nodes safely
           while (currentRef.firstChild) {
-            currentRef.removeChild(currentRef.firstChild);
+            const child: ChildNode | null = currentRef.firstChild;
+            if (child && child.parentNode === currentRef) {
+              currentRef.removeChild(child);
+            } else {
+              break; // Exit if child is no longer a child of currentRef
+            }
           }
         } catch {
           // TODO: handle ad cleanup error
@@ -182,7 +192,12 @@ function AdsterraIframe({ id, scriptSrc, width, height, style }: AdProps) {
         // Clear existing content safely
         try {
           while (container.firstChild) {
-            container.removeChild(container.firstChild);
+            const child: ChildNode | null = container.firstChild;
+            if (child && child.parentNode === container) {
+              container.removeChild(child);
+            } else {
+              break; // Exit if child is no longer a child of container
+            }
           }
         } catch {
           // TODO: handle iframe container clear error
@@ -217,7 +232,12 @@ function AdsterraIframe({ id, scriptSrc, width, height, style }: AdProps) {
         if (container && container.parentNode) {
           // Remove all child nodes safely
           while (container.firstChild) {
-            container.removeChild(container.firstChild);
+            const child: ChildNode | null = container.firstChild;
+            if (child && child.parentNode === container) {
+              container.removeChild(child);
+            } else {
+              break; // Exit if child is no longer a child of container
+            }
           }
         }
       } catch {
