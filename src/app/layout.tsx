@@ -1,69 +1,101 @@
-import Footer from '@components/Footer';
-import "./globals.css";
-import PwaInstallToast from '@components/PwaInstallToast';
-import DynamicHeader from '@components/DynamicHeader';
-import BreakingNewsTickerController from '@components/BreakingNewsTickerController';
-import ClientLangHead from './ClientLangHead';
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
-export const metadata = {
+const inter = Inter({ subsets: ['latin'] });
+
+export const metadata: Metadata = {
+  title: {
+    default: 'GlobalEye News - Latest Breaking News, World Headlines',
+    template: '%s | GlobalEye News'
+  },
+  description: 'Get the latest breaking news, world headlines, business, technology, sports, health, and more. Trusted global news coverage, real-time updates, and in-depth analysis from GlobalEye News.',
+  keywords: ['news', 'breaking news', 'world news', 'latest news', 'global news', 'headlines', 'current events'],
+  authors: [{ name: 'GlobalEye News' }],
+  creator: 'GlobalEye News',
+  publisher: 'GlobalEye News',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   metadataBase: new URL('https://globaleye.live'),
-  title: "GlobalEye News - Your Trusted Source for Global News",
-  description: "Stay informed with the latest breaking news, business updates, technology trends, sports coverage, and more from around the world.",
-  keywords: "news, global news, breaking news, business news, technology news, sports news, world news",
-  authors: [{ name: "GlobalEye News" }],
-  robots: "index, follow",
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: 'GlobalEye News - Latest Breaking News, World Headlines',
+    description: 'Get the latest breaking news, world headlines, business, technology, sports, health, and more.',
+    url: 'https://globaleye.live',
+    siteName: 'GlobalEye News',
+    images: [
+      {
+        url: '/favicon.ico.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'GlobalEye News',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'GlobalEye News - Latest Breaking News, World Headlines',
+    description: 'Get the latest breaking news, world headlines, business, technology, sports, health, and more.',
+    images: ['/favicon.ico.jpg'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   icons: {
     icon: '/favicon.ico.jpg',
     shortcut: '/favicon.ico.jpg',
     apple: '/favicon.ico.jpg',
   },
-  openGraph: {
-    title: "GlobalEye News",
-    description: "Your trusted source for global news and insights",
-    type: "website",
-    locale: "en_US",
-    url: 'https://globaleye.live',
-    images: [
-      { url: '/placeholder-news.jpg', width: 1200, height: 630, alt: 'GlobalEye News' }
-    ],
-    siteName: 'GlobalEye News',
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "GlobalEye News",
-    description: "Your trusted source for global news and insights",
-    images: ['/placeholder-news.jpg'],
-    site: '@globaleyenews',
+  verification: {
+    google: 'your-google-verification-code',
   },
 };
 
-export const viewport = {
-  width: "device-width",
-  initialScale: 1,
-};
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en" dir="ltr" suppressHydrationWarning>
+    <html lang="en">
       <head>
-        <ClientLangHead />
-        <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/favicon.ico.jpg" />
-        <meta name="theme-color" content="#0a0a0a" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#dc2626" />
+        <meta name="msapplication-TileColor" content="#dc2626" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="GlobalEye News" />
+        <link rel="apple-touch-icon" href="/favicon.ico.jpg" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="application-name" content="GlobalEye News" />
+        <meta name="msapplication-TileImage" content="/favicon.ico.jpg" />
+        <meta name="msapplication-config" content="/browserconfig.xml" />
       </head>
-      <body suppressHydrationWarning>
-        <PwaInstallToast />
-        <header className="cnn-header"></header>
-        <DynamicHeader />
-        <nav className="cnn-nav">
-          <div className="nav-container"></div>
-        </nav>
-        <BreakingNewsTickerController>
-          <div className="main-container max-w-screen-xl mx-auto px-2 sm:px-4 pt-4 pb-8 w-full">
-            {children}
-          </div>
-          <Footer />
-        </BreakingNewsTickerController>
+      <body className={inter.className}>
+        <ErrorBoundary>
+          <main className="min-h-screen bg-gray-50">
+            <ErrorBoundary>
+              {children}
+            </ErrorBoundary>
+          </main>
+        </ErrorBoundary>
       </body>
     </html>
   );

@@ -1,7 +1,7 @@
 "use client";
 import Head from 'next/head';
 import { NewsArticle } from '../../utils/fetchNews';
-import { sanitizeText } from '@/utils/sanitizeText';
+import { sanitizeText, sanitizeJson } from '@/utils/sanitizeText';
 
 export default function ArticleJsonLdHead({ article }: { article: NewsArticle | null }) {
   if (!article) return null;
@@ -28,7 +28,7 @@ export default function ArticleJsonLdHead({ article }: { article: NewsArticle | 
     <Head>
       <script 
         type="application/ld+json" 
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/[^\x00-\x7F]/g, '') }} 
+        dangerouslySetInnerHTML={{ __html: sanitizeJson(jsonLd) }} 
       />
     </Head>
   );
