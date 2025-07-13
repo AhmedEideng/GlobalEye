@@ -4,7 +4,11 @@ import { useAuth } from '@hooks/useAuth';
 /**
  * Small button for login/logout using Google via Supabase with dropdown for profile
  */
-export default function LoginButton() {
+interface LoginButtonProps {
+  onLoginClick?: () => void;
+}
+
+export default function LoginButton({ onLoginClick }: LoginButtonProps) {
   const { user, loading, signOut } = useAuth();
 
   if (loading) {
@@ -43,7 +47,12 @@ export default function LoginButton() {
 
   // If user is not logged in, show login button
   return (
-    <Link href="/login" aria-label="Go to Login" className="flex items-center justify-center text-gray-700 hover:text-red-600 transition-colors duration-200">
+    <Link 
+      href="/login" 
+      aria-label="Go to Login" 
+      className="flex items-center justify-center text-gray-700 hover:text-red-600 transition-colors duration-200"
+      {...(onLoginClick && { onClick: onLoginClick })}
+    >
       <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="16" cy="12" r="6" fill="currentColor" />
         <rect x="7" y="22" width="18" height="7" rx="4" fill="currentColor" />

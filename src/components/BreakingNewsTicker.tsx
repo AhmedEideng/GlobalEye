@@ -2,27 +2,24 @@
 import Link from 'next/link';
 import { FaNewspaper, FaSync } from 'react-icons/fa';
 import { useBreakingNews, BreakingNewsItem } from '@hooks/useBreakingNews';
-import { useWindowSize } from '@hooks/useWindowSize';
 import { useEffect, useState } from 'react';
 
 export default function BreakingNewsTicker({ showTicker = true }: { showTicker?: boolean }) {
   const { news, loading, error, refreshNews } = useBreakingNews();
-  const { width } = useWindowSize();
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [scrollPosition, setScrollPosition] = useState(0);
 
-  let newsCount = 5;
-  if (width < 500) newsCount = 1;
-  else if (width < 700) newsCount = 2;
-  else if (width < 900) newsCount = 3;
-  else if (width < 1200) newsCount = 4;
-
-  // Auto-scroll through news items
+  // Continuous scrolling animation
   useEffect(() => {
     if (news.length === 0) return;
     
+    const animationSpeed = 50; // pixels per second
     const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % news.length);
-    }, 5000); // Change news every 5 seconds
+      setScrollPosition((prev) => {
+        const newPosition = prev + (animationSpeed / 60); // 60fps
+        const maxScroll = news.length * 300; // approximate width
+        return newPosition >= maxScroll ? 0 : newPosition;
+      });
+    }, 16); // ~60fps
 
     return () => clearInterval(interval);
   }, [news.length]);
@@ -33,6 +30,7 @@ export default function BreakingNewsTicker({ showTicker = true }: { showTicker?:
     <div className="breaking-news-ticker bg-red-800 text-white w-full overflow-hidden relative fixed left-0 top-16 md:top-20 z-30">
       <div 
         className="ticker-container flex items-center py-2 px-4"
+        style={{ marginTop: '-1px' }}
       >
         {/* Breaking News Label */}
         <div className="breaking-label flex items-center gap-2 mr-4 flex-shrink-0">
@@ -63,17 +61,17 @@ export default function BreakingNewsTicker({ showTicker = true }: { showTicker?:
           ) : news.length > 0 ? (
             <div className="ticker-items-container overflow-hidden">
               <div 
-                className="ticker-items flex items-center transition-transform duration-1000 ease-in-out"
+                className="ticker-items flex items-center"
                 style={{
-                  transform: `translateX(-${currentIndex * 100}%)`,
-                  width: `${news.length * 100}%`
+                  transform: `translateX(-${scrollPosition}px)`,
+                  width: `${news.length * 300}px`
                 }}
               >
-                {news.slice(0, newsCount).map((newsItem: BreakingNewsItem) => (
+                {news.map((newsItem: BreakingNewsItem) => (
                   <div
                     key={newsItem.id || `news-${newsItem.url}`}
                     className="ticker-item flex-shrink-0 flex items-center"
-                    style={{ width: `${100 / news.length}%` }}
+                    style={{ width: '300px', marginRight: '50px' }}
                   >
                     {/* Yellow dot at the start of each news */}
                     <div className="separator-dot mr-2 flex-shrink-0">

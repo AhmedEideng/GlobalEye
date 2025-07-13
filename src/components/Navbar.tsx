@@ -61,7 +61,7 @@ export default function Navbar({ isMenuOpen, setIsMenuOpen, style }: NavbarProps
       </ul>
       {/* Login button left (always last) */}
       <div className="flex items-center gap-4 ml-2">
-        <LoginButton />
+        <LoginButton onLoginClick={() => setIsMenuOpen(false)} />
       </div>
       {/* Mobile sidebar */}
       {isMenuOpen && (
@@ -78,7 +78,7 @@ export default function Navbar({ isMenuOpen, setIsMenuOpen, style }: NavbarProps
             {/* Login button */}
             <div className="mb-6 pb-4 border-b border-gray-200">
               <div className="flex items-center justify-center">
-                <LoginButton />
+                <LoginButton onLoginClick={() => setIsMenuOpen(false)} />
               </div>
             </div>
             

@@ -4,6 +4,7 @@ import './globals.css';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import BreakingNewsTickerController from '@/components/BreakingNewsTickerController';
 import ScrollToTopWrapper from '@/components/ScrollToTopWrapper';
+import Footer from '@/components/Footer';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -115,6 +116,7 @@ export default function RootLayout({
               <main className="min-h-screen bg-gray-50 pt-24 md:pt-28">
                 {children}
               </main>
+              <Footer />
             </ScrollToTopWrapper>
           </BreakingNewsTickerController>
         </ErrorBoundary>
