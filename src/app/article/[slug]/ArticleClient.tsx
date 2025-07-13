@@ -7,11 +7,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { sendAnalyticsEvent, fetchRelatedNews } from '../../utils/fetchNews';
 import Link from 'next/link';
-import { AdsterraBanner468x60 } from '@components/AdsterraAds';
-import { AdsterraBanner300x250 } from '@components/AdsterraAds';
 import { AdsterraBanner728x90 } from '@components/AdsterraAds';
-import { AdsterraBanner160x300 } from '@components/AdsterraAds';
-import { AdsterraBanner320x50 } from '@components/AdsterraAds';
 import React from 'react';
 
 export default function ArticleClient({ article, slug }: { article: NewsArticle | null, slug: string }) {

@@ -4,39 +4,9 @@ import React from 'react';
 import Image from 'next/image';
 import { sendAnalyticsEvent, fetchRelatedNews } from '../utils/fetchNews';
 import Link from 'next/link';
-import { AdsterraBanner728x90 } from '@components/AdsterraAds';
 import HomeFeatured from '@components/HomeFeatured';
 import HomeNewsGrid from '@components/HomeNewsGrid';
-
-// Helper function to generate slug (updated version)
-function generateSlug(title: string, url: string): string {
-  // Clean the title and remove special characters
-  if (title && title.trim()) {
-    const cleanTitle = title
-      .toLowerCase()
-      .trim()
-      // Remove Arabic characters and special characters
-      .replace(/[^\w\s-]/g, '')
-      // Replace multiple spaces and dashes with a single dash
-      .replace(/[\s\-]+/g, '-')
-      // Remove dashes from the beginning and end
-      .replace(/^-+|-+$/g, '')
-      // Set the maximum length
-      .slice(0, 50);
-    
-    // If the title is empty after cleaning, use hash from URL
-    if (!cleanTitle) {
-      return `article-${Math.abs(hashCode(url)).toString()}`;
-    }
-    
-    // Add hash from URL to ensure uniqueness
-    const urlHash = Math.abs(hashCode(url)).toString().slice(0, 8);
-    return `${cleanTitle}-${urlHash}`;
-  }
-  
-  // If there is no title, use hash from URL
-  return `article-${Math.abs(hashCode(url)).toString()}`;
-}
+import { NewsArticle } from '../utils/fetchNews';
 
 function hashCode(str: string): number {
   let hash = 0, i, chr;
@@ -129,7 +99,18 @@ export default function CategoryClient({ category }: { category: string }) {
   const suggested = suggestedArticles.slice(0, 40);
 
   // تحويل Article[] إلى NewsArticle[] بإضافة content فارغ إذا لم يكن موجودًا
-  const toNewsArticle = (a: any) => ({ content: '', ...a });
+  const toNewsArticle = (a: Article): NewsArticle => ({
+    source: { id: null, name: a.source?.name || '' },
+    author: a.author || '',
+    title: a.title,
+    description: a.description || '',
+    url: a.url,
+    urlToImage: a.urlToImage || '',
+    publishedAt: a.publishedAt,
+    content: '',
+    slug: a.slug,
+    category: a.category || '',
+  });
   const featuredNews = featured ? toNewsArticle(featured) : null;
   const mainNews = mainArticles.map(toNewsArticle);
   const suggestedNews = suggested.map(toNewsArticle);

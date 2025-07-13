@@ -1,13 +1,11 @@
 import { fetchNews, NewsArticle } from './utils/fetchNews';
 import HomeFeatured from '@components/HomeFeatured';
 import HomeNewsGrid from '@components/HomeNewsGrid';
-import BreakingNewsTickerController from '@components/BreakingNewsTickerController';
 import type { Metadata } from 'next';
 import ArticleHomeJsonLdHead from './ArticleHomeJsonLdHead';
 import Link from 'next/link';
 import Image from 'next/image';
 import React from 'react'; // Added missing import for React
-import { AdsterraBanner728x90 } from '@components/AdsterraAds';
 
 export const revalidate = 180; // 3 دقائق
 

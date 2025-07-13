@@ -1,6 +1,5 @@
 import { NewsArticle } from '../utils/fetchNews';
 import Image from 'next/image';
-import { AdsterraBanner728x90 } from '@components/AdsterraAds';
 
 const categoryLabels: { [key: string]: string } = {
   'world': 'World News',

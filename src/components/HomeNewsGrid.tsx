@@ -3,7 +3,6 @@ import Link from "next/link";
 import { NewsArticle } from '@utils/fetchNews';
 import { cleanImageUrl } from '@utils/cleanImageUrl';
 import Image from "next/image";
-import { AdsterraBanner468x60 } from './AdsterraAds';
 
 export default function HomeNewsGrid({ articles }: { articles: NewsArticle[] }) {
   if (!articles?.length) return null;
