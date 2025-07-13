@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 type AdProps = {
   id: string;
@@ -12,10 +12,57 @@ type AdProps = {
 };
 
 function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdProps) {
-  const ref = useRef<HTMLDivElement>(null);
   const [adLoaded, setAdLoaded] = useState(false);
   const [adError, setAdError] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const loadAd = useCallback(() => {
+    try {
+      const currentRef = ref.current;
+      if (!currentRef) return;
+      
+      // Create and append options script
+      const scriptOptions = document.createElement("script");
+      scriptOptions.type = "text/javascript";
+      scriptOptions.innerHTML = `atOptions = ${JSON.stringify(atOptions).replace(/[^\x00-\x7F]/g, '')};`;
+      
+      // Check if element still exists before appending
+      if (currentRef && currentRef.parentNode) {
+        currentRef.appendChild(scriptOptions);
+      }
+
+      // Create and append main script
+      const script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src = scriptSrc;
+      script.async = true;
+      script.crossOrigin = "anonymous";
+      
+      // Add event listeners for debugging
+      script.onload = () => {
+        if (ref.current) {
+          setAdLoaded(true);
+        }
+      };
+      
+      script.onerror = () => {
+        if (ref.current) {
+          setAdError(true);
+        }
+      };
+      
+      // Check if element still exists before appending
+      if (currentRef && currentRef.parentNode) {
+        currentRef.appendChild(script);
+      }
+
+    } catch {
+      if (ref.current) {
+        setAdError(true);
+      }
+    }
+  }, [scriptSrc, atOptions]);
 
   useEffect(() => {
     if (!ref.current) return;
@@ -40,62 +87,15 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
       }
     }, 5000); // Retry after 5 seconds
 
-    const loadAd = () => {
-      try {
-        // Check if ref still exists and is the same element
-        if (!ref.current || !currentRef || ref.current !== currentRef) return;
-        
-        // Create and append options script
-        const scriptOptions = document.createElement("script");
-        scriptOptions.type = "text/javascript";
-        scriptOptions.innerHTML = `atOptions = ${JSON.stringify(atOptions).replace(/[^\x00-\x7F]/g, '')};`;
-        
-        // Check if element still exists before appending
-        if (currentRef && currentRef.parentNode) {
-          currentRef.appendChild(scriptOptions);
-        }
-
-        // Create and append main script
-        const script = document.createElement("script");
-        script.type = "text/javascript";
-        script.src = scriptSrc;
-        script.async = true;
-        script.crossOrigin = "anonymous";
-        
-        // Add event listeners for debugging
-        script.onload = () => {
-          if (ref.current && ref.current === currentRef) {
-            setAdLoaded(true);
-          }
-        };
-        
-        script.onerror = () => {
-          if (ref.current && ref.current === currentRef) {
-            setAdError(true);
-          }
-        };
-        
-        // Check if element still exists before appending
-        if (currentRef && currentRef.parentNode) {
-          currentRef.appendChild(script);
-        }
-
-        // Set timeout to detect if ad doesn't load
-        timeoutId = setTimeout(() => {
-          if (!adLoaded && !adError && ref.current && ref.current === currentRef) {
-            setAdError(true);
-          }
-        }, 10000); // 10 seconds timeout
-
-      } catch {
-        if (ref.current && ref.current === currentRef) {
-          setAdError(true);
-        }
-      }
-    };
-
     // Initial load
     loadAd();
+
+    // Set timeout to detect if ad doesn't load
+    timeoutId = setTimeout(() => {
+      if (!adLoaded && !adError && ref.current) {
+        setAdError(true);
+      }
+    }, 10000); // 10 seconds timeout
 
     return () => {
       clearTimeout(timeoutId);
@@ -112,7 +112,7 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
         }
       }
     };
-  }, [scriptSrc, atOptions, id, retryCount, adLoaded, adError]);
+  }, [loadAd, retryCount, adLoaded, adError]);
 
   // Show fallback if ad fails to load
   if (adError) {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import Image from 'next/image';
 import { NewsArticle, sendAnalyticsEvent } from '@utils/fetchNews';
 import { useAuth } from '@hooks/useAuth';
@@ -12,29 +12,17 @@ import Head from 'next/head';
  */
 export default function ArticleHeader({ article }: { article: NewsArticle }) {
   const { user } = useAuth();
-  const [favorite, setFavorite] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [favorite, setFavorite] = React.useState(false);
 
   useEffect(() => {
     if (user) {
-      isFavorite(user.id, article.slug).then(setFavorite);
+      const checkFavorite = async () => {
+        const isFav = await isFavorite(user.id, article.slug);
+        setFavorite(isFav);
+      };
+      checkFavorite();
     }
   }, [user, article.slug]);
-
-  const handleToggleFavorite = async () => {
-    if (!user) return;
-    setLoading(true);
-    if (favorite) {
-      await removeFavorite(user.id, article.slug);
-      setFavorite(false);
-      sendAnalyticsEvent('favorite_remove', { slug: article.slug, category: article.category, source: article.source?.name || '' });
-    } else {
-      await addFavorite(user.id, article.slug);
-      setFavorite(true);
-      sendAnalyticsEvent('favorite_add', { slug: article.slug, category: article.category, source: article.source?.name || '' });
-    }
-    setLoading(false);
-  };
 
   // Generate structured data (JSON-LD)
   const jsonLd = {

@@ -25,6 +25,7 @@ class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log the error to console in development
     if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
       console.error('ErrorBoundary caught an error:', error, errorInfo);
     }
     
@@ -48,7 +49,7 @@ class ErrorBoundary extends Component<Props, State> {
                 Something went wrong
               </h3>
               <p className="mt-1 text-sm text-gray-500">
-                We're sorry, but there was an error rendering this content.
+                We&apos;re sorry, but there was an error rendering this content.
               </p>
               <div className="mt-6">
                 <button

@@ -49,7 +49,7 @@ export function sanitizeHtml(html: string): string {
  * @param json - The JSON object to sanitize
  * @returns Sanitized JSON string safe for dangerouslySetInnerHTML
  */
-export function sanitizeJson(json: any): string {
+export function sanitizeJson(json: Record<string, unknown>): string {
   if (!json) return '{}';
   
   try {
@@ -67,7 +67,7 @@ export function sanitizeJson(json: any): string {
       // Normalize whitespace
       .replace(/\s+/g, ' ')
       .trim();
-  } catch (error) {
+  } catch {
     // Return empty object if JSON stringify fails
     return '{}';
   }
