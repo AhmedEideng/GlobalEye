@@ -28,7 +28,12 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
     // Store ref.current in a variable for cleanup
     const currentRef = ref.current;
     let timeoutId: NodeJS.Timeout;
-    let retryTimeoutId: NodeJS.Timeout;
+    const retryTimeoutId: NodeJS.Timeout = setTimeout(() => {
+      if (!adLoaded && !adError && retryCount < 2 && ref.current) {
+        setRetryCount(prev => prev + 1);
+        loadAd();
+      }
+    }, 5000); // Retry after 5 seconds
 
     const loadAd = () => {
       try {
@@ -70,7 +75,7 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
           }
         }, 10000); // 10 seconds timeout
 
-      } catch (error) {
+      } catch {
         if (ref.current) {
           setAdError(true);
         }
@@ -80,14 +85,6 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
     // Initial load
     loadAd();
 
-    // Retry mechanism
-    retryTimeoutId = setTimeout(() => {
-      if (!adLoaded && !adError && retryCount < 2 && ref.current) {
-        setRetryCount(prev => prev + 1);
-        loadAd();
-      }
-    }, 5000); // Retry after 5 seconds
-
     return () => {
       clearTimeout(timeoutId);
       clearTimeout(retryTimeoutId);
@@ -95,7 +92,7 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
       if (ref.current && ref.current === currentRef) {
         try {
           ref.current.innerHTML = "";
-        } catch (error) {
+        } catch {
           // Ignore errors during cleanup
         }
       }
@@ -186,12 +183,12 @@ function AdsterraIframe({ id, scriptSrc, width, height, style }: AdProps) {
           try {
             container.innerHTML = '';
             container.appendChild(iframe);
-          } catch (error) {
+          } catch {
             // Ignore errors during DOM manipulation
             setIframeError(true);
           }
         }
-      } catch (error) {
+      } catch {
         setIframeError(true);
       }
     }, 1000);
@@ -204,7 +201,7 @@ function AdsterraIframe({ id, scriptSrc, width, height, style }: AdProps) {
         if (container) {
           container.innerHTML = '';
         }
-      } catch (error) {
+      } catch {
         // Ignore cleanup errors
       }
     };
