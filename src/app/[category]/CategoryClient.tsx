@@ -208,7 +208,6 @@ export default function CategoryClient({
 
   return (
     <div className="category-page max-w-screen-xl mx-auto px-2 sm:px-4">
-      {/* <AdsterraBanner728x90 /> */}
       <div className="category-header text-center mb-6">
         <h1
           className="category-title text-3xl sm:text-4xl md:text-6xl font-extrabold mb-2 tracking-tight text-red-700 break-words"
@@ -228,7 +227,6 @@ export default function CategoryClient({
           News automatically updates every 3 hours
         </div>
       </div>
-
       {/* Featured Article */}
       {featuredNews && <HomeFeatured article={featuredNews} />}
       {/* Main News Grid */}
@@ -237,11 +235,11 @@ export default function CategoryClient({
       {suggestedNews.length > 0 && (
         <section className="mt-12 bg-gradient-to-br from-gray-100 via-white to-gray-50 rounded-2xl p-6 shadow-lg">
           <div className="mb-4">
-            <h2 className="text-3xl font-extrabold mb-2 text-red-800 flex items-center gap-2">
+            <h2 className="text-2xl font-extrabold mb-2 text-red-800 flex items-center gap-2">
               <span role="img" aria-label="newspaper">📰</span>
-              Selected Articles for You
+              Suggested Articles
             </h2>
-            <p className="text-gray-500 text-base border-b pb-2">We select the latest and most important news from our trusted sources for you</p>
+            <p className="text-gray-500 text-base border-b pb-2">More news you might like</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             {suggestedNews.map((article, idx) => (

@@ -97,7 +97,6 @@ export default async function HomePage() {
     <>
       <ArticleHomeJsonLdHead />
       <main>
-          {/* <AdsterraBanner728x90 /> */}
           {featured && <HomeFeatured article={featured} />}
           {articles.length > 0 && <HomeNewsGrid articles={articles} />}
           {/* قسم الأخبار المقترحة */}
@@ -135,14 +134,6 @@ export default async function HomePage() {
                         </div>
                       </div>
                     </Link>
-                    {/* Add ad every 10 articles */}
-                    {/*
-                    {(idx + 1) % 10 === 0 && idx < suggestedArticles.length - 1 && (
-                      <div className="col-span-full">
-                        <AdsterraBanner728x90 />
-                      </div>
-                    )}
-                    */}
                   </React.Fragment>
                 ))}
               </div>

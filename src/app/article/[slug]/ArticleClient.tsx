@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { sendAnalyticsEvent, fetchRelatedNews } from '../../utils/fetchNews';
 import Link from 'next/link';
-import { AdsterraBanner728x90 } from '@components/AdsterraAds';
 import React from 'react';
 
 export default function ArticleClient({ article, slug }: { article: NewsArticle | null, slug: string }) {
@@ -48,12 +47,8 @@ export default function ArticleClient({ article, slug }: { article: NewsArticle 
 
   return (
     <article className="w-full max-w-screen-xl mx-auto px-2 sm:px-4 py-6 md:py-10">
-      {/* <AdsterraBanner728x90 /> */}
       <ArticleHeader article={article} />
       <ArticleContent article={article} />
-      {/* <AdsterraBanner300x250 /> */}
-      {/* <AdsterraBanner160x300 /> */}
-      {/* <AdsterraBanner468x60 /> */}
       {/* Read Full Article Button */}
       <div className="flex justify-center my-8">
         <a
@@ -70,14 +65,20 @@ export default function ArticleClient({ article, slug }: { article: NewsArticle 
       <ShareButtons url={`/article/${article.slug}`} title={article.title} />
       {/* Suggested Articles Section */}
       {relatedArticles.length > 0 && (
-        <section className="mt-12">
-          <h2 className="text-xl font-bold mb-4">Suggested Articles</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <section className="mt-12 bg-gradient-to-br from-gray-100 via-white to-gray-50 rounded-2xl p-6 shadow-lg">
+          <div className="mb-4">
+            <h2 className="text-2xl font-extrabold mb-2 text-red-800 flex items-center gap-2">
+              <span role="img" aria-label="newspaper">📰</span>
+              Related Articles
+            </h2>
+            <p className="text-gray-500 text-base border-b pb-2">More news you might like</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             {relatedArticles.map((related, idx) => (
-              <React.Fragment key={related.slug || `related-${idx}-${related.url}`}>
+              <React.Fragment key={related.slug || `related-${idx}-${related.url}`}> 
                 <Link
                   href={`/article/${related.slug}`}
-                  className="article-card group"
+                  className="article-card group transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl rounded-xl bg-white shadow-md overflow-hidden"
                 >
                   <div className="relative w-full h-48 overflow-hidden">
                     <Image
@@ -89,7 +90,7 @@ export default function ArticleClient({ article, slug }: { article: NewsArticle 
                   </div>
                   <div className="p-4">
                     <div className="article-category text-xs font-bold mb-1 bg-red-600 text-white rounded-full px-3 py-1 inline-block">{related.source?.name}</div>
-                    <h3 className="article-title text-lg font-bold mb-2 line-clamp-2">{related.title}</h3>
+                    <h3 className="article-title text-lg font-bold mb-2 line-clamp-2 group-hover:text-red-700 transition-colors duration-200">{related.title}</h3>
                     <p className="article-excerpt text-gray-600 text-sm mb-2 line-clamp-2">{related.description}</p>
                     <div className="article-meta text-xs flex flex-wrap gap-2 text-gray-400">
                       <span className="flex items-center gap-1 text-gray-400">{new Date(related.publishedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
@@ -97,18 +98,11 @@ export default function ArticleClient({ article, slug }: { article: NewsArticle 
                     </div>
                   </div>
                 </Link>
-                {/* Add ad every 10 articles */}
-                {(idx + 1) % 10 === 0 && idx < relatedArticles.length - 1 && (
-                  <div className="col-span-full">
-                    <AdsterraBanner728x90 />
-                  </div>
-                )}
               </React.Fragment>
             ))}
           </div>
         </section>
       )}
-      {/* <AdsterraBanner320x50 /> */}
     </article>
   );
 } 

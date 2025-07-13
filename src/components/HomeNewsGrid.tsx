@@ -11,7 +11,6 @@ export default function HomeNewsGrid({ articles }: { articles: NewsArticle[] }) 
       <div className="section-header flex flex-col sm:flex-row items-center justify-between mb-4 gap-2">
         <h2 className="section-title text-lg sm:text-xl font-bold">Latest News</h2>
       </div>
-      {/* <AdsterraBanner468x60 /> */}
       <div className="news-grid">
         {articles.map((article, idx) => {
           const cleanImage = cleanImageUrl(article.urlToImage);
