@@ -11,6 +11,15 @@ interface AdProps {
   style?: React.CSSProperties | undefined;
 }
 
+// Professional error logger for ads
+function logAdError(...args: unknown[]) {
+  if (process.env.NODE_ENV === 'development') {
+    // eslint-disable-next-line no-console
+    console.error('[AdsterraAds]', ...args);
+  }
+  // In production, you can send errors to a monitoring service here
+}
+
 function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdProps) {
   const [adLoaded, setAdLoaded] = useState(false);
   const [adError, setAdError] = useState(false);
@@ -27,7 +36,7 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
         currentRef.innerHTML = '';
       } catch (err) {
         // Log the error for debugging
-        console.error('Ad container clear error:', err);
+        logAdError('Ad container clear error:', err);
       }
       
       // Create and append options script
@@ -106,7 +115,7 @@ function AdsterraScript({ id, scriptSrc, atOptions, width, height, style }: AdPr
           currentRef.innerHTML = '';
         } catch (err) {
           // TODO: handle ad cleanup error
-          console.error('Ad cleanup error:', err);
+          logAdError('Ad cleanup error:', err);
         }
       }
     };
@@ -182,7 +191,7 @@ function AdsterraIframe({ id, scriptSrc, width, height, style }: AdProps) {
           container.innerHTML = '';
         } catch (err) {
           // Log the error for debugging
-          console.error('Iframe container clear error:', err);
+          logAdError('Iframe container clear error:', err);
         }
 
         const iframe = document.createElement('iframe');
@@ -217,7 +226,7 @@ function AdsterraIframe({ id, scriptSrc, width, height, style }: AdProps) {
         }
       } catch (err) {
         // TODO: handle iframe cleanup error
-        console.error('Iframe cleanup error:', err);
+        logAdError('Iframe cleanup error:', err);
       }
     };
   }, [id, scriptSrc, width, height]);
