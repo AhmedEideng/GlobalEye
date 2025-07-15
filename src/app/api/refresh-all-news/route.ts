@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { fetchExternalNews } from '@/app/utils/fetchExternalNews';
 import { saveNewsToSupabase } from '@/app/utils/saveNewsToSupabase';
 import { supabase } from '@/app/utils/supabaseClient';
+import { getOrAddCategoryId } from '@/app/utils/categoryUtils';
 
 export async function GET() {
   try {
@@ -23,10 +24,15 @@ export async function GET() {
       const category = cat.name;
       try {
         const articles = await fetchExternalNews(category);
-        await saveNewsToSupabase(articles, category);
+        const category_id = await getOrAddCategoryId(category);
+        if (!category_id) {
+          console.error(`لم يتم العثور على category_id للتصنيف: ${category}`);
+          continue;
+        }
+        await saveNewsToSupabase(articles, category_id);
         total += articles.length;
-      } catch {
-        void 0;
+      } catch (err) {
+        console.error(`Error fetching or saving category "${category}":`, err);
       }
     }
 
