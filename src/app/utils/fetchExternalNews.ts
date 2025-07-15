@@ -39,15 +39,15 @@ async function fetchFromNewsAPI(category: string = 'general'): Promise<ExternalN
   const res = await fetch(url);
   if (!res.ok) return [];
   const data = await res.json();
-  return (data.articles || []).map((article: any) => ({
-    source: { id: article.source?.id || null, name: article.source?.name || 'Unknown' },
-    author: article.author || null,
-    title: article.title || '',
-    description: article.description || null,
-    url: article.url || '',
-    urlToImage: article.urlToImage || null,
-    publishedAt: article.publishedAt || '',
-    content: article.content || null,
+  return (data.articles || []).map((article: Record<string, unknown>) => ({
+    source: { id: typeof article.source === 'object' && article.source && 'id' in article.source ? (article.source as Record<string, unknown>).id as string ?? null : null, name: typeof article.source === 'object' && article.source && 'name' in article.source ? (article.source as Record<string, unknown>).name as string ?? 'Unknown' : 'Unknown' },
+    author: article.author as string || null,
+    title: article.title as string || '',
+    description: article.description as string || null,
+    url: article.url as string || '',
+    urlToImage: article.urlToImage as string || null,
+    publishedAt: article.publishedAt as string || '',
+    content: article.content as string || null,
   }));
 }
 
@@ -57,15 +57,15 @@ export async function fetchFromGNews(category: string = 'general'): Promise<Exte
   const res = await fetch(url);
   if (!res.ok) return [];
   const data = await res.json();
-  return (data.articles || []).map((article: any) => ({
-    source: { id: null, name: article.source?.name || 'GNews' },
-    author: article.author || null,
-    title: article.title || '',
-    description: article.description || null,
-    url: article.url || '',
-    urlToImage: article.image || null,
-    publishedAt: article.publishedAt || '',
-    content: article.content || null,
+  return (data.articles || []).map((article: Record<string, unknown>) => ({
+    source: { id: null, name: typeof article.source === 'object' && article.source && 'name' in article.source ? (article.source as Record<string, unknown>).name as string ?? 'GNews' : 'GNews' },
+    author: article.author as string || null,
+    title: article.title as string || '',
+    description: article.description as string || null,
+    url: article.url as string || '',
+    urlToImage: article.image as string || null,
+    publishedAt: article.publishedAt as string || '',
+    content: article.content as string || null,
   }));
 }
 
@@ -75,15 +75,15 @@ export async function fetchFromGuardian(category: string = 'general'): Promise<E
   const res = await fetch(url);
   if (!res.ok) return [];
   const data = await res.json();
-  return (data.response?.results || []).map((article: any) => ({
+  return (data.response?.results || []).map((article: Record<string, unknown>) => ({
     source: { id: 'guardian', name: 'The Guardian' },
-    author: article.fields?.byline || null,
-    title: article.webTitle || '',
-    description: article.fields?.trailText || null,
-    url: article.webUrl || '',
-    urlToImage: article.fields?.thumbnail || null,
-    publishedAt: article.webPublicationDate || '',
-    content: article.fields?.bodyText || null,
+    author: typeof article.fields === 'object' && article.fields && 'byline' in article.fields ? (article.fields as Record<string, unknown>).byline as string ?? null : null,
+    title: article.webTitle as string || '',
+    description: typeof article.fields === 'object' && article.fields && 'trailText' in article.fields ? (article.fields as Record<string, unknown>).trailText as string ?? null : null,
+    url: article.webUrl as string || '',
+    urlToImage: typeof article.fields === 'object' && article.fields && 'thumbnail' in article.fields ? (article.fields as Record<string, unknown>).thumbnail as string ?? null : null,
+    publishedAt: article.webPublicationDate as string || '',
+    content: typeof article.fields === 'object' && article.fields && 'bodyText' in article.fields ? (article.fields as Record<string, unknown>).bodyText as string ?? null : null,
   }));
 }
 
@@ -93,14 +93,14 @@ export async function fetchFromMediastack(category: string = 'general'): Promise
   const res = await fetch(url);
   if (!res.ok) return [];
   const data = await res.json();
-  return (data.data || []).map((article: any) => ({
-    source: { id: null, name: article.source || 'Mediastack' },
-    author: article.author || null,
-    title: article.title || '',
-    description: article.description || null,
-    url: article.url || '',
-    urlToImage: article.image || null,
-    publishedAt: article.published_at || '',
+  return (data.data || []).map((article: Record<string, unknown>) => ({
+    source: { id: null, name: article.source as string || 'Mediastack' },
+    author: article.author as string || null,
+    title: article.title as string || '',
+    description: article.description as string || null,
+    url: article.url as string || '',
+    urlToImage: article.image as string || null,
+    publishedAt: article.published_at as string || '',
     content: null,
   }));
 } 
