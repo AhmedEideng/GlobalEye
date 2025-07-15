@@ -27,10 +27,9 @@ export default function BreakingNewsTicker({ showTicker = true }: { showTicker?:
   if (!showTicker) return null;
 
   return (
-    <div className="breaking-news-ticker bg-red-800 text-white w-full overflow-hidden relative fixed left-0 top-16 md:top-20 z-30">
+    <div className="breaking-news-ticker bg-red-800 text-white w-full overflow-hidden fixed left-0 top-12 md:top-16 z-30">
       <div 
         className="ticker-container flex items-center py-2 px-4"
-        style={{ marginTop: '-1px' }}
       >
         {/* Breaking News Label */}
         <div className="breaking-label flex items-center gap-2 mr-4 flex-shrink-0">

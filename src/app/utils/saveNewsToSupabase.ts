@@ -2,6 +2,7 @@ import { supabase } from './supabaseClient';
 import { ExternalNewsArticle } from './fetchExternalNews';
 
 export async function saveNewsToSupabase(articles: ExternalNewsArticle[], category: string) {
+  console.log('Fetched articles:', articles.length);
   if (!articles.length) return;
 
   // تجهيز البيانات لتناسب بنية جدول news
@@ -17,6 +18,7 @@ export async function saveNewsToSupabase(articles: ExternalNewsArticle[], catego
     category, // يمكنك تعديل هذا الحقل حسب بنية الجدول لديك
   }));
 
-  // upsert لتجنب التكرار بناءً على url
-  await supabase.from('news').upsert(mapped, { onConflict: 'url' });
+  console.log('Articles to upsert:', mapped.length);
+  const { data, error } = await supabase.from('news').upsert(mapped, { onConflict: 'url' });
+  console.log('Upsert result:', { data, error });
 } 

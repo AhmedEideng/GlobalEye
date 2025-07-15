@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import LoginButton from '@components/LoginButton';
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 
 const categories = [
   { name: 'home', path: '/', label: 'Home' },
@@ -24,6 +24,19 @@ interface NavbarProps {
 
 export default function Navbar({ isMenuOpen, setIsMenuOpen, style }: NavbarProps) {
   const pathname = usePathname();
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // إغلاق القائمة عند الضغط خارجها في وضع الجوال
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isMenuOpen, setIsMenuOpen]);
 
   return (
     <div className="navbar-container flex items-center justify-between py-2 px-4 bg-white fixed left-0 w-full z-50 top-0" style={style}>
@@ -66,7 +79,7 @@ export default function Navbar({ isMenuOpen, setIsMenuOpen, style }: NavbarProps
       {/* Mobile sidebar */}
       {isMenuOpen && (
         <div className="mobile-nav fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50 flex justify-start">
-          <div className="bg-white w-80 h-full p-6 flex flex-col shadow-lg rounded-r-2xl relative overflow-y-auto">
+          <div ref={menuRef} className="bg-white w-80 h-full p-6 flex flex-col shadow-lg rounded-r-2xl relative overflow-y-auto">
             {/* Logo at the top */}
             <div className="mb-6 pb-4 border-b border-gray-200">
               <Link href="/" className="site-logo flex items-center text-2xl font-extrabold select-none text-red-600 tracking-tight drop-shadow-lg" onClick={() => setIsMenuOpen(false)}>
