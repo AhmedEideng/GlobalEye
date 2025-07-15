@@ -18,17 +18,45 @@ const MEDIASTACK_KEY = process.env.MEDIASTACK_KEY;
 
 export async function fetchExternalNews(category: string = 'general'): Promise<ExternalNewsArticle[]> {
   // جلب من جميع المصادر بالتوازي
-  const [newsapi, gnews, guardian, mediastack] = await Promise.all([
-    fetchFromNewsAPI(category),
-    fetchFromGNews(category),
-    fetchFromGuardian(category),
-    fetchFromMediastack(category),
-  ]);
+  let newsapi: ExternalNewsArticle[] = [];
+  let gnews: ExternalNewsArticle[] = [];
+  let guardian: ExternalNewsArticle[] = [];
+  let mediastack: ExternalNewsArticle[] = [];
+
+  try {
+    newsapi = await fetchFromNewsAPI(category);
+    console.log('NewsAPI articles:', newsapi.length);
+  } catch (err) {
+    console.error('Error fetching from NewsAPI:', err);
+  }
+
+  try {
+    gnews = await fetchFromGNews(category);
+    console.log('GNews articles:', gnews.length);
+  } catch (err) {
+    console.error('Error fetching from GNews:', err);
+  }
+
+  try {
+    guardian = await fetchFromGuardian(category);
+    console.log('Guardian articles:', guardian.length);
+  } catch (err) {
+    console.error('Error fetching from Guardian:', err);
+  }
+
+  try {
+    mediastack = await fetchFromMediastack(category);
+    console.log('Mediastack articles:', mediastack.length);
+  } catch (err) {
+    console.error('Error fetching from Mediastack:', err);
+  }
+
   // دمج النتائج وإزالة التكرار حسب url
   const all = [...newsapi, ...gnews, ...guardian, ...mediastack];
   const unique = all.filter((article, idx, arr) =>
     article.url && arr.findIndex(a => a.url === article.url) === idx
   );
+  console.log('Total unique articles:', unique.length);
   return unique;
 }
 
