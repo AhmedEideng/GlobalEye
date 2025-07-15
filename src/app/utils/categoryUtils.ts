@@ -42,4 +42,16 @@ export async function addCategoryIfNotExists(name: string) {
 export async function getOrAddCategoryId(name: string): Promise<number|null> {
   const category = await addCategoryIfNotExists(name);
   return category ? category.id : null;
+}
+
+/**
+ * Fetch all categories from the categories table
+ * @returns Array of categories or []
+ */
+export async function fetchAllCategories() {
+  const { data, error } = await supabase
+    .from('categories')
+    .select('*');
+  if (error || !data) return [];
+  return data;
 } 

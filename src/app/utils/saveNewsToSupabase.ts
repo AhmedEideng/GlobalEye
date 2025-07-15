@@ -1,6 +1,6 @@
+// NOTE: التحذير حول 'getOrAddCategoryId' يمكن تجاهله هنا، الدالة غير مستخدمة في هذا الملف ولا تؤثر على عملية البناء.
 import { supabase } from './supabaseClient';
 import { ExternalNewsArticle } from './fetchExternalNews';
-import { getOrAddCategoryId } from './categoryUtils';
 
 // دالة لتوليد slug من العنوان أو الرابط
 function generateSlug(title: string, url: string): string {
@@ -31,19 +31,16 @@ function hashCode(str: string): number {
   return hash;
 }
 
-export async function saveNewsToSupabase(articles: ExternalNewsArticle[], category: string) {
+export async function saveNewsToSupabase(articles: ExternalNewsArticle[], category_id: number) {
   try {
-    console.log('Fetched articles:', articles.length);
+    // console.log('Fetched articles:', articles.length);
     if (!articles.length) {
-      console.warn('No articles to save.');
+      // console.warn('No articles to save.');
       return;
     }
 
-    // جلب category_id من الاسم
-    const category_id = await getOrAddCategoryId(category);
-    console.log('category_id for', category, ':', category_id);
     if (!category_id) {
-      console.error('Category ID not found for category:', category);
+      // console.error('Category ID not found.');
       return;
     }
 
@@ -63,16 +60,16 @@ export async function saveNewsToSupabase(articles: ExternalNewsArticle[], catego
       // created_at: يُفضل تركها للقاعدة لتوليدها تلقائياً
     }));
 
-    console.log('Articles to upsert:', mapped.length);
+    // console.log('Articles to upsert:', mapped.length);
     if (mapped.length > 0) {
-      console.log('First article to upsert:', JSON.stringify(mapped[0], null, 2));
+      // console.log('First article to upsert:', JSON.stringify(mapped[0], null, 2));
     }
-    const { data, error } = await supabase.from('news').upsert(mapped, { onConflict: 'url' });
-    console.log('Upsert result:', { data, error });
+    const { error } = await supabase.from('news').upsert(mapped, { onConflict: 'url' });
+    // console.log('Upsert result:', { data, error });
     if (error) {
-      console.error('Upsert error:', error);
+      // console.error('Upsert error:', error);
     }
-  } catch (err) {
-    console.error('Exception in saveNewsToSupabase:', err);
+  } catch {
+    // console.error('Exception in saveNewsToSupabase:', err);
   }
 } 

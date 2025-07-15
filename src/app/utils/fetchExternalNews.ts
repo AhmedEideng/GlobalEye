@@ -25,30 +25,26 @@ export async function fetchExternalNews(category: string = 'general'): Promise<E
 
   try {
     newsapi = await fetchFromNewsAPI(category);
-    console.log('NewsAPI articles:', newsapi.length);
-  } catch (err) {
-    console.error('Error fetching from NewsAPI:', err);
+  } catch {
+    // console.error('Error fetching from NewsAPI:', err);
   }
 
   try {
     gnews = await fetchFromGNews(category);
-    console.log('GNews articles:', gnews.length);
-  } catch (err) {
-    console.error('Error fetching from GNews:', err);
+  } catch {
+    // console.error('Error fetching from GNews:', err);
   }
 
   try {
     guardian = await fetchFromGuardian(category);
-    console.log('Guardian articles:', guardian.length);
-  } catch (err) {
-    console.error('Error fetching from Guardian:', err);
+  } catch {
+    // console.error('Error fetching from Guardian:', err);
   }
 
   try {
     mediastack = await fetchFromMediastack(category);
-    console.log('Mediastack articles:', mediastack.length);
-  } catch (err) {
-    console.error('Error fetching from Mediastack:', err);
+  } catch {
+    // console.error('Error fetching from Mediastack:', err);
   }
 
   // دمج النتائج وإزالة التكرار حسب url
@@ -56,7 +52,6 @@ export async function fetchExternalNews(category: string = 'general'): Promise<E
   const unique = all.filter((article, idx, arr) =>
     article.url && arr.findIndex(a => a.url === article.url) === idx
   );
-  console.log('Total unique articles:', unique.length);
   return unique;
 }
 
