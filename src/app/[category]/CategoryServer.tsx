@@ -41,7 +41,7 @@ async function fetchRotatedCategoryNews(category: string): Promise<{
   } catch (error) {
     logCategoryServerError(`Failed to fetch rotated news for category ${category}:`, error);
     // Fallback to direct fetch
-    const allArticles: NewsArticle[] = await fetchNews(category);
+    const allArticles: NewsArticle[] = await fetchNews(category); // الآن تجلب فقط من Supabase
     const sortedArticles = allArticles;
     const featured = sortedArticles[0] || null;
     const restArticles = featured ? sortedArticles.filter(a => a.slug !== featured.slug) : sortedArticles;

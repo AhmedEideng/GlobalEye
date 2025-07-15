@@ -15,7 +15,7 @@ export async function GET(request: Request) {
   }
   
   try {
-    const articles = await fetchNews(category);
+    const articles = await fetchNews(category); // الآن تجلب فقط من Supabase
     const response = NextResponse.json({ 
       articles,
       category,

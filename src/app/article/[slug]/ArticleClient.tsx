@@ -21,7 +21,7 @@ export default function ArticleClient({ article, slug }: { article: NewsArticle 
       // Fetch related articles (at least 20)
       fetchRelatedNews(article, article.category).then((res) => {
         setRelatedArticles(res.slice(0, 20));
-      });
+      }); // تعتمد فقط على Supabase
     }
   }, [article]);
 

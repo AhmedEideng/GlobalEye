@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Fetch fresh news for rotation
-    const allArticles = await fetchNews(category);
+    const allArticles = await fetchNews(category); // الآن تجلب فقط من Supabase
     
     if (!allArticles || allArticles.length === 0) {
       return NextResponse.json({

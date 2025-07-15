@@ -109,6 +109,7 @@ export default function CategoryClient({
     } catch (error) {
       logCategoryError('Failed to fetch rotated news:', error);
       // Keep existing data if rotation fails
+      // لا يوجد fallback لجلب من API خارجي بعد الآن
     } finally {
       setLoading(false);
     }

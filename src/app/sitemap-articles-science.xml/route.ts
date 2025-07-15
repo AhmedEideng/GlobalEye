@@ -6,7 +6,7 @@ export async function GET() {
   const category = 'science';
 
   try {
-    const articles = await fetchNews(category);
+    const articles = await fetchNews(category); // الآن تجلب فقط من Supabase
     const limitedArticles = articles.slice(0, 1000);
 
     let urls = '';

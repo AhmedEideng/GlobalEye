@@ -74,7 +74,7 @@ async function fetchRotatedNews(): Promise<{
   } catch (error) {
     logHomeError('Failed to fetch rotated news:', error);
     // Fallback to direct fetch
-    const allArticles: NewsArticle[] = await fetchNews();
+    const allArticles: NewsArticle[] = await fetchNews(); // الآن تجلب فقط من Supabase
     const sortedArticles = allArticles;
     const featured = sortedArticles[0] || null;
     const restArticles = featured ? sortedArticles.filter(a => a.slug !== featured.slug) : sortedArticles;

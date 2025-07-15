@@ -111,8 +111,7 @@ export async function forceRefreshNews(category: string = 'general') {
 }
 
 /**
- * Fetches news articles for a given category from the database or APIs, sorted from newest to oldest.
- * If no recent news in the DB, fetches from APIs and saves to DB.
+ * Fetches news articles for a given category from the database only, sorted from newest to oldest.
  * @param category - The news category (default: 'general')
  * @returns Promise<NewsArticle[]>
  */
@@ -121,7 +120,7 @@ export async function fetchNews(category: string = 'general'): Promise<NewsArtic
   const cached = newsCache.get(category);
   if (cached) return cached;
 
-  // 1. Fetch latest news from the database (e.g., last hour)
+  // Fetch latest news from the database
   const { data: dbArticles, error } = await supabase
     .from('news')
     .select('*, categories(name)')
@@ -129,83 +128,8 @@ export async function fetchNews(category: string = 'general'): Promise<NewsArtic
     .order('published_at', { ascending: false })
     .limit(50);
 
-  // If we find recent news (e.g., published within the last hour), return it immediately
   if (!error && dbArticles && dbArticles.length > 0) {
-    const now = new Date();
-    const latest = new Date(dbArticles[0].published_at);
-    const diffMinutes = (now.getTime() - latest.getTime()) / (1000 * 60);
-    if (diffMinutes < 60) { // Less than an hour
-      const result = dbArticles.map((article: NewsWithCategory) => ({
-        source: { id: null, name: article.source_name },
-        author: article.author,
-        title: article.title,
-        description: article.description,
-        url: article.url,
-        urlToImage: article.url_to_image,
-        publishedAt: article.published_at,
-        content: article.content,
-        slug: article.slug,
-        category: article.categories?.name || category,
-      }) as NewsArticle);
-      newsCache.set(category, result); // Store the result in cache
-      return result;
-    }
-  }
-
-  // 2. If no recent news, fetch from external APIs and update the database
-  const sources = [
-    { fn: fetchFromNewsAPI, name: 'NewsAPI' },
-    { fn: fetchFromGNews, name: 'GNews' },
-    { fn: fetchFromGuardian, name: 'Guardian' },
-    { fn: fetchFromMediastack, name: 'Mediastack' },
-  ];
-  const promises = sources.map(({ fn }) =>
-    withTimeout(fn(category).then(result => result), 8000)
-  );
-  const results = await Promise.all(promises);
-  const all = results.filter(Boolean).flat().filter((article): article is NewsArticle => article !== null && article !== undefined) as NewsArticle[];
-  // ====== Merge similar news into unique and long articles ======
-  const groups = groupSimilarArticles(all, 0.5); // threshold can be adjusted as needed
-  const mergedArticles = groups.map(group => mergeArticlesGroup(group));
-  mergedArticles.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
-  if (mergedArticles.length > 0) {
-    await saveArticlesToSupabase(mergedArticles, category);
-  }
-
-  // Fetch latest news from the database after update
-  const { data: freshDbArticles, error: freshError } = await supabase
-    .from('news')
-    .select('*, categories(name)')
-    .eq('category_id', await getOrAddCategoryId(category))
-    .order('published_at', { ascending: false })
-    .limit(50);
-
-  if (!freshError && freshDbArticles && freshDbArticles.length > 0) {
-    const result = freshDbArticles.map((article: NewsWithCategory) => ({
-      source: { id: null, name: article.source_name },
-      author: article.author,
-      title: article.title,
-      description: article.description,
-      url: article.url,
-      urlToImage: article.url_to_image,
-      publishedAt: article.published_at,
-      content: article.content,
-      slug: article.slug,
-      category: article.categories?.name || category,
-    }) as NewsArticle);
-    newsCache.set(category, result); // Store the result in cache
-    return result;
-  }
-
-  // Fallback: Fetch or add the category and get its id
-  const { data: oldArticles, error: oldError } = await supabase
-    .from('news')
-    .select('*, categories(name)')
-    .eq('category_id', await getOrAddCategoryId(category))
-    .order('published_at', { ascending: true })
-    .limit(50);
-  if (!oldError && oldArticles && oldArticles.length > 0) {
-    const result = oldArticles.map((article: NewsWithCategory) => ({
+    const result = dbArticles.map((article: NewsWithCategory) => ({
       source: { id: null, name: article.source_name },
       author: article.author,
       title: article.title,
@@ -605,124 +529,6 @@ function assignCategoryToArticle(
     return (article as { category: string }).category.toLowerCase();
   }
   return fallbackDetect(article);
-}
-
-async function fetchFromNewsAPI(category: string): Promise<NewsArticle[]> {
-  if (!NEWS_API_KEY) return [];
-  try {
-    const url = `https://newsapi.org/v2/top-headlines?country=us&category=${category}&pageSize=20&apiKey=${NEWS_API_KEY}`;
-    const res = await fetch(url, { next: { revalidate: 900 }, headers: { 'User-Agent': 'GlobalEye-News/1.0' } });
-    if (!res.ok) return [];
-    const data = await res.json();
-    const articles = (data.articles || []).map((article: NewsAPIArticle) => {
-      const title = article.title || '';
-      const url = article.url || '';
-      const slug = generateSlug(title, url);
-      // @ts-expect-error - assignCategoryToArticle accepts multiple article types
-      const newsCategory = assignCategoryToArticle(article, detectCategory, category);
-      return {
-        source: { id: article.source?.id || null, name: article.source?.name || 'Unknown' },
-        author: article.author || null,
-        title: title,
-        description: article.description || null,
-        url: url,
-        urlToImage: article.urlToImage || null,
-        publishedAt: article.publishedAt || '',
-        content: article.content || null,
-        slug: slug,
-        category: newsCategory
-      };
-    });
-    return articles;
-  } catch { return []; }
-}
-
-async function fetchFromGNews(category: string): Promise<NewsArticle[]> {
-  if (!GNEWS_API_KEY) return [];
-  try {
-    const url = `https://gnews.io/api/v4/top-headlines?category=${category}&lang=en&country=us&max=20&apikey=${GNEWS_API_KEY}`;
-    const res = await fetch(url, { next: { revalidate: 900 }, headers: { 'User-Agent': 'GlobalEye-News/1.0' } });
-    if (!res.ok) return [];
-    const data = await res.json();
-    const articles = (data.articles || []).map((article: GNewsArticle) => {
-      const title = article.title || '';
-      const url = article.url || '';
-      const slug = generateSlug(title, url);
-      // @ts-expect-error - assignCategoryToArticle accepts multiple article types
-      const newsCategory = assignCategoryToArticle(article, detectCategory, category);
-      return {
-        source: { id: null, name: article.source?.name || 'GNews' },
-        author: article.author || null,
-        title: title,
-        description: article.description || null,
-        url: url,
-        urlToImage: article.image || null,
-        publishedAt: article.publishedAt || '',
-        content: article.content || null,
-        slug: slug,
-        category: newsCategory
-      };
-    });
-    return articles;
-  } catch { return []; }
-}
-
-async function fetchFromGuardian(category: string): Promise<NewsArticle[]> {
-  if (!GUARDIAN_KEY) return [];
-  try {
-    const url = `https://content.guardianapis.com/search?section=${category}&show-fields=all&page-size=20&api-key=${GUARDIAN_KEY}`;
-    const res = await fetch(url, { next: { revalidate: 900 }, headers: { 'User-Agent': 'GlobalEye-News/1.0' } });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return (data.response?.results || []).map((article: GuardianArticle) => {
-      const title = article.webTitle || '';
-      const url = article.webUrl || '';
-      const slug = generateSlug(title, url);
-      // @ts-expect-error - assignCategoryToArticle accepts multiple article types
-      const newsCategory = assignCategoryToArticle(article, detectCategory, category);
-      return {
-        source: { id: 'guardian', name: 'The Guardian' },
-        author: article.fields?.byline || null,
-        title: title,
-        description: article.fields?.trailText || null,
-        url: url,
-        urlToImage: article.fields?.thumbnail || null,
-        publishedAt: article.webPublicationDate || '',
-        content: article.fields?.bodyText || null,
-        slug: slug,
-        category: newsCategory
-      };
-    });
-  } catch { return []; }
-}
-
-async function fetchFromMediastack(category: string): Promise<NewsArticle[]> {
-  if (!MEDIASTACK_KEY) return [];
-  try {
-    const url = `http://api.mediastack.com/v1/news?access_key=${MEDIASTACK_KEY}&categories=${category}&languages=en&countries=us&limit=20`;
-    const res = await fetch(url, { next: { revalidate: 900 }, headers: { 'User-Agent': 'GlobalEye-News/1.0' } });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return (data.data || []).map((article: MediastackArticle) => {
-      const title = article.title || '';
-      const url = article.url || '';
-      const slug = generateSlug(title, url);
-      // @ts-expect-error - assignCategoryToArticle accepts multiple article types
-      const newsCategory = assignCategoryToArticle(article, detectCategory, category);
-      return {
-        source: { id: null, name: article.source || 'Mediastack' },
-        author: article.author || null,
-        title: title,
-        description: article.description || null,
-        url: url,
-        urlToImage: article.image || null,
-        publishedAt: article.published_at || '',
-        content: null,
-        slug: slug,
-        category: newsCategory
-      };
-    });
-  } catch { return []; }
 }
 
 // ====== Text Similarity & Merging Utilities ======
