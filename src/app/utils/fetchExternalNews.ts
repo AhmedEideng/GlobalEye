@@ -1,5 +1,3 @@
-// src/app/utils/fetchExternalNews.ts
-
 export interface ExternalNewsArticle {
   source: { id: string | null; name: string };
   author: string | null;
@@ -40,15 +38,19 @@ async function fetchFromNewsAPI(category: string = 'general'): Promise<ExternalN
   const res = await fetch(url);
   if (!res.ok) return [];
   const data = await res.json();
-  return (data.articles || []).map((article: Record<string, unknown>) => ({
-    source: { id: (article.source as any)?.id ?? null, name: (article.source as any)?.name ?? 'Unknown' },
-    author: article.author as string || null,
-    title: article.title as string || '',
-    description: article.description as string || null,
-    url: article.url as string || '',
-    urlToImage: article.urlToImage as string || null,
-    publishedAt: article.publishedAt as string || '',
-    content: article.content as string || null,
+
+  return (data.articles || []).map((article: { source: { id: string | null, name: string }, [key: string]: any }) => ({
+    source: {
+      id: article.source?.id ?? null,
+      name: article.source?.name ?? 'Unknown'
+    },
+    author: article.author ?? null,
+    title: article.title ?? '',
+    description: article.description ?? null,
+    url: article.url ?? '',
+    urlToImage: article.urlToImage ?? null,
+    publishedAt: article.publishedAt ?? '',
+    content: article.content ?? null
   }));
 }
 
@@ -58,15 +60,19 @@ export async function fetchFromGNews(category: string = 'general'): Promise<Exte
   const res = await fetch(url);
   if (!res.ok) return [];
   const data = await res.json();
-  return (data.articles || []).map((article: Record<string, unknown>) => ({
-    source: { id: null, name: (article.source as any)?.name ?? 'GNews' },
-    author: article.author as string || null,
-    title: article.title as string || '',
-    description: article.description as string || null,
-    url: article.url as string || '',
-    urlToImage: article.image as string || null,
-    publishedAt: article.publishedAt as string || '',
-    content: article.content as string || null,
+
+  return (data.articles || []).map((article: { source: { name: string }, [key: string]: any }) => ({
+    source: {
+      id: null,
+      name: article.source?.name ?? 'GNews'
+    },
+    author: article.author ?? null,
+    title: article.title ?? '',
+    description: article.description ?? null,
+    url: article.url ?? '',
+    urlToImage: article.image ?? null,
+    publishedAt: article.publishedAt ?? '',
+    content: article.content ?? null
   }));
 }
 
@@ -76,15 +82,16 @@ export async function fetchFromGuardian(category: string = 'general'): Promise<E
   const res = await fetch(url);
   if (!res.ok) return [];
   const data = await res.json();
-  return (data.response?.results || []).map((article: Record<string, unknown>) => ({
+
+  return (data.response?.results || []).map((article: { fields: Record<string, unknown>, [key: string]: any }) => ({
     source: { id: 'guardian', name: 'The Guardian' },
-    author: (article.fields as any)?.byline ?? null,
-    title: article.webTitle as string || '',
-    description: (article.fields as any)?.trailText ?? null,
-    url: article.webUrl as string || '',
-    urlToImage: (article.fields as any)?.thumbnail ?? null,
-    publishedAt: article.webPublicationDate as string || '',
-    content: (article.fields as any)?.bodyText ?? null,
+    author: article.fields?.byline as string ?? null,
+    title: article.webTitle ?? '',
+    description: article.fields?.trailText as string ?? null,
+    url: article.webUrl ?? '',
+    urlToImage: article.fields?.thumbnail as string ?? null,
+    publishedAt: article.webPublicationDate ?? '',
+    content: article.fields?.bodyText as string ?? null
   }));
 }
 
@@ -94,6 +101,7 @@ export async function fetchFromMediastack(category: string = 'general'): Promise
   const res = await fetch(url);
   if (!res.ok) return [];
   const data = await res.json();
+
   return (data.data || []).map((article: Record<string, unknown>) => ({
     source: { id: null, name: article.source as string || 'Mediastack' },
     author: article.author as string || null,
@@ -102,6 +110,6 @@ export async function fetchFromMediastack(category: string = 'general'): Promise
     url: article.url as string || '',
     urlToImage: article.image as string || null,
     publishedAt: article.published_at as string || '',
-    content: null,
+    content: null
   }));
 }
