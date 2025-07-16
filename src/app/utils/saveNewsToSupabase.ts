@@ -1,48 +1,7 @@
-// NOTE: التحذير حول 'getOrAddCategoryId' يمكن تجاهله هنا، الدالة غير مستخدمة في هذا الملف ولا تؤثر على عملية البناء.
-import { supabase } from './supabaseClient';
-import { ExternalNewsArticle } from './fetchExternalNews';
-
-// دالة لتوليد slug من العنوان أو الرابط
-function generateSlug(title: string, url: string): string {
-  if (title && title.trim()) {
-    const cleanTitle = title
-      .toLowerCase()
-      .trim()
-      .replace(/[^ -\w\s-]/g, '')
-      .replace(/[\s\-]+/g, '-')
-      .replace(/^-+|-+$/g, '')
-      .slice(0, 50);
-    if (!cleanTitle) {
-      return `article-${Math.abs(hashCode(url)).toString()}`;
-    }
-    const urlHash = Math.abs(hashCode(url)).toString().slice(0, 8);
-    return `${cleanTitle}-${urlHash}`;
-  }
-  return `article-${Math.abs(hashCode(url)).toString()}`;
-}
-function hashCode(str: string): number {
-  let hash = 0, i, chr;
-  if (str.length === 0) return hash;
-  for (i = 0; i < str.length; i++) {
-    chr = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + chr;
-    hash |= 0;
-  }
-  return hash;
-}
-
 export async function saveNewsToSupabase(articles: ExternalNewsArticle[], category_id: number) {
   try {
-    // console.log('Fetched articles:', articles.length);
-    if (!articles.length) {
-      // console.warn('No articles to save.');
-      return;
-    }
-
-    if (!category_id) {
-      // console.error('Category ID not found.');
-      return;
-    }
+    if (!articles.length) return;
+    if (!category_id) return;
 
     const mapped = articles.map(article => ({
       title: article.title,
@@ -57,19 +16,20 @@ export async function saveNewsToSupabase(articles: ExternalNewsArticle[], catego
       views_count: 0,
       source_name: article.source.name,
       category_id,
-      // created_at: يُفضل تركها للقاعدة لتوليدها تلقائياً
     }));
 
-    // console.log('Articles to upsert:', mapped.length);
-    if (mapped.length > 0) {
-      // console.log('First article to upsert:', JSON.stringify(mapped[0], null, 2));
-    }
-    const { error } = await supabase.from('news').upsert(mapped, { onConflict: 'url' });
-    // console.log('Upsert result:', { data, error });
+    console.log('📰 Articles to upsert:', mapped.length);
+
+    const { error } = await supabase
+      .from('news')
+      .upsert(mapped, { onConflict: 'url' });
+
     if (error) {
-      // console.error('Upsert error:', error);
+      console.error('❌ Supabase upsert error:', error.message || error);
+    } else {
+      console.log('✅ Articles upserted successfully.');
     }
-  } catch {
-    // console.error('Exception in saveNewsToSupabase:', err);
+  } catch (err) {
+    console.error('❌ Exception in saveNewsToSupabase:', err);
   }
-} 
+}
