@@ -1,6 +1,6 @@
-// fetchExternalNews.ts
+// src/app/utils/fetchExternalNews.ts
 
-export type ExternalNewsArticle = {
+export interface ExternalNewsArticle {
   source: { id: string | null; name: string };
   author: string | null;
   title: string;
@@ -9,7 +9,7 @@ export type ExternalNewsArticle = {
   urlToImage: string | null;
   publishedAt: string;
   content: string | null;
-};
+}
 
 const NEWS_API_KEY = process.env.NEWS_API_KEY;
 const GNEWS_API_KEY = process.env.GNEWS_API_KEY;
@@ -17,37 +17,16 @@ const GUARDIAN_API_KEY = process.env.GUARDIAN_API_KEY;
 const MEDIASTACK_KEY = process.env.MEDIASTACK_KEY;
 
 export async function fetchExternalNews(category: string = 'general'): Promise<ExternalNewsArticle[]> {
-  // جلب من جميع المصادر بالتوازي
   let newsapi: ExternalNewsArticle[] = [];
   let gnews: ExternalNewsArticle[] = [];
   let guardian: ExternalNewsArticle[] = [];
   let mediastack: ExternalNewsArticle[] = [];
 
-  try {
-    newsapi = await fetchFromNewsAPI(category);
-  } catch {
-    // console.error('Error fetching from NewsAPI:', err);
-  }
+  try { newsapi = await fetchFromNewsAPI(category); } catch {}
+  try { gnews = await fetchFromGNews(category); } catch {}
+  try { guardian = await fetchFromGuardian(category); } catch {}
+  try { mediastack = await fetchFromMediastack(category); } catch {}
 
-  try {
-    gnews = await fetchFromGNews(category);
-  } catch {
-    // console.error('Error fetching from GNews:', err);
-  }
-
-  try {
-    guardian = await fetchFromGuardian(category);
-  } catch {
-    // console.error('Error fetching from Guardian:', err);
-  }
-
-  try {
-    mediastack = await fetchFromMediastack(category);
-  } catch {
-    // console.error('Error fetching from Mediastack:', err);
-  }
-
-  // دمج النتائج وإزالة التكرار حسب url
   const all = [...newsapi, ...gnews, ...guardian, ...mediastack];
   const unique = all.filter((article, idx, arr) =>
     article.url && arr.findIndex(a => a.url === article.url) === idx
@@ -55,7 +34,6 @@ export async function fetchExternalNews(category: string = 'general'): Promise<E
   return unique;
 }
 
-// إعادة تسمية الدالة القديمة لجلب NewsAPI فقط
 async function fetchFromNewsAPI(category: string = 'general'): Promise<ExternalNewsArticle[]> {
   if (!NEWS_API_KEY) return [];
   const url = `https://newsapi.org/v2/top-headlines?country=us&category=${category}&pageSize=20&apiKey=${NEWS_API_KEY}`;
@@ -63,7 +41,7 @@ async function fetchFromNewsAPI(category: string = 'general'): Promise<ExternalN
   if (!res.ok) return [];
   const data = await res.json();
   return (data.articles || []).map((article: Record<string, unknown>) => ({
-    source: { id: typeof article.source === 'object' && article.source && 'id' in article.source ? (article.source as Record<string, unknown>).id as string ?? null : null, name: typeof article.source === 'object' && article.source && 'name' in article.source ? (article.source as Record<string, unknown>).name as string ?? 'Unknown' : 'Unknown' },
+    source: { id: (article.source as any)?.id ?? null, name: (article.source as any)?.name ?? 'Unknown' },
     author: article.author as string || null,
     title: article.title as string || '',
     description: article.description as string || null,
@@ -81,7 +59,7 @@ export async function fetchFromGNews(category: string = 'general'): Promise<Exte
   if (!res.ok) return [];
   const data = await res.json();
   return (data.articles || []).map((article: Record<string, unknown>) => ({
-    source: { id: null, name: typeof article.source === 'object' && article.source && 'name' in article.source ? (article.source as Record<string, unknown>).name as string ?? 'GNews' : 'GNews' },
+    source: { id: null, name: (article.source as any)?.name ?? 'GNews' },
     author: article.author as string || null,
     title: article.title as string || '',
     description: article.description as string || null,
@@ -100,13 +78,13 @@ export async function fetchFromGuardian(category: string = 'general'): Promise<E
   const data = await res.json();
   return (data.response?.results || []).map((article: Record<string, unknown>) => ({
     source: { id: 'guardian', name: 'The Guardian' },
-    author: typeof article.fields === 'object' && article.fields && 'byline' in article.fields ? (article.fields as Record<string, unknown>).byline as string ?? null : null,
+    author: (article.fields as any)?.byline ?? null,
     title: article.webTitle as string || '',
-    description: typeof article.fields === 'object' && article.fields && 'trailText' in article.fields ? (article.fields as Record<string, unknown>).trailText as string ?? null : null,
+    description: (article.fields as any)?.trailText ?? null,
     url: article.webUrl as string || '',
-    urlToImage: typeof article.fields === 'object' && article.fields && 'thumbnail' in article.fields ? (article.fields as Record<string, unknown>).thumbnail as string ?? null : null,
+    urlToImage: (article.fields as any)?.thumbnail ?? null,
     publishedAt: article.webPublicationDate as string || '',
-    content: typeof article.fields === 'object' && article.fields && 'bodyText' in article.fields ? (article.fields as Record<string, unknown>).bodyText as string ?? null : null,
+    content: (article.fields as any)?.bodyText ?? null,
   }));
 }
 
@@ -126,4 +104,4 @@ export async function fetchFromMediastack(category: string = 'general'): Promise
     publishedAt: article.published_at as string || '',
     content: null,
   }));
-} 
+}
