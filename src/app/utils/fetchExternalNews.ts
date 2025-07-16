@@ -32,70 +32,80 @@ export async function fetchExternalNews(category: string = 'general'): Promise<E
   return unique;
 }
 
-async function fetchFromNewsAPI(category: string = 'general'): Promise<ExternalNewsArticle[]> {
+async function fetchFromNewsAPI(category: string): Promise<ExternalNewsArticle[]> {
   if (!NEWS_API_KEY) return [];
   const url = `https://newsapi.org/v2/top-headlines?country=us&category=${category}&pageSize=20&apiKey=${NEWS_API_KEY}`;
   const res = await fetch(url);
   if (!res.ok) return [];
   const data = await res.json();
 
-  return (data.articles || []).map((article: { source: { id: string | null, name: string }, [key: string]: any }) => ({
+  return (data.articles || []).map((article: Record<string, unknown>) => ({
     source: {
-      id: article.source?.id ?? null,
-      name: article.source?.name ?? 'Unknown'
+      id: typeof article.source === 'object' && article.source && 'id' in article.source ? (article.source as Record<string, unknown>).id as string ?? null : null,
+      name: typeof article.source === 'object' && article.source && 'name' in article.source ? (article.source as Record<string, unknown>).name as string ?? 'Unknown' : 'Unknown',
     },
-    author: article.author ?? null,
-    title: article.title ?? '',
-    description: article.description ?? null,
-    url: article.url ?? '',
-    urlToImage: article.urlToImage ?? null,
-    publishedAt: article.publishedAt ?? '',
-    content: article.content ?? null
+    author: article.author as string ?? null,
+    title: article.title as string ?? '',
+    description: article.description as string ?? null,
+    url: article.url as string ?? '',
+    urlToImage: article.urlToImage as string ?? null,
+    publishedAt: article.publishedAt as string ?? '',
+    content: article.content as string ?? null,
   }));
 }
 
-export async function fetchFromGNews(category: string = 'general'): Promise<ExternalNewsArticle[]> {
+export async function fetchFromGNews(category: string): Promise<ExternalNewsArticle[]> {
   if (!GNEWS_API_KEY) return [];
   const url = `https://gnews.io/api/v4/top-headlines?category=${category}&lang=en&country=us&max=20&apikey=${GNEWS_API_KEY}`;
   const res = await fetch(url);
   if (!res.ok) return [];
   const data = await res.json();
 
-  return (data.articles || []).map((article: { source: { name: string }, [key: string]: any }) => ({
+  return (data.articles || []).map((article: Record<string, unknown>) => ({
     source: {
       id: null,
-      name: article.source?.name ?? 'GNews'
+      name: typeof article.source === 'object' && article.source && 'name' in article.source
+        ? (article.source as Record<string, unknown>).name as string ?? 'GNews'
+        : 'GNews',
     },
-    author: article.author ?? null,
-    title: article.title ?? '',
-    description: article.description ?? null,
-    url: article.url ?? '',
-    urlToImage: article.image ?? null,
-    publishedAt: article.publishedAt ?? '',
-    content: article.content ?? null
+    author: article.author as string ?? null,
+    title: article.title as string ?? '',
+    description: article.description as string ?? null,
+    url: article.url as string ?? '',
+    urlToImage: article.image as string ?? null,
+    publishedAt: article.publishedAt as string ?? '',
+    content: article.content as string ?? null,
   }));
 }
 
-export async function fetchFromGuardian(category: string = 'general'): Promise<ExternalNewsArticle[]> {
+export async function fetchFromGuardian(category: string): Promise<ExternalNewsArticle[]> {
   if (!GUARDIAN_API_KEY) return [];
   const url = `https://content.guardianapis.com/search?section=${category}&show-fields=all&page-size=20&api-key=${GUARDIAN_API_KEY}`;
   const res = await fetch(url);
   if (!res.ok) return [];
   const data = await res.json();
 
-  return (data.response?.results || []).map((article: { fields: Record<string, unknown>, [key: string]: any }) => ({
+  return (data.response?.results || []).map((article: Record<string, unknown>) => ({
     source: { id: 'guardian', name: 'The Guardian' },
-    author: article.fields?.byline as string ?? null,
-    title: article.webTitle ?? '',
-    description: article.fields?.trailText as string ?? null,
-    url: article.webUrl ?? '',
-    urlToImage: article.fields?.thumbnail as string ?? null,
-    publishedAt: article.webPublicationDate ?? '',
-    content: article.fields?.bodyText as string ?? null
+    author: typeof article.fields === 'object' && article.fields && 'byline' in article.fields
+      ? (article.fields as Record<string, unknown>).byline as string ?? null
+      : null,
+    title: article.webTitle as string ?? '',
+    description: typeof article.fields === 'object' && article.fields && 'trailText' in article.fields
+      ? (article.fields as Record<string, unknown>).trailText as string ?? null
+      : null,
+    url: article.webUrl as string ?? '',
+    urlToImage: typeof article.fields === 'object' && article.fields && 'thumbnail' in article.fields
+      ? (article.fields as Record<string, unknown>).thumbnail as string ?? null
+      : null,
+    publishedAt: article.webPublicationDate as string ?? '',
+    content: typeof article.fields === 'object' && article.fields && 'bodyText' in article.fields
+      ? (article.fields as Record<string, unknown>).bodyText as string ?? null
+      : null,
   }));
 }
 
-export async function fetchFromMediastack(category: string = 'general'): Promise<ExternalNewsArticle[]> {
+export async function fetchFromMediastack(category: string): Promise<ExternalNewsArticle[]> {
   if (!MEDIASTACK_KEY) return [];
   const url = `http://api.mediastack.com/v1/news?access_key=${MEDIASTACK_KEY}&categories=${category}&languages=en&countries=us&limit=20`;
   const res = await fetch(url);
@@ -103,13 +113,13 @@ export async function fetchFromMediastack(category: string = 'general'): Promise
   const data = await res.json();
 
   return (data.data || []).map((article: Record<string, unknown>) => ({
-    source: { id: null, name: article.source as string || 'Mediastack' },
-    author: article.author as string || null,
-    title: article.title as string || '',
-    description: article.description as string || null,
-    url: article.url as string || '',
-    urlToImage: article.image as string || null,
-    publishedAt: article.published_at as string || '',
-    content: null
+    source: { id: null, name: article.source as string ?? 'Mediastack' },
+    author: article.author as string ?? null,
+    title: article.title as string ?? '',
+    description: article.description as string ?? null,
+    url: article.url as string ?? '',
+    urlToImage: article.image as string ?? null,
+    publishedAt: article.published_at as string ?? '',
+    content: null,
   }));
 }
