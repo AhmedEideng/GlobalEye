@@ -1,20 +1,8 @@
+// src/app/utils/saveNewsToSupabase.ts
+
 import { supabase } from './supabaseClient';
+import { ExternalNewsArticle } from './fetchExternalNews';
 
-// ✅ تعريف نوع المقالات المستوردة من API
-interface ExternalNewsArticle {
-  title: string;
-  description?: string;
-  url: string;
-  publishedAt?: string;
-  content?: string;
-  author?: string;
-  urlToImage?: string;
-  source: {
-    name: string;
-  };
-}
-
-// ✅ دالة لتوليد slug فريد وآمن من العنوان أو الرابط
 function generateSlug(title: string, url: string): string {
   if (title && title.trim()) {
     const cleanTitle = title
@@ -39,12 +27,11 @@ function hashCode(str: string): number {
   for (i = 0; i < str.length; i++) {
     chr = str.charCodeAt(i);
     hash = ((hash << 5) - hash) + chr;
-    hash |= 0; // Convert to 32bit integer
+    hash |= 0;
   }
   return hash;
 }
 
-// ✅ الدالة الرئيسية لحفظ الأخبار في Supabase
 export async function saveNewsToSupabase(articles: ExternalNewsArticle[], category_id: number) {
   try {
     if (!articles.length) {
