@@ -105,9 +105,7 @@ export default function RootLayout({
         <meta name="application-name" content="GlobalEye News" />
         <meta name="msapplication-TileImage" content="/favicon.ico.jpg" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
-        {/* Preload critical resources */}
-        <link rel="preload" href="/fonts.css" as="style" />
-        <link rel="preload" href="/favicon.ico.jpg" as="image" />
+        {/* تم حذف وسوم preload لتقليل التحذيرات */}
       </head>
       <body className={inter.className}>
         <ErrorBoundary>
