@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { fetchExternalNews } from '@/app/utils/fetchExternalNews';
 import { saveNewsToSupabase } from '@/app/utils/saveNewsToSupabase';
 import { getOrAddCategoryId } from '@/app/utils/categoryUtils';
+import { logSnagEvent } from '@/app/utils/logsnag'; // ← أضفنا هذا
 
 export async function GET() {
   const supportedCategories = [
@@ -17,6 +18,8 @@ export async function GET() {
   let total = 0;
   const results: { category: string; count: number }[] = [];
 
+  await logSnagEvent("🔄 بدء تحديث الأخبار", "بدأ تحديث الأخبار من جميع المصادر");
+
   for (const category of supportedCategories) {
     try {
       const articles = await fetchExternalNews(category);
@@ -26,10 +29,13 @@ export async function GET() {
       await saveNewsToSupabase(articles, category_id);
       results.push({ category, count: articles.length });
       total += articles.length;
-    } catch (err) {
+    } catch (err: any) {
       console.error(`Error with category "${category}":`, err);
+      await logSnagEvent(`❌ خطأ في ${category}`, err.message || "Unknown error");
     }
   }
+
+  await logSnagEvent("✅ انتهاء تحديث الأخبار", `تم حفظ ${total} مقال في Supabase`);
 
   return NextResponse.json({
     success: true,
