@@ -1,15 +1,12 @@
 version = 1
 
 [[analyzers]]
-name = "javascript"
+name = "typescript"
 enabled = true
-
-  [analyzers.meta]
-  runtime_version = "18" # غيرها إذا كنت تستخدم Node.js 20 أو 16
 
 exclude_patterns = [
   "node_modules/**",
   ".next/**",
-  "build/**",
-  "dist/**"
+  "dist/**",
+  "build/**"
 ]
