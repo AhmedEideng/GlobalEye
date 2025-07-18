@@ -12,10 +12,16 @@ export interface ExternalNewsArticle {
   content: string | null;
 }
 
-const NEWS_API_KEY = process.env.NEWS_API_KEY;
-const GNEWS_API_KEY = process.env.GNEWS_API_KEY;
-const GUARDIAN_API_KEY = process.env.GUARDIAN_API_KEY;
-const MEDIASTACK_KEY = process.env.MEDIASTACK_KEY;
+// Validate API keys
+const NEWS_API_KEY = process.env.NEWS_API_KEY?.trim();
+const GNEWS_API_KEY = process.env.GNEWS_API_KEY?.trim();
+const GUARDIAN_API_KEY = process.env.GUARDIAN_API_KEY?.trim();
+const MEDIASTACK_KEY = process.env.MEDIASTACK_KEY?.trim();
+
+// Helper function to validate API key format
+const isValidApiKey = (key: string | undefined): boolean => {
+  return typeof key === 'string' && key.length > 0 && key !== 'undefined';
+};
 
 export async function fetchExternalNews(category: string = 'general'): Promise<ExternalNewsArticle[]> {
   let newsapi: ExternalNewsArticle[] = [];
@@ -23,10 +29,50 @@ export async function fetchExternalNews(category: string = 'general'): Promise<E
   let guardian: ExternalNewsArticle[] = [];
   let mediastack: ExternalNewsArticle[] = [];
 
-  try { newsapi = await fetchFromNewsAPI(category); } catch {}
-  try { gnews = await fetchFromGNews(category); } catch {}
-  try { guardian = await fetchFromGuardian(category); } catch {}
-  try { mediastack = await fetchFromMediastack(category); } catch {}
+  // Only fetch from APIs with valid keys
+  if (isValidApiKey(NEWS_API_KEY)) {
+    try { 
+      newsapi = await fetchFromNewsAPI(category); 
+    } catch (error) {
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.warn('NewsAPI fetch failed:', error);
+      }
+    }
+  }
+  
+  if (isValidApiKey(GNEWS_API_KEY)) {
+    try { 
+      gnews = await fetchFromGNews(category); 
+    } catch (error) {
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.warn('GNews fetch failed:', error);
+      }
+    }
+  }
+  
+  if (isValidApiKey(GUARDIAN_API_KEY)) {
+    try { 
+      guardian = await fetchFromGuardian(category); 
+    } catch (error) {
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.warn('Guardian fetch failed:', error);
+      }
+    }
+  }
+  
+  if (isValidApiKey(MEDIASTACK_KEY)) {
+    try { 
+      mediastack = await fetchFromMediastack(category); 
+    } catch (error) {
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.warn('Mediastack fetch failed:', error);
+      }
+    }
+  }
 
   const all = [...newsapi, ...gnews, ...guardian, ...mediastack];
   const unique = all.filter((article, idx, arr) =>

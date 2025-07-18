@@ -1,94 +1,133 @@
 "use client";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { supabase } from '@utils/supabaseClient';
 import { NewsArticle } from '@utils/fetchNews';
 import Head from 'next/head';
 import { useAuth } from '@hooks/useAuth';
 
+interface Stats {
+  articlesCount: number;
+  sourcesCount: number;
+  removedParagraphs: number;
+  topCategories: [string, number][];
+}
+
+interface NewsArticleWithSourceName extends NewsArticle {
+  source_name?: string;
+}
+
+// قائمة إيميلات المشرفين المسموح لهم
+const ADMINS = ['nadianow120@gmail.com', 'ahmed3id333@gmail.com'];
+
 export default function AdminStatsPage() {
   const { user, loading: authLoading, signInWithGoogle } = useAuth();
-  interface Stats {
-    articlesCount: number;
-    sourcesCount: number;
-    removedParagraphs: number;
-    topCategories: [string, number][];
-  }
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // قائمة إيميلات المشرفين المسموح لهم
-  const ADMINS = ['nadianow120@gmail.com', 'ahmed3id333@gmail.com']; // عدل القائمة حسب الحاجة
+  const fetchStats = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const { data, error: supabaseError } = await supabase
+        .from('news')
+        .select('*')
+        .eq('published', true);
 
-  useEffect(() => {
-    fetchStats();
+      if (supabaseError) {
+        throw new Error(`Database error: ${supabaseError.message}`);
+      }
+
+      if (!data || data.length === 0) {
+        setStats({
+          articlesCount: 0,
+          sourcesCount: 0,
+          removedParagraphs: 0,
+          topCategories: []
+        });
+        return;
+      }
+
+      // عدد المقالات المدمجة
+      const articlesCount = data.length;
+      
+      // عدد المصادر المستخدمة
+      const sourcesSet = new Set<string>();
+      (data as NewsArticleWithSourceName[]).forEach((article) => {
+        let names: string[] = [];
+        if (article.source && typeof article.source === 'object' && 'name' in article.source) {
+          names = (article.source.name || '').split(' + ');
+        } else if (article.source_name) {
+          names = article.source_name.split(' + ');
+        }
+        names.forEach((name) => name && sourcesSet.add(name.trim()));
+      });
+      const sourcesCount = sourcesSet.size;
+      
+      // عدد الفقرات المكررة المحذوفة
+      let totalParagraphs = 0;
+      let totalUniqueParagraphs = 0;
+      const categoryCounts: Record<string, number> = {};
+      
+      data.forEach((article: NewsArticle) => {
+        const content = article.content || '';
+        const match = content.match(/المصادر:/);
+        const mainContent = match ? content.slice(0, match.index || 0) : content;
+        const paragraphs = mainContent.split(/\n+/).map((p: string) => p.trim()).filter(Boolean);
+        totalUniqueParagraphs += paragraphs.length;
+        // نفترض أن كل مقال مدمج كان يحتوي على 2.5 مصدر في المتوسط
+        totalParagraphs += Math.round(paragraphs.length * 2.5);
+        
+        // حساب التصنيفات
+        categoryCounts[article.category] = (categoryCounts[article.category] || 0) + 1;
+      });
+      
+      const removedParagraphs = totalParagraphs - totalUniqueParagraphs;
+      const topCategories = Object.entries(categoryCounts).sort((a, b) => b[1] - a[1]);
+      
+      setStats({ articlesCount, sourcesCount, removedParagraphs, topCategories });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unknown error occurred');
+      setStats(null);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  async function fetchStats() {
-    setLoading(true);
-    type NewsArticleWithSourceName = NewsArticle & { source_name?: string };
-    const { data } = await supabase
-      .from('news')
-      .select('*')
-      .eq('published', true);
-    if (!data) {
-      setStats(null);
-      setLoading(false);
-      return;
+  useEffect(() => {
+    if (user && ADMINS.includes(user.email)) {
+      fetchStats();
     }
-    // عدد المقالات المدمجة
-    const articlesCount = data.length;
-    // عدد المصادر المستخدمة
-    const sourcesSet = new Set<string>();
-    (data as (NewsArticleWithSourceName)[]).forEach((a) => {
-      // دعم كلا الحالتين: source.name أو source_name
-      let names: string[] = [];
-      if (a.source && typeof a.source === 'object' && (a.source as { name?: string }).name) {
-        names = ((a.source as { name: string }).name).split(' + ');
-      } else if (a.source_name) {
-        names = a.source_name.split(' + ');
-      }
-      names.forEach((s: string) => s && sourcesSet.add(s.trim()));
-    });
-    const sourcesCount = sourcesSet.size;
-    // عدد الفقرات المكررة المحذوفة (تقدير: الفرق بين عدد الفقرات الأصلية والمحتوى النهائي)
-    let totalParagraphs = 0;
-    let totalUniqueParagraphs = 0;
-    data.forEach((a: NewsArticle) => {
-      const content = a.content || '';
-      const match = content.match(/المصادر:/);
-      const mainContent = match ? content.slice(0, match.index) : content;
-      const paragraphs = mainContent.split(/\n+/).map((p: string) => p.trim()).filter(Boolean);
-      totalUniqueParagraphs += paragraphs.length;
-      // نفترض أن كل مقال مدمج كان يحتوي على 2.5 مصدر في المتوسط
-      totalParagraphs += Math.round(paragraphs.length * 2.5);
-    });
-    const removedParagraphs = totalParagraphs - totalUniqueParagraphs;
-    // أكثر التصنيفات تكرارًا
-    const categoryCounts: Record<string, number> = {};
-    data.forEach((a: NewsArticle) => {
-      categoryCounts[a.category] = (categoryCounts[a.category] || 0) + 1;
-    });
-    const topCategories = Object.entries(categoryCounts).sort((a, b) => b[1] - a[1]);
-    setStats({ articlesCount, sourcesCount, removedParagraphs, topCategories });
-    setLoading(false);
-  }
+  }, [user, fetchStats]);
 
-  // دالة خارجية لتفادي تحذير any في map
-  const renderCategory = ([cat, count]: [string, number]) => (
+  const renderCategory = useCallback(([cat, count]: [string, number]) => (
     <li key={cat}>{cat}: {count}</li>
-  );
+  ), []);
+
+  const isAuthorized = useMemo(() => {
+    return user && ADMINS.includes(user.email);
+  }, [user]);
 
   if (authLoading) {
     return <div className="max-w-2xl mx-auto py-10 px-4">جاري التحقق من الصلاحيات...</div>;
   }
-  if (!user || !ADMINS.includes(user.email)) {
+
+  if (!isAuthorized) {
     return (
       <div className="max-w-2xl mx-auto py-10 px-4 text-center">
         <Head>
           <meta name="robots" content="noindex, nofollow" />
         </Head>
         <div className="text-red-600 font-bold mb-4">غير مصرح لك بالوصول لهذه الصفحة.</div>
-        {!user && <button className="px-4 py-2 bg-blue-600 text-white rounded" onClick={signInWithGoogle}>تسجيل الدخول كمشرف</button>}
+        {!user && (
+          <button 
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors" 
+            onClick={signInWithGoogle}
+          >
+            تسجيل الدخول كمشرف
+          </button>
+        )}
       </div>
     );
   }
@@ -99,18 +138,34 @@ export default function AdminStatsPage() {
         <meta name="robots" content="noindex, nofollow" />
       </Head>
       <h1 className="text-3xl font-bold mb-6">إحصائيات جودة الدمج</h1>
+      
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <strong>خطأ:</strong> {error}
+          <button 
+            onClick={fetchStats}
+            className="ml-4 text-red-800 underline hover:no-underline"
+          >
+            إعادة المحاولة
+          </button>
+        </div>
+      )}
+      
       {loading ? (
-        <div>جاري التحميل...</div>
+        <div className="text-center py-8">جاري التحميل...</div>
       ) : !stats ? (
-        <div>لا توجد بيانات.</div>
+        <div className="text-center py-8">لا توجد بيانات.</div>
       ) : (
         <div className="space-y-4">
-          <div>عدد المقالات المدمجة: <span className="font-bold">{stats.articlesCount}</span></div>
-          <div>عدد المصادر المستخدمة: <span className="font-bold">{stats.sourcesCount}</span></div>
-          <div>عدد الفقرات المكررة التي تم حذفها (تقديري): <span className="font-bold">{stats.removedParagraphs}</span></div>
-          <div>
-            أكثر التصنيفات تكرارًا:
-            <ul className="list-disc pl-6">
+          <div className="bg-white p-4 rounded-lg shadow">
+            <div className="text-lg font-semibold mb-2">عدد المقالات المدمجة: <span className="text-blue-600">{stats.articlesCount}</span></div>
+            <div className="text-lg font-semibold mb-2">عدد المصادر المستخدمة: <span className="text-green-600">{stats.sourcesCount}</span></div>
+            <div className="text-lg font-semibold mb-2">عدد الفقرات المكررة التي تم حذفها (تقديري): <span className="text-orange-600">{stats.removedParagraphs}</span></div>
+          </div>
+          
+          <div className="bg-white p-4 rounded-lg shadow">
+            <h3 className="text-lg font-semibold mb-3">أكثر التصنيفات تكرارًا:</h3>
+            <ul className="list-disc pl-6 space-y-1">
               {stats.topCategories.map(renderCategory)}
             </ul>
           </div>

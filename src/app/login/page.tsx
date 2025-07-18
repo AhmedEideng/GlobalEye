@@ -34,11 +34,10 @@ export default function LoginPage() {
   };
 
   const passwordValidation = validatePassword(password);
-  const { signOut } = useAuth();
+  // Remove unused variables
 
   const handleGoogleSignIn = React.useCallback(async () => {
     try {
-      await signOut();
       const options: Record<string, unknown> = { skipBrowserRedirect: true };
       if (typeof window !== 'undefined') {
         options.redirectTo = window.location.origin + '/profile';
@@ -55,7 +54,7 @@ export default function LoginPage() {
     } catch (err) {
       alert("Exception during Google login: " + err);
     }
-  }, [signOut]);
+  }, []);
 
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 export interface BreakingNewsItem {
   id: string;
@@ -9,12 +9,23 @@ export interface BreakingNewsItem {
   priority?: 'high' | 'medium' | 'low';
 }
 
+// Cache for breaking news to avoid unnecessary API calls
+let newsCache: BreakingNewsItem[] | null = null;
+let lastFetchTime = 0;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
 // Mock API function - replace with real API call
 const fetchBreakingNews = async (): Promise<BreakingNewsItem[]> => {
+  // Check cache first
+  const now = Date.now();
+  if (newsCache && (now - lastFetchTime) < CACHE_DURATION) {
+    return newsCache;
+  }
+
   // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 500));
   
-  return [
+  const data: BreakingNewsItem[] = [
     {
       id: '1',
       title: 'Breaking: Major breakthrough in renewable energy technology announced',
@@ -96,14 +107,21 @@ const fetchBreakingNews = async (): Promise<BreakingNewsItem[]> => {
       priority: 'low'
     }
   ];
+
+  // Update cache
+  newsCache = data;
+  lastFetchTime = now;
+  
+  return data;
 };
 
 export const useBreakingNews = () => {
   const [news, setNews] = useState<BreakingNewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const fetchNews = async () => {
+  const fetchNews = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -116,20 +134,27 @@ export const useBreakingNews = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  const refreshNews = useCallback(() => {
+    // Clear cache to force fresh fetch
+    newsCache = null;
+    lastFetchTime = 0;
+    fetchNews();
+  }, [fetchNews]);
 
   useEffect(() => {
     fetchNews();
     
-    // Set up interval for real-time updates (every 2 minutes)
-    const interval = setInterval(fetchNews, 2 * 60 * 1000);
+    // Set up interval for real-time updates (every 5 minutes instead of 2)
+    intervalRef.current = setInterval(fetchNews, CACHE_DURATION);
     
-    return () => clearInterval(interval);
-  }, []);
-
-  const refreshNews = () => {
-    fetchNews();
-  };
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [fetchNews]);
 
   return {
     news,
