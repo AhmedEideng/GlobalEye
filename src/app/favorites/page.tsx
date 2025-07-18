@@ -1,11 +1,11 @@
 "use client";
 import { useAuth } from '@hooks/useAuth';
 import { getFavorites, removeFavorite } from '../../services/favorites';
-import { fetchNews, NewsArticle } from '../utils/fetchNews';
+import { fetchNews, NewsArticle } from '@utils/fetchNews';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import OptimizedImage from '@components/OptimizedImage';
-import { sendAnalyticsEvent } from '../utils/fetchNews';
+import { sendAnalyticsEvent } from '@utils/fetchNews';
 import React from 'react';
 
 export default function FavoritesPage() {

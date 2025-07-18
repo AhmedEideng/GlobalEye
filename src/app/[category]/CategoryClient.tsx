@@ -2,11 +2,11 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { sendAnalyticsEvent } from '../utils/fetchNews';
+import { sendAnalyticsEvent } from '@utils/fetchNews';
 import Link from 'next/link';
 import HomeFeatured from '@components/HomeFeatured';
 import HomeNewsGrid from '@components/HomeNewsGrid';
-import { NewsArticle } from '../utils/fetchNews';
+import { NewsArticle } from '@utils/fetchNews';
 
 // Professional error logger for category client
 function logCategoryError(...args: unknown[]) {

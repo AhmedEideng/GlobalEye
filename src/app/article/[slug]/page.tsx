@@ -1,4 +1,4 @@
-import { getArticleBySlug, NewsArticle } from '../../utils/fetchNews';
+import { getArticleBySlug, NewsArticle } from '@utils/fetchNews';
 import ArticleClient from './ArticleClient';
 import ArticleJsonLdHead from './ArticleJsonLdHead';
 

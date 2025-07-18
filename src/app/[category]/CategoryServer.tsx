@@ -1,4 +1,4 @@
-import { fetchNews, NewsArticle } from '../utils/fetchNews';
+import { fetchNews, NewsArticle } from '@utils/fetchNews';
 
 // Professional error logger for category server
 function logCategoryServerError(...args: unknown[]) {

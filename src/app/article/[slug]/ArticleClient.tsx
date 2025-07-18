@@ -1,11 +1,11 @@
 "use client";
-import { NewsArticle } from '../../utils/fetchNews';
+import { NewsArticle } from '@utils/fetchNews';
 import ArticleHeader from '@components/ArticleHeader';
 import ArticleContent from '@components/ArticleContent';
 import ShareButtons from '@components/ShareButtons';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { sendAnalyticsEvent, fetchRelatedNews } from '../../utils/fetchNews';
+import { sendAnalyticsEvent, fetchRelatedNews } from '@utils/fetchNews';
 import Link from 'next/link';
 import React from 'react';
 

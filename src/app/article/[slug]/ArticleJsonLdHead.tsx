@@ -1,6 +1,6 @@
 "use client";
 import Head from 'next/head';
-import { NewsArticle } from '../../utils/fetchNews';
+import { NewsArticle } from '@utils/fetchNews';
 import { sanitizeText, sanitizeJson } from '@/utils/sanitizeText';
 
 export default function ArticleJsonLdHead({ article }: { article: NewsArticle | null }) {

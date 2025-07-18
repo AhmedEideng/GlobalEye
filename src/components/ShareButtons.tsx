@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { sendAnalyticsEvent } from '../app/utils/fetchNews';
+import { sendAnalyticsEvent } from '@utils/fetchNews';
 import React from 'react';
 
 export default function ShareButtons({ url, title }: { url: string, title: string }) {
