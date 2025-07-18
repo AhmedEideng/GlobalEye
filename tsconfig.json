@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2015",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -17,6 +17,7 @@
     "jsx": "preserve",
     "incremental": true,
     "baseUrl": ".", 
+    "downlevelIteration": true,
     "paths": {
       "@/*": ["src/*"],
       "@components/*": ["src/components/*"],
