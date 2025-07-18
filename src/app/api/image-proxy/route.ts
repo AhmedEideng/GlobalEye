@@ -62,7 +62,7 @@ export async function GET(req: NextRequest) {
     }
     // If content-length is not available, read buffer and measure size
     const arrayBuffer = await response.arrayBuffer();
-    const imageBuffer = Buffer.from(new Uint8Array(arrayBuffer));
+    const imageBuffer = Buffer.from(new Uint8Array(arrayBuffer as ArrayBuffer));
     if (imageBuffer.length > MAX_IMAGE_SIZE) {
       return fallbackImageResponse();
     }
