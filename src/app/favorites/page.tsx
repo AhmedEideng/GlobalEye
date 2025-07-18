@@ -6,11 +6,22 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import OptimizedImage from '@components/OptimizedImage';
 import { sendAnalyticsEvent } from '../utils/fetchNews';
+import React from 'react';
 
 export default function FavoritesPage() {
   const { user, loading } = useAuth();
   const [articles, setArticles] = useState<NewsArticle[]>([]);
   const [favLoading, setFavLoading] = useState(true);
+
+  const handleRemove = React.useCallback(async (slug: string) => {
+    if (!user) return;
+    setArticles((prev) => prev.filter((a) => a.slug !== slug)); // Optimistic update
+    await removeFavorite(user.id, slug);
+  }, [user]);
+
+  const handleRemoveFavorite = React.useCallback((slug: string) => {
+    handleRemove(slug);
+  }, [handleRemove]);
 
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -25,12 +36,6 @@ export default function FavoritesPage() {
     };
     if (user) fetchFavorites();
   }, [user]);
-
-  const handleRemove = async (slug: string) => {
-    if (!user) return;
-    setArticles((prev) => prev.filter((a) => a.slug !== slug)); // Optimistic update
-    await removeFavorite(user.id, slug);
-  };
 
   if (loading || favLoading) {
     return <div className="min-h-[60vh] flex items-center justify-center text-lg">Loading...</div>;
@@ -66,7 +71,7 @@ export default function FavoritesPage() {
                 </div>
               </Link>
               <button
-                onClick={() => handleRemove(article.slug)}
+                onClick={() => handleRemoveFavorite(article.slug)}
                 className="absolute top-2 right-2 z-10 bg-white/80 rounded-full p-2 shadow hover:bg-red-100 transition-opacity opacity-0 group-hover:opacity-100"
                 title="Remove from favorites"
               >

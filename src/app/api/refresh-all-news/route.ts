@@ -30,8 +30,11 @@ export async function GET() {
       results.push({ category, count: articles.length });
       total += articles.length;
     } catch (err: any) {
-      console.error(`Error with category "${category}":`, err);
-      await logSnagEvent(`❌ خطأ في ${category}`, err.message || "Unknown error");
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error(`Error with category "${category}":`, err);
+      }
+      await logSnagEvent(`❌ خطأ في ${category}`, err?.message || "Unknown error");
     }
   }
 

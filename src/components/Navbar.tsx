@@ -26,6 +26,9 @@ export default function Navbar({ isMenuOpen, setIsMenuOpen, style }: NavbarProps
   const pathname = usePathname();
   const menuRef = useRef<HTMLDivElement>(null);
 
+  const handleMenuToggle = React.useCallback(() => setIsMenuOpen((prev) => !prev), [setIsMenuOpen]);
+  const handleMenuClose = React.useCallback(() => setIsMenuOpen(false), [setIsMenuOpen]);
+
   // إغلاق القائمة عند الضغط خارجها في وضع الجوال
   useEffect(() => {
     if (!isMenuOpen) return;
@@ -42,7 +45,7 @@ export default function Navbar({ isMenuOpen, setIsMenuOpen, style }: NavbarProps
     <div className="navbar-container flex items-center justify-between py-2 px-4 bg-white fixed left-0 w-full z-50 top-0" style={style}>
       {/* Mobile menu button and logo left (mobile only) */}
       <div className="flex-1 flex items-center gap-2 md:hidden">
-        <button className="mobile-menu-btn" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">
+        <button className="mobile-menu-btn" onClick={handleMenuToggle} aria-label="Toggle menu">
           <span className="block w-6 h-0.5 bg-gray-800 mb-1"></span>
           <span className="block w-6 h-0.5 bg-gray-800 mb-1"></span>
           <span className="block w-6 h-0.5 bg-gray-800"></span>
@@ -74,7 +77,7 @@ export default function Navbar({ isMenuOpen, setIsMenuOpen, style }: NavbarProps
       </ul>
       {/* Login button left (always last) */}
       <div className="flex items-center gap-4 ml-2">
-        <LoginButton onLoginClick={() => setIsMenuOpen(false)} />
+        <LoginButton onLoginClick={handleMenuClose} />
       </div>
       {/* Mobile sidebar */}
       {isMenuOpen && (
@@ -82,7 +85,7 @@ export default function Navbar({ isMenuOpen, setIsMenuOpen, style }: NavbarProps
           <div ref={menuRef} className="bg-white w-80 h-full p-6 flex flex-col shadow-lg rounded-r-2xl relative overflow-y-auto">
             {/* Logo at the top */}
             <div className="mb-6 pb-4 border-b border-gray-200">
-              <Link href="/" className="site-logo flex items-center text-2xl font-extrabold select-none text-red-600 tracking-tight drop-shadow-lg" onClick={() => setIsMenuOpen(false)}>
+              <Link href="/" className="site-logo flex items-center text-2xl font-extrabold select-none text-red-600 tracking-tight drop-shadow-lg" onClick={handleMenuClose}>
                 <svg className="w-8 h-8 mr-2" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="url(#paint0_linear)"/><defs><linearGradient id="paint0_linear" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse"><stop stopColor="#dc2626"/><stop offset="1" stopColor="#f59e42"/></linearGradient></defs></svg>
                 <span className="text-red-600">Global</span><span className="text-gradient-eye">Eye</span>
               </Link>
@@ -91,7 +94,7 @@ export default function Navbar({ isMenuOpen, setIsMenuOpen, style }: NavbarProps
             {/* Login button */}
             <div className="mb-6 pb-4 border-b border-gray-200">
               <div className="flex items-center justify-center">
-                <LoginButton onLoginClick={() => setIsMenuOpen(false)} />
+                <LoginButton onLoginClick={handleMenuClose} />
               </div>
             </div>
             
@@ -104,7 +107,7 @@ export default function Navbar({ isMenuOpen, setIsMenuOpen, style }: NavbarProps
                     <Link
                       href={category.path}
                       className={`mobile-nav-link px-4 py-3 font-medium transition-colors duration-200 rounded-lg ${pathname === category.path ? 'text-red-600 bg-red-50' : 'text-gray-700 hover:text-red-600 hover:bg-gray-50'}`}
-                      onClick={() => setIsMenuOpen(false)}
+                      onClick={handleMenuClose}
                     >
                       {category.label}
                     </Link>
@@ -121,7 +124,7 @@ export default function Navbar({ isMenuOpen, setIsMenuOpen, style }: NavbarProps
                   <Link
                     href="/about"
                     className="mobile-nav-link px-4 py-3 font-medium transition-colors duration-200 rounded-lg text-gray-700 hover:text-red-600 hover:bg-gray-50"
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={handleMenuClose}
                   >
                     About Us
                   </Link>
@@ -130,7 +133,7 @@ export default function Navbar({ isMenuOpen, setIsMenuOpen, style }: NavbarProps
                   <Link
                     href="/privacy"
                     className="mobile-nav-link px-4 py-3 font-medium transition-colors duration-200 rounded-lg text-gray-700 hover:text-red-600 hover:bg-gray-50"
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={handleMenuClose}
                   >
                     Privacy Policy
                   </Link>
@@ -139,7 +142,7 @@ export default function Navbar({ isMenuOpen, setIsMenuOpen, style }: NavbarProps
                   <Link
                     href="/terms-and-conditions"
                     className="mobile-nav-link px-4 py-3 font-medium transition-colors duration-200 rounded-lg text-gray-700 hover:text-red-600 hover:bg-gray-50"
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={handleMenuClose}
                   >
                     Terms & Conditions
                   </Link>
@@ -148,7 +151,7 @@ export default function Navbar({ isMenuOpen, setIsMenuOpen, style }: NavbarProps
                   <Link
                     href="/contact-us"
                     className="mobile-nav-link px-4 py-3 font-medium transition-colors duration-200 rounded-lg text-gray-700 hover:text-red-600 hover:bg-gray-50"
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={handleMenuClose}
                   >
                     Contact Us
                   </Link>

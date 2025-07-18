@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { FaNewspaper, FaSync } from 'react-icons/fa';
 import { useBreakingNews, BreakingNewsItem } from '@hooks/useBreakingNews';
 import { useEffect, useState } from 'react';
+import React from 'react';
 
 export default function BreakingNewsTicker({ showTicker = true }: { showTicker?: boolean }) {
   const { news, loading, error, refreshNews } = useBreakingNews();
@@ -23,6 +24,10 @@ export default function BreakingNewsTicker({ showTicker = true }: { showTicker?:
 
     return () => clearInterval(interval);
   }, [news.length]);
+
+  const handleRetry = React.useCallback(() => {
+    refreshNews();
+  }, [refreshNews]);
 
   if (!showTicker) return null;
 
@@ -50,7 +55,7 @@ export default function BreakingNewsTicker({ showTicker = true }: { showTicker?:
             <div className="flex items-center justify-center py-2">
               <span className="text-sm text-yellow-200">Failed to load breaking news</span>
               <button 
-                onClick={refreshNews}
+                onClick={handleRetry}
                 className="ml-2 p-1 hover:text-yellow-300 transition-colors"
                 aria-label="Retry loading breaking news"
               >

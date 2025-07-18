@@ -35,12 +35,18 @@ function hashCode(str: string): number {
 export async function saveNewsToSupabase(articles: ExternalNewsArticle[], category_id: number) {
   try {
     if (!articles.length) {
-      console.warn('⚠️ No articles to save.');
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.warn('No articles to save.');
+      }
       return;
     }
 
     if (!category_id) {
-      console.error('❌ Category ID is missing.');
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error('Category ID is missing.');
+      }
       return;
     }
 
@@ -59,18 +65,30 @@ export async function saveNewsToSupabase(articles: ExternalNewsArticle[], catego
       category_id,
     }));
 
-    console.log(`📦 Saving ${mapped.length} articles to Supabase...`);
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.log(`Saving ${mapped.length} articles to Supabase...`);
+    }
 
     const { error } = await supabase
       .from('news')
       .upsert(mapped, { onConflict: 'url' });
 
     if (error) {
-      console.error('❌ Supabase upsert error:', error.message || error);
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error('Supabase upsert error:', error.message || error);
+      }
     } else {
-      console.log('✅ Articles saved successfully to Supabase.');
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.log('Articles saved successfully to Supabase.');
+      }
     }
   } catch (err) {
-    console.error('❌ Exception in saveNewsToSupabase:', err);
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.error('Exception in saveNewsToSupabase:', err);
+    }
   }
 }

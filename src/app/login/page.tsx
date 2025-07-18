@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@utils/supabaseClient";
 import { useAuth } from "@hooks/useAuth";
@@ -14,6 +14,14 @@ export default function LoginPage() {
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const emailInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (step === "email" && emailInputRef.current) {
+      emailInputRef.current.focus();
+    }
+    // No return value needed
+  }, [step]);
 
   // Password validation function
   const validatePassword = (password: string) => {
@@ -28,7 +36,7 @@ export default function LoginPage() {
   const passwordValidation = validatePassword(password);
   const { signOut } = useAuth();
 
-  const handleGoogleSignIn = async () => {
+  const handleGoogleSignIn = React.useCallback(async () => {
     try {
       await signOut();
       const options: Record<string, unknown> = { skipBrowserRedirect: true };
@@ -47,7 +55,7 @@ export default function LoginPage() {
     } catch (err) {
       alert("Exception during Google login: " + err);
     }
-  };
+  }, [signOut]);
 
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,6 +114,15 @@ export default function LoginPage() {
     }
   };
 
+  const handleToggleShowPassword = React.useCallback(() => setShowPassword(v => !v), []);
+  const handlePasswordChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value), []);
+  const handleEmailChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value), []);
+  const handleModeToggle = React.useCallback(() => {
+    setMode(mode === "login" ? "signup" : "login");
+    setError("");
+  }, [mode]);
+  const handleGoogleSignInClick = React.useCallback(() => handleGoogleSignIn(), [handleGoogleSignIn]);
+
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-[#FAFAFA] px-4">
       <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
@@ -122,9 +139,9 @@ export default function LoginPage() {
                 type="email"
                 className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
+                onChange={handleEmailChange}
                 required
-                autoFocus
+                ref={emailInputRef}
               />
             </div>
             {error && <div className="text-red-600 text-sm">{error}</div>}
@@ -149,7 +166,7 @@ export default function LoginPage() {
             {/* Google Sign In Button */}
             <button
               type="button"
-              onClick={handleGoogleSignIn}
+              onClick={handleGoogleSignInClick}
               className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded font-medium hover:bg-gray-50 transition-colors"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -181,15 +198,15 @@ export default function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400 pr-10"
                   value={password}
-                  onChange={e => setPassword(e.target.value)}
+                  onChange={handlePasswordChange}
                   required
-                  autoFocus
+                  // Removed autoFocus for accessibility best practices
                 />
                 <button
                   type="button"
                   tabIndex={-1}
                   className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-800 focus:outline-none"
-                  onClick={() => setShowPassword(v => !v)}
+                  onClick={handleToggleShowPassword}
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
@@ -246,7 +263,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 className="text-blue-600 text-xs underline ml-2"
-                onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(""); }}
+                onClick={handleModeToggle}
               >
                 {mode === "login" ? "Create Account" : "Log In"}
               </button>
@@ -265,7 +282,7 @@ export default function LoginPage() {
             {/* Google Sign In Button */}
             <button
               type="button"
-              onClick={handleGoogleSignIn}
+              onClick={handleGoogleSignInClick}
               className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded font-medium hover:bg-gray-50 transition-colors"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">

@@ -170,6 +170,33 @@ export default function CategoryClient({
   const mainNews = mainArticles.map(toNewsArticle);
   const suggestedNews = suggested.map(toNewsArticle);
 
+  const renderSuggestedArticle = React.useCallback((article: Article, idx: number) => (
+    <React.Fragment key={article.slug || `suggested-${idx}-${article.url}`}>
+      <Link
+        href={`/article/${article.slug}`}
+        className="article-card group transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl rounded-xl bg-white shadow-md overflow-hidden"
+      >
+        <div className="relative w-full h-48 overflow-hidden">
+          <Image
+            src={article.urlToImage || "/placeholder-news.jpg"}
+            alt={article.title}
+            fill
+            className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+          />
+        </div>
+        <div className="p-4">
+          <div className="article-category text-xs font-bold mb-1 bg-red-600 text-white rounded-full px-3 py-1 inline-block">{article.source?.name}</div>
+          <h3 className="article-title text-lg font-bold mb-2 line-clamp-2 group-hover:text-red-700 transition-colors duration-200">{article.title}</h3>
+          <p className="article-excerpt text-gray-600 text-sm mb-2 line-clamp-2">{article.description}</p>
+          <div className="article-meta text-xs flex flex-wrap gap-2 text-gray-400">
+            <span className="flex items-center gap-1 text-gray-400">{new Date(article.publishedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+            {article.author && <span>by {article.author}</span>}
+          </div>
+        </div>
+      </Link>
+    </React.Fragment>
+  ), []);
+
   if (loading && !timeout) {
     return (
       <div className="loading flex items-center justify-center min-h-[400px]">
@@ -243,32 +270,7 @@ export default function CategoryClient({
             <p className="text-gray-500 text-base border-b pb-2">More news you might like</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {suggestedNews.map((article, idx) => (
-              <React.Fragment key={article.slug || `suggested-${idx}-${article.url}`}> 
-                <Link
-                  href={`/article/${article.slug}`}
-                  className="article-card group transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl rounded-xl bg-white shadow-md overflow-hidden"
-                >
-                  <div className="relative w-full h-48 overflow-hidden">
-                    <Image
-                      src={article.urlToImage || "/placeholder-news.jpg"}
-                      alt={article.title}
-                      fill
-                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <div className="p-4">
-                    <div className="article-category text-xs font-bold mb-1 bg-red-600 text-white rounded-full px-3 py-1 inline-block">{article.source?.name}</div>
-                    <h3 className="article-title text-lg font-bold mb-2 line-clamp-2 group-hover:text-red-700 transition-colors duration-200">{article.title}</h3>
-                    <p className="article-excerpt text-gray-600 text-sm mb-2 line-clamp-2">{article.description}</p>
-                    <div className="article-meta text-xs flex flex-wrap gap-2 text-gray-400">
-                      <span className="flex items-center gap-1 text-gray-400">{new Date(article.publishedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
-                      {article.author && <span>by {article.author}</span>}
-                    </div>
-                  </div>
-                </Link>
-              </React.Fragment>
-            ))}
+            {suggestedNews.map(renderSuggestedArticle)}
           </div>
         </section>
       )}

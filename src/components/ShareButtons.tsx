@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { sendAnalyticsEvent } from '../app/utils/fetchNews';
+import React from 'react';
 
 export default function ShareButtons({ url, title }: { url: string, title: string }) {
   const [fullUrl, setFullUrl] = useState(url);
@@ -18,6 +19,10 @@ export default function ShareButtons({ url, title }: { url: string, title: strin
     sendAnalyticsEvent('share_article', { method: 'copy', url: fullUrl });
     setTimeout(() => setCopied(false), 1500);
   };
+
+  const handleWhatsAppShare = React.useCallback(() => {
+    sendAnalyticsEvent('share_article', { method: 'whatsapp', url: fullUrl });
+  }, [fullUrl]);
   return (
     <div className="flex flex-wrap gap-3 mt-6 mb-8 items-center justify-center">
       {/* WhatsApp */}
@@ -26,7 +31,7 @@ export default function ShareButtons({ url, title }: { url: string, title: strin
         target="_blank" 
         rel="noopener noreferrer" 
         title="Share on WhatsApp" 
-        onClick={() => sendAnalyticsEvent('share_article', { method: 'whatsapp', url: fullUrl })}
+        onClick={handleWhatsAppShare}
         className="btn btn-secondary"
       >
         WhatsApp
