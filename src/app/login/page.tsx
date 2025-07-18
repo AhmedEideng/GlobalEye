@@ -3,7 +3,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@utils/supabaseClient";
-import { useAuth } from "@hooks/useAuth";
 
 export default function LoginPage() {
   const [step, setStep] = useState<"email" | "loginOrSignup">("email");
