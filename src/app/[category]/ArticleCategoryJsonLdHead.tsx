@@ -1,6 +1,6 @@
 "use client";
 import Head from 'next/head';
-import { sanitizeText, sanitizeJson } from '@/utils/sanitizeText';
+import { sanitizeText, sanitizeJsonLd } from '@/utils/sanitizeText';
 
 const categoryLabels: { [key: string]: string } = {
   'world': 'World News',
@@ -28,7 +28,7 @@ export default function ArticleCategoryJsonLdHead({ category }: { category: stri
     <Head>
       <script 
         type="application/ld+json" 
-        dangerouslySetInnerHTML={{ __html: sanitizeJson(jsonLd) }} 
+        dangerouslySetInnerHTML={{ __html: sanitizeJsonLd(jsonLd) }} 
       />
     </Head>
   );

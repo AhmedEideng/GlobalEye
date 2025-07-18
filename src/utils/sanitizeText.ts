@@ -23,6 +23,93 @@ export function sanitizeText(text: string | null | undefined): string {
 }
 
 /**
+ * Ultra-secure JSON-LD sanitization for dangerouslySetInnerHTML
+ * This function is specifically designed to prevent XSS attacks in JSON-LD scripts
+ * @param data - The data to sanitize
+ * @returns Sanitized JSON string safe for dangerouslySetInnerHTML
+ */
+export function sanitizeJsonLd(data: unknown): string {
+  try {
+    // Deep sanitize the data with extra security for JSON-LD
+    const sanitizedData = sanitizeJsonLdDeep(data);
+    const jsonString = JSON.stringify(sanitizedData);
+    
+    // Additional security layer: remove any potentially dangerous characters
+    return jsonString
+      // Remove all HTML/XML tags
+      .replace(/<[^>]*>/g, '')
+      // Remove script tags and their content
+      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+      // Remove event handlers
+      .replace(/\bon\w+\s*=/gi, '')
+      // Remove javascript: protocol
+      .replace(/javascript:/gi, '')
+      // Remove data: protocol
+      .replace(/data:/gi, '')
+      // Remove vbscript: protocol
+      .replace(/vbscript:/gi, '')
+      // Remove any remaining potentially dangerous characters
+      .replace(/[<>]/g, '')
+      // Ensure proper JSON structure
+      .replace(/,\s*}/g, '}')
+      .replace(/,\s*]/g, ']');
+  } catch {
+    // Return safe empty object if sanitization fails
+    return '{}';
+  }
+}
+
+/**
+ * Deep sanitize data for JSON-LD with extra security measures
+ * @param data - The data to sanitize
+ * @returns Sanitized data
+ */
+function sanitizeJsonLdDeep(data: unknown): unknown {
+  if (data === null || data === undefined) {
+    return data;
+  }
+  
+  if (typeof data === 'string') {
+    return sanitizeText(data)
+      // Additional security for JSON-LD strings
+      .replace(/[<>]/g, '') // Remove angle brackets
+      .replace(/javascript:/gi, '') // Remove javascript protocol
+      .replace(/data:/gi, '') // Remove data protocol
+      .replace(/vbscript:/gi, '') // Remove vbscript protocol
+      .replace(/\bon\w+\s*=/gi, '') // Remove event handlers
+      .substring(0, 1000); // Limit string length
+  }
+  
+  if (typeof data === 'number' || typeof data === 'boolean') {
+    return data;
+  }
+  
+  if (Array.isArray(data)) {
+    return data.slice(0, 100).map(sanitizeJsonLdDeep); // Limit array size
+  }
+  
+  if (typeof data === 'object') {
+    const sanitized: Record<string, unknown> = {};
+    let count = 0;
+    for (const [key, value] of Object.entries(data)) {
+      if (count >= 50) break; // Limit object properties
+      // Sanitize the key as well
+      const sanitizedKey = sanitizeText(key)
+        .replace(/[<>]/g, '') // Remove angle brackets
+        .replace(/javascript:/gi, '') // Remove javascript protocol
+        .substring(0, 50); // Limit key length
+      if (sanitizedKey) {
+        sanitized[sanitizedKey] = sanitizeJsonLdDeep(value);
+        count++;
+      }
+    }
+    return sanitized;
+  }
+  
+  return String(data).substring(0, 100); // Limit length
+}
+
+/**
  * Sanitizes HTML content for dangerouslySetInnerHTML
  * @param html - The HTML content to sanitize
  * @returns Sanitized HTML safe for dangerouslySetInnerHTML
@@ -45,7 +132,7 @@ export function sanitizeHtml(html: string): string {
 }
 
 /**
- * Sanitize JSON data for safe rendering
+ * Sanitize JSON data for safe rendering (general purpose)
  * @param data - The data to sanitize
  * @returns Sanitized JSON string
  */

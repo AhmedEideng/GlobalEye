@@ -1,6 +1,6 @@
 "use client";
 import Head from 'next/head';
-import { sanitizeText, sanitizeJson } from '@/utils/sanitizeText';
+import { sanitizeText, sanitizeJsonLd } from '@/utils/sanitizeText';
 
 export default function ArticleContactJsonLdHead() {
   const jsonLd = {
@@ -15,7 +15,7 @@ export default function ArticleContactJsonLdHead() {
     <Head>
       <script 
         type="application/ld+json" 
-        dangerouslySetInnerHTML={{ __html: sanitizeJson(jsonLd) }} 
+        dangerouslySetInnerHTML={{ __html: sanitizeJsonLd(jsonLd) }} 
       />
     </Head>
   );

@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { NewsArticle } from '@utils/fetchNews';
 import { useAuth } from '@hooks/useAuth';
 import { isFavorite } from '@services/favorites';
-import { sanitizeText, sanitizeJson } from '../utils/sanitizeText';
+import { sanitizeText, sanitizeJsonLd } from '../utils/sanitizeText';
 
 export default function ArticleHeader({ article }: { article: NewsArticle }) {
   const { user } = useAuth();
@@ -44,7 +44,7 @@ export default function ArticleHeader({ article }: { article: NewsArticle }) {
       <Head>
         <script 
           type="application/ld+json" 
-          dangerouslySetInnerHTML={{ __html: sanitizeJson(jsonLd) }} 
+          dangerouslySetInnerHTML={{ __html: sanitizeJsonLd(jsonLd) }} 
         />
       </Head>
       {/* Main Image */}

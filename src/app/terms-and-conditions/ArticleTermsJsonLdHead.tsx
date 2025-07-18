@@ -1,6 +1,6 @@
 "use client";
 import Head from 'next/head';
-import { sanitizeText, sanitizeJson } from '@/utils/sanitizeText';
+import { sanitizeText, sanitizeJsonLd } from '@/utils/sanitizeText';
 
 export default function ArticleTermsJsonLdHead() {
   const jsonLd = {
@@ -13,7 +13,7 @@ export default function ArticleTermsJsonLdHead() {
   };
   return (
     <Head>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: sanitizeJson(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: sanitizeJsonLd(jsonLd) }} />
     </Head>
   );
 } 
