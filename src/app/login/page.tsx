@@ -124,7 +124,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
-                autoFocus
+                
               />
             </div>
             {error && <div className="text-red-600 text-sm">{error}</div>}
@@ -183,7 +183,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   required
-                  autoFocus
+                  
                 />
                 <button
                   type="button"
