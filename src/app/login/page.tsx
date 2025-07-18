@@ -32,9 +32,6 @@ export default function LoginPage() {
     return { hasLowerCase, hasUpperCase, hasNumber, hasSpecialChar };
   };
 
-  const passwordValidation = validatePassword(password);
-  // Remove unused variables
-
   const handleGoogleSignIn = React.useCallback(async () => {
     try {
       const options: Record<string, unknown> = { skipBrowserRedirect: true };
@@ -230,19 +227,19 @@ export default function LoginPage() {
                   <span>Password should contain at least 8 characters</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  {passwordValidation.hasLowerCase ? <span className="text-green-600">&#10003;</span> : <span className="inline-block w-4" />}
+                  {validatePassword(password).hasLowerCase ? <span className="text-green-600">&#10003;</span> : <span className="inline-block w-4" />}
                   <span>Password should contain lowercase letter</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  {passwordValidation.hasUpperCase ? <span className="text-green-600">&#10003;</span> : <span className="inline-block w-4" />}
+                  {validatePassword(password).hasUpperCase ? <span className="text-green-600">&#10003;</span> : <span className="inline-block w-4" />}
                   <span>Password should contain uppercase letter</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  {passwordValidation.hasNumber ? <span className="text-green-600">&#10003;</span> : <span className="inline-block w-4" />}
+                  {validatePassword(password).hasNumber ? <span className="text-green-600">&#10003;</span> : <span className="inline-block w-4" />}
                   <span>Password should contain number</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  {passwordValidation.hasSpecialChar ? <span className="text-green-600">&#10003;</span> : <span className="inline-block w-4" />}
+                  {validatePassword(password).hasSpecialChar ? <span className="text-green-600">&#10003;</span> : <span className="inline-block w-4" />}
                   <span>Password should contain special character</span>
                 </div>
               </div>

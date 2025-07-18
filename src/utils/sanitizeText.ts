@@ -45,32 +45,56 @@ export function sanitizeHtml(html: string): string {
 }
 
 /**
- * Sanitizes JSON content for JSON-LD scripts
- * @param json - The JSON object to sanitize
- * @returns Sanitized JSON string safe for dangerouslySetInnerHTML
+ * Sanitize JSON data for safe rendering
+ * @param data - The data to sanitize
+ * @returns Sanitized JSON string
  */
-export function sanitizeJson(json: Record<string, unknown>): string {
-  if (!json) return '{}';
-  
+export function sanitizeJson(data: unknown): string {
   try {
-    // Convert to string and sanitize
-    const jsonString = JSON.stringify(json);
-    return jsonString
-      // Remove all null bytes and control characters
-      .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
-      // Remove non-ASCII characters
-      .replace(/[^\x00-\x7F]/g, '')
-      // Remove any remaining problematic Unicode characters
-      .replace(/[\uFFFE\uFFFF]/g, '')
-      // Remove zero-width characters
-      .replace(/[\u200B-\u200D\uFEFF]/g, '')
-      // Normalize whitespace
-      .replace(/\s+/g, ' ')
-      .trim();
-  } catch {
-    // Return empty object if JSON stringify fails
+    // Deep sanitize the data
+    const sanitizedData = sanitizeDataDeep(data);
+    return JSON.stringify(sanitizedData);
+  } catch (error) {
+    // Return empty object if sanitization fails
     return '{}';
   }
+}
+
+/**
+ * Deep sanitize data recursively
+ * @param data - The data to sanitize
+ * @returns Sanitized data
+ */
+function sanitizeDataDeep(data: unknown): unknown {
+  if (data === null || data === undefined) {
+    return data;
+  }
+  
+  if (typeof data === 'string') {
+    return sanitizeText(data);
+  }
+  
+  if (typeof data === 'number' || typeof data === 'boolean') {
+    return data;
+  }
+  
+  if (Array.isArray(data)) {
+    return data.map(sanitizeDataDeep);
+  }
+  
+  if (typeof data === 'object') {
+    const sanitized: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(data)) {
+      // Sanitize the key as well
+      const sanitizedKey = sanitizeText(key);
+      if (sanitizedKey) {
+        sanitized[sanitizedKey] = sanitizeDataDeep(value);
+      }
+    }
+    return sanitized;
+  }
+  
+  return String(data);
 }
 
 /**
