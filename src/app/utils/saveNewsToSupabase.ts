@@ -59,7 +59,7 @@ export async function saveNewsToSupabase(articles: ExternalNewsArticle[], catego
       category_id,
     }));
 
-    console.log(`📦 Saving ${mapped.length} articles to Supabase...`);
+    
 
     const { error } = await supabase
       .from('news')
@@ -68,7 +68,7 @@ export async function saveNewsToSupabase(articles: ExternalNewsArticle[], catego
     if (error) {
       console.error('❌ Supabase upsert error:', error.message || error);
     } else {
-      console.log('✅ Articles saved successfully to Supabase.');
+      
     }
   } catch (err) {
     console.error('❌ Exception in saveNewsToSupabase:', err);
