@@ -4,7 +4,7 @@ import { supabase } from './supabaseClient';
 import { ExternalNewsArticle } from './fetchExternalNews';
 
 function generateSlug(title: string, url: string): string {
-  if (title && title.trim()) {
+  if (title?.trim()) {
     const cleanTitle = title
       .toLowerCase()
       .trim()
