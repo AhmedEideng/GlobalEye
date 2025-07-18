@@ -59,8 +59,8 @@ async function fetchFromNewsAPI(category: string): Promise<ExternalNewsArticle[]
       publishedAt: article.publishedAt as string ?? '',
       content: article.content as string ?? null,
     }));
-  } catch (error: any) {
-    await logSnagEvent("NewsAPI ❌", `فشل جلب أخبار ${category}: ${error.message}`);
+  } catch (error: unknown) {
+    await logSnagEvent("NewsAPI ❌", `فشل جلب أخبار ${category}: ${error instanceof Error ? error.message : error}`);
     return [];
   }
 }
@@ -91,8 +91,8 @@ export async function fetchFromGNews(category: string): Promise<ExternalNewsArti
       publishedAt: article.publishedAt as string ?? '',
       content: article.content as string ?? null,
     }));
-  } catch (error: any) {
-    await logSnagEvent("GNews ❌", `فشل جلب أخبار ${category}: ${error.message}`);
+  } catch (error: unknown) {
+    await logSnagEvent("GNews ❌", `فشل جلب أخبار ${category}: ${error instanceof Error ? error.message : error}`);
     return [];
   }
 }
@@ -126,8 +126,8 @@ export async function fetchFromGuardian(category: string): Promise<ExternalNewsA
         ? (article.fields as Record<string, unknown>).bodyText as string ?? null
         : null,
     }));
-  } catch (error: any) {
-    await logSnagEvent("Guardian ❌", `فشل جلب أخبار ${category}: ${error.message}`);
+  } catch (error: unknown) {
+    await logSnagEvent("Guardian ❌", `فشل جلب أخبار ${category}: ${error instanceof Error ? error.message : error}`);
     return [];
   }
 }
@@ -153,8 +153,8 @@ export async function fetchFromMediastack(category: string): Promise<ExternalNew
       publishedAt: article.published_at as string ?? '',
       content: null,
     }));
-  } catch (error: any) {
-    await logSnagEvent("Mediastack ❌", `فشل جلب أخبار ${category}: ${error.message}`);
+  } catch (error: unknown) {
+    await logSnagEvent("Mediastack ❌", `فشل جلب أخبار ${category}: ${error instanceof Error ? error.message : error}`);
     return [];
   }
 }

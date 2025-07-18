@@ -29,12 +29,16 @@ export async function GET() {
       await saveNewsToSupabase(articles, category_id);
       results.push({ category, count: articles.length });
       total += articles.length;
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (process.env.NODE_ENV === 'development') {
         // eslint-disable-next-line no-console
-        console.error(`Error with category "${category}":`, err);
+        if (err instanceof Error) {
+          console.error(`Error with category "${category}":`, err);
+        } else {
+          console.error(`Error with category "${category}":`, err);
+        }
       }
-      await logSnagEvent(`❌ خطأ في ${category}`, err?.message || "Unknown error");
+      await logSnagEvent(`❌ خطأ في ${category}`, err instanceof Error ? err.message : "Unknown error");
     }
   }
 
