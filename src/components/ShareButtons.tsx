@@ -19,7 +19,7 @@ export default function ShareButtons({ url, title }: { url: string, title: strin
       setCopied(true);
       sendAnalyticsEvent('share_article', { method: 'copy', url: fullUrl });
       setTimeout(() => setCopied(false), 1500);
-    } catch (error) {
+    } catch {
       // Fallback for older browsers
       const textArea = document.createElement('textarea');
       textArea.value = fullUrl;

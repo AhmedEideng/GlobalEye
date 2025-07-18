@@ -54,7 +54,7 @@ export function sanitizeJson(data: unknown): string {
     // Deep sanitize the data
     const sanitizedData = sanitizeDataDeep(data);
     return JSON.stringify(sanitizedData);
-  } catch (error) {
+  } catch {
     // Return empty object if sanitization fails
     return '{}';
   }
