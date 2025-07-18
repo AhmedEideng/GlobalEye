@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchNews, NewsArticle } from '../../utils/fetchNews';
+import { fetchNews, NewsArticle } from '@utils/fetchNews';
 
 // Professional error logger for rotation API
 function logRotationError(...args: unknown[]) {

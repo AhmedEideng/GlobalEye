@@ -1,5 +1,5 @@
 // ← أضيفي هذا في أعلى الملف
-import { logSnagEvent } from "@/app/utils/logsnag";
+import { logSnagEvent } from '@utils/logsnag';
 
 export interface ExternalNewsArticle {
   source: { id: string | null; name: string };

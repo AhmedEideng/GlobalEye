@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import { fetchExternalNews } from '@/app/utils/fetchExternalNews';
-import { saveNewsToSupabase } from '@/app/utils/saveNewsToSupabase';
-import { getOrAddCategoryId } from '@/app/utils/categoryUtils';
-import { logSnagEvent } from '@/app/utils/logsnag'; // ← أضفنا هذا
+import { fetchExternalNews } from '@utils/fetchExternalNews';
+import { saveNewsToSupabase } from '@utils/saveNewsToSupabase';
+import { getOrAddCategoryId } from '@utils/categoryUtils';
+import { logSnagEvent } from '@utils/logsnag'; // ← أضفنا هذا
 
 export async function GET() {
   const supportedCategories = [
