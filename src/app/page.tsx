@@ -1,4 +1,4 @@
-import { fetchNews, NewsArticle } from './utils/fetchNews';
+import { fetchNews, NewsArticle } from '@utils/fetchNews';
 import HomeFeatured from '@components/HomeFeatured';
 import HomeNewsGrid from '@components/HomeNewsGrid';
 import type { Metadata } from 'next';
