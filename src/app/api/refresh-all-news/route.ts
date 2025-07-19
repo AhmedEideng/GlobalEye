@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchExternalNews } from '@utils/fetchExternalNews';
+import { fetchExternalNews, ExternalNewsArticle } from '@utils/fetchExternalNews';
 import { saveNewsToSupabase } from '@utils/saveNewsToSupabase';
+import { NewsArticle } from '@utils/fetchNews';
 import { getOrAddCategoryId } from '@utils/categoryUtils';
 import { logSnagEvent } from '@utils/logsnag';
 
@@ -25,6 +26,24 @@ function checkRateLimit(identifier: string): boolean {
   
   record.count++;
   return true;
+}
+
+// Helper function to convert ExternalNewsArticle to NewsArticle
+function convertToNewsArticle(externalArticle: ExternalNewsArticle, category: string): NewsArticle {
+  // Create a slug from the title
+  const slug = externalArticle.title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/-+/g, '-') // Replace multiple hyphens with single
+    .trim()
+    .substring(0, 100); // Limit length
+
+  return {
+    ...externalArticle,
+    slug,
+    category
+  };
 }
 
 export async function GET(request: NextRequest) {
@@ -74,14 +93,19 @@ export async function GET(request: NextRequest) {
     // Process categories in parallel for better performance
     const categoryPromises = supportedCategories.map(async (category) => {
       try {
-        const articles = await fetchExternalNews(category);
+        const externalArticles = await fetchExternalNews(category);
         const category_id = await getOrAddCategoryId(category);
         
         if (!category_id) {
           throw new Error(`Failed to get category ID for ${category}`);
         }
 
-        await saveNewsToSupabase(articles, category_id);
+        // Convert ExternalNewsArticle to NewsArticle
+        const articles: NewsArticle[] = externalArticles.map(article => 
+          convertToNewsArticle(article, category)
+        );
+
+        await saveNewsToSupabase(articles, category);
         
         return {
           category,
