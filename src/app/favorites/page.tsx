@@ -47,7 +47,7 @@ export default function FavoritesPage() {
         setFavLoading(false);
       }
     };
-    if (user) fetchFavorites();
+    if (user) void fetchFavorites();
   }, [user]);
 
   if (loading || favLoading) {

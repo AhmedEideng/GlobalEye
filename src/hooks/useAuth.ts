@@ -30,7 +30,7 @@ export function useAuth() {
       if (data?.user) {
         setUser({
           id: data.user.id,
-          email: data.user.email!,
+          email: data.user.email || '',
           name: data.user.user_metadata?.full_name || data.user.user_metadata?.name || '',
           avatar_url: data.user.user_metadata?.avatar_url || '',
         });
@@ -39,7 +39,7 @@ export function useAuth() {
       }
       setLoading(false);
     };
-    getUser();
+    void getUser();
     // Listen to session changes
     const { data: listener } = supabase.auth.onAuthStateChange(() => {
       getUser();

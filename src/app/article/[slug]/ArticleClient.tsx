@@ -67,7 +67,7 @@ export default function ArticleClient({ article, slug }: { article: NewsArticle 
           // Optionally log or handle the error
         }
       };
-      fetchAndSetRelatedArticles();
+      void fetchAndSetRelatedArticles();
     }
   }, [article]);
 
