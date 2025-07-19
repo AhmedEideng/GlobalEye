@@ -3,6 +3,13 @@
  * @param text - The text to sanitize
  * @returns Sanitized text safe for React rendering
  */
+const CONTROL_CHARS_REGEX = /[\u0000-\u001F\u007F-\u009F]/gu;
+const SAFE_PRINTABLE_REGEX = /[^\u0020-\u007E\u000A\u0009]/gu;
+const UNICODE_SPECIAL_REGEX = /[\uFFFE\uFFFF]/gu;
+const ZERO_WIDTH_REGEX = /[\u200B-\u200D\uFEFF]/gu;
+const MULTI_SPACE_REGEX = /\s+/gu;
+const STRICT_SAFE_REGEX = /[^\w\s\-.,+*()[\]{}|&^%#@!?=:;"'\\]/gu;
+
 export function sanitizeText(text: string | null | undefined): string {
   if (!text) return '';
   
@@ -214,10 +221,3 @@ export function sanitizeSvgContent(svgContent: string): string {
     .replace(MULTI_SPACE_REGEX, ' ')
     .trim();
 } 
-
-const CONTROL_CHARS_REGEX = /[\u0000-\u001F\u007F-\u009F]/gu;
-const SAFE_PRINTABLE_REGEX = /[^\u0020-\u007E\u000A\u0009]/gu;
-const UNICODE_SPECIAL_REGEX = /[\uFFFE\uFFFF]/gu;
-const ZERO_WIDTH_REGEX = /[\u200B-\u200D\uFEFF]/gu;
-const MULTI_SPACE_REGEX = /\s+/gu;
-const STRICT_SAFE_REGEX = /[^\w\s\-.,+*()[\]{}|&^%#@!?=:;"'\\]/gu; 
