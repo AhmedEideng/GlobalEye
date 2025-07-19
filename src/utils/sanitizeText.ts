@@ -17,7 +17,7 @@ export function sanitizeText(text: string | null | undefined): string {
     .replace(/[\u200B-\u200D\uFEFF]/gu, '')
     // Normalize whitespace
     .replace(/\s+/gu, ' ')
-    // Remove any remaining invalid characters (simplified)
+    // Remove any remaining special characters that could be dangerous
     .replace(/[^\w\s\-.,+*()[\]{}|&^%#@!?=:;"'\\]/gu, '')
     .trim();
 }
