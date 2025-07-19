@@ -28,6 +28,8 @@ export default function FavoritesPage() {
     }
   }, [user]);
 
+  const handleRemoveCb = React.useCallback((slug: string) => handleRemove(slug), [handleRemove]);
+
   useEffect(() => {
     const fetchFavorites = async () => {
       if (!user) return;
@@ -57,8 +59,6 @@ export default function FavoritesPage() {
   if (!user) {
     return <div className="min-h-[60vh] flex items-center justify-center text-lg">Please login to view your favorites.</div>;
   }
-
-  const handleRemoveCb = React.useCallback((slug: string) => handleRemove(slug), [handleRemove]);
 
   return (
     <main className="max-w-3xl mx-auto mt-10 p-4">
