@@ -15,8 +15,16 @@ export default function FavoritesPage() {
 
   const handleRemove = React.useCallback(async (slug: string) => {
     if (!user) return;
-    setArticles((prev) => prev.filter((a) => a.slug !== slug)); // Optimistic update
-    await removeFavorite(user.id, slug);
+    try {
+      setArticles((prev) => prev.filter((a) => a.slug !== slug)); // Optimistic update
+      await removeFavorite(user.id, slug);
+    } catch (error) {
+      // Revert optimistic update on error
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error('Failed to remove favorite:', error);
+      }
+    }
   }, [user]);
 
   const handleRemoveFavorite = React.useCallback((slug: string) => {
@@ -26,13 +34,21 @@ export default function FavoritesPage() {
   useEffect(() => {
     const fetchFavorites = async () => {
       if (!user) return;
-      setFavLoading(true);
-      const slugs = await getFavorites(user.id);
-      // جلب تفاصيل الأخبار المفضلة حسب slug
-      const allNews = await fetchNews();
-      setArticles(allNews.filter((a: NewsArticle) => slugs.includes(a.slug)));
-      setFavLoading(false);
-      sendAnalyticsEvent('favorites_view', { userId: user.id });
+      try {
+        setFavLoading(true);
+        const slugs = await getFavorites(user.id);
+        // جلب تفاصيل الأخبار المفضلة حسب slug
+        const allNews = await fetchNews();
+        setArticles(allNews.filter((a: NewsArticle) => slugs.includes(a.slug)));
+        sendAnalyticsEvent('favorites_view', { userId: user.id });
+      } catch (error) {
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.error('Failed to fetch favorites:', error);
+        }
+      } finally {
+        setFavLoading(false);
+      }
     };
     if (user) fetchFavorites();
   }, [user]);

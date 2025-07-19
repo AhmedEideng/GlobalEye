@@ -12,7 +12,15 @@ export default function ArticleHeader({ article }: { article: NewsArticle }) {
   React.useEffect(() => {
     if (user) {
       const checkFavorite = async () => {
-        await isFavorite(user.id, article.slug);
+        try {
+          await isFavorite(user.id, article.slug);
+        } catch (error) {
+          // Silently handle error for favorite check
+          if (process.env.NODE_ENV === 'development') {
+            // eslint-disable-next-line no-console
+            console.warn('Failed to check favorite status:', error);
+          }
+        }
       };
       checkFavorite();
     }

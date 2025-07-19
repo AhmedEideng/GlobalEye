@@ -82,7 +82,7 @@ export default function ShareButtons({ url, title }: { url: string, title: strin
     <div className="flex flex-wrap gap-2 mt-6">
       {shareButtons.map((button, index) => (
         <button
-          key={index}
+          key={`${button.label}-${index}`}
           onClick={button.onClick}
           className={`${button.className} text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2`}
           aria-label={button.label}
