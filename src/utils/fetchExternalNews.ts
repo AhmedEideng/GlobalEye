@@ -23,7 +23,7 @@ const isValidApiKey = (key: string | undefined): boolean => {
   return typeof key === 'string' && key.length > 0 && key !== 'undefined';
 };
 
-export async function fetchExternalNews(category: string = 'general'): Promise<ExternalNewsArticle[]> {
+export async function fetchExternalNews(category = 'general'): Promise<ExternalNewsArticle[]> {
   let newsapi: ExternalNewsArticle[] = [];
   let gnews: ExternalNewsArticle[] = [];
   let guardian: ExternalNewsArticle[] = [];

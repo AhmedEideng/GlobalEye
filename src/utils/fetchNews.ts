@@ -57,7 +57,7 @@ const newsCache = new LRUCache<string, NewsArticle[]>({
  * @param category - The news category (default: 'general')
  * @returns Promise<NewsArticle[]>
  */
-export async function forceRefreshNews(category: string = 'general') {
+export async function forceRefreshNews(category = 'general') {
   newsCache.delete(category);
   return await fetchNews(category);
 }
@@ -67,7 +67,7 @@ export async function forceRefreshNews(category: string = 'general') {
  * @param category - The news category (default: 'general')
  * @returns Promise<NewsArticle[]>
  */
-export async function fetchNews(category: string = 'general'): Promise<NewsArticle[]> {
+export async function fetchNews(category = 'general'): Promise<NewsArticle[]> {
   // Check cache first
   const cached = newsCache.get(category);
   if (cached) return cached;
