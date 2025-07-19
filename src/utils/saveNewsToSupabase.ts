@@ -15,17 +15,6 @@ function generateSlug(title: string, url: string): string {
     .substring(0, 100);
 }
 
-function hashCode(str: string): number {
-  let hash = 0, i, chr;
-  if (str.length === 0) return hash;
-  for (i = 0; i < str.length; i++) {
-    chr = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + chr;
-    hash |= 0;
-  }
-  return hash;
-}
-
 export async function saveNewsToSupabase(articles: ExternalNewsArticle[], category_id: number) {
   try {
     if (!articles.length) {
