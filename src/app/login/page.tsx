@@ -45,10 +45,10 @@ export default function LoginPage() {
       if (data?.url) {
         window.location.href = data.url;
       } else {
-        alert("Google login failed. Please check your Supabase settings and API keys.");
+        setError("Google login failed. Please check your Supabase settings and API keys.");
       }
     } catch (err) {
-      alert("Exception during Google login: " + err);
+      setError("Exception during Google login: " + err);
     }
   }, []);
 

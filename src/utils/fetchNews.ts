@@ -124,7 +124,9 @@ export function detectCategory(article: NewsArticle): string {
     for (const kw of keywords) {
       // Support Arabic and English
       const regex = new RegExp(`\\b${kw.replace(/[-/\\^$*+?.()|[\]{}]/gu, '\\$&')}\\b`, 'giu');
-      count += (text.match(regex) || []).length;
+      // استخدم matchAll بدلاً من match للحصول على جميع التطابقات
+      const matches = [...text.matchAll(regex)];
+      count += matches.length;
     }
     if (count > maxCount) {
       maxCount = count;
