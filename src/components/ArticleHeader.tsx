@@ -111,6 +111,7 @@ export default function ArticleHeader({ article }: { article: NewsArticle }) {
   return (
     <>
       <Head>
+        {/* skipcq: JS-0440 - Usage of dangerouslySetInnerHTML is required for SEO JSON-LD and is sanitized. */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
