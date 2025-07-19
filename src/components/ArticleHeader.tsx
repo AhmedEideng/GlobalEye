@@ -83,7 +83,7 @@ export default function ArticleHeader({ article }: { article: NewsArticle }) {
           }
         }
       };
-      checkFavorite();
+      void checkFavorite();
     }
   }, [user, article.slug]);
 
