@@ -44,7 +44,6 @@ const pwaConfig = {
 };
 
 const nextConfig = {
-  output: 'standalone',
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '**' },
@@ -107,4 +106,7 @@ const nextConfig = {
   },
 };
 
-module.exports = withPWA({ ...nextConfig, pwa: pwaConfig }); 
+module.exports = {
+  output: 'standalone',
+  ...withPWA({ ...nextConfig, pwa: pwaConfig })
+}; 
