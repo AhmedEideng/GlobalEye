@@ -1,4 +1,5 @@
-const withPWA = require('next-pwa')({
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+module.exports = require('next-pwa')({
   dest: 'public',
   register: true,
   skipWaiting: true,
