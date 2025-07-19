@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "es2015",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -16,16 +20,38 @@
     "noEmit": true,
     "jsx": "preserve",
     "incremental": true,
-    "baseUrl": ".", 
+    "baseUrl": ".",
     "downlevelIteration": true,
     "paths": {
-      "@/*": ["src/*"],
-      "@components/*": ["src/components/*"],
-      "@utils/*": ["src/utils/*"],
-      "@hooks/*": ["src/hooks/*"],
-      "@services/*": ["src/services/*"]
-    }
+      "@/*": [
+        "src/*"
+      ],
+      "@components/*": [
+        "src/components/*"
+      ],
+      "@utils/*": [
+        "src/utils/*"
+      ],
+      "@hooks/*": [
+        "src/hooks/*"
+      ],
+      "@services/*": [
+        "src/services/*"
+      ]
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "next-env.d.ts",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

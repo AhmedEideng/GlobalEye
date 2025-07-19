@@ -20,7 +20,7 @@ export function useAuth() {
   useEffect(() => {
     const t = setTimeout(() => setTimeoutReached(true), 5000);
     return () => clearTimeout(t);
-  }, []);
+  }, [setTimeoutReached]);
 
   useEffect(() => {
     // Get current user on load
@@ -47,7 +47,7 @@ export function useAuth() {
     return () => {
       listener?.subscription.unsubscribe();
     };
-  }, []);
+  }, [setLoading, setUser]);
 
   // Login with Google
   const signInWithGoogle = async () => {

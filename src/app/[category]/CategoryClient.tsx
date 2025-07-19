@@ -170,32 +170,41 @@ export default function CategoryClient({
   const mainNews = mainArticles.map(toNewsArticle);
   const suggestedNews = suggested.map(toNewsArticle);
 
-  const renderSuggestedArticle = React.useCallback((article: Article, idx: number) => (
-    <React.Fragment key={article.slug || `suggested-${idx}-${article.url}`}>
-      <Link
-        href={`/article/${article.slug}`}
-        className="article-card group transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl rounded-xl bg-white shadow-md overflow-hidden"
-      >
-        <div className="relative w-full h-48 overflow-hidden">
-          <Image
-            src={article.urlToImage || "/placeholder-news.jpg"}
-            alt={article.title}
-            fill
-            className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-          />
-        </div>
-        <div className="p-4">
-          <div className="article-category text-xs font-bold mb-1 bg-red-600 text-white rounded-full px-3 py-1 inline-block">{article.source?.name}</div>
-          <h3 className="article-title text-lg font-bold mb-2 line-clamp-2 group-hover:text-red-700 transition-colors duration-200">{article.title}</h3>
-          <p className="article-excerpt text-gray-600 text-sm mb-2 line-clamp-2">{article.description}</p>
-          <div className="article-meta text-xs flex flex-wrap gap-2 text-gray-400">
-            <span className="flex items-center gap-1 text-gray-400">{new Date(article.publishedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
-            {article.author && <span>by {article.author}</span>}
+  const renderSuggestedArticle = React.useCallback((article: Article, idx: number) => {
+    // Format date outside of the callback to avoid hooks rules violation
+    const formattedDate = new Date(article.publishedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
+    return (
+      <React.Fragment key={article.slug || `suggested-${idx}-${article.url}`}>
+        <Link
+          href={`/article/${article.slug}`}
+          className="article-card group transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl rounded-xl bg-white shadow-md overflow-hidden"
+        >
+          <div className="relative w-full h-48 overflow-hidden">
+            <Image
+              src={article.urlToImage || "/placeholder-news.jpg"}
+              alt={article.title}
+              fill
+              className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+            />
           </div>
-        </div>
-      </Link>
-    </React.Fragment>
-  ), []);
+          <div className="p-4">
+            <div className="article-category text-xs font-bold mb-1 bg-red-600 text-white rounded-full px-3 py-1 inline-block">{article.source?.name}</div>
+            <h3 className="article-title text-lg font-bold mb-2 line-clamp-2 group-hover:text-red-700 transition-colors duration-200">{article.title}</h3>
+            <p className="article-excerpt text-gray-600 text-sm mb-2 line-clamp-2">{article.description}</p>
+            <div className="article-meta text-xs flex flex-wrap gap-2 text-gray-400">
+              <span className="flex items-center gap-1 text-gray-400">{formattedDate}</span>
+              {article.author && <span>by {article.author}</span>}
+            </div>
+          </div>
+        </Link>
+      </React.Fragment>
+    );
+  }, []);
+
+  const handleRefresh = React.useCallback(() => {
+    window.location.reload();
+  }, []);
 
   if (loading && !timeout) {
     return (
@@ -214,7 +223,7 @@ export default function CategoryClient({
       <div className="error text-center py-8">
         <h2 className="text-2xl font-bold text-red-700 mb-4">Failed to load news</h2>
         <p className="text-gray-600 mb-6">Loading took too long. Try refreshing the page or check your internet connection.</p>
-        <button className="btn btn-primary" onClick={() => window.location.reload()}>Refresh Page</button>
+        <button className="btn btn-primary" onClick={handleRefresh}>Refresh Page</button>
       </div>
     );
   }
@@ -226,7 +235,7 @@ export default function CategoryClient({
         <p className="text-gray-600 mb-6">No news articles found in the {categoryLabel} category at the moment.</p>
         <button 
           className="btn btn-primary"
-          onClick={() => window.location.reload()}
+          onClick={handleRefresh}
         >
           Refresh
         </button>

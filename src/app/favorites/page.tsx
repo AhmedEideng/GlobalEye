@@ -27,10 +27,6 @@ export default function FavoritesPage() {
     }
   }, [user]);
 
-  const handleRemoveFavorite = React.useCallback((slug: string) => {
-    handleRemove(slug);
-  }, [handleRemove]);
-
   useEffect(() => {
     const fetchFavorites = async () => {
       if (!user) return;
@@ -68,33 +64,38 @@ export default function FavoritesPage() {
         <div className="text-gray-500">You have no favorite articles yet.</div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          {articles.map((article) => (
-            <div key={article.slug || `favorite-${article.url}`} className="relative group">
-              <Link href={`/article/${article.slug}`} className="article-card">
-                <div className="relative w-full h-40 overflow-hidden">
-                  <OptimizedImage
-                    src={article.urlToImage || '/placeholder-news.jpg'}
-                    alt={article.title}
-                    fill
-                    className="object-cover w-full h-full"
-                    sizes="100vw"
-                  />
-                </div>
-                <div className="p-4">
-                  <div className="text-xs text-red-600 font-bold mb-1">{article.source?.name}</div>
-                  <h3 className="text-lg font-bold mb-1 line-clamp-2 break-words text-balance">{article.title}</h3>
-                  <div className="text-xs text-gray-400">{new Date(article.publishedAt).toLocaleDateString('en-GB')}</div>
-                </div>
-              </Link>
-              <button
-                onClick={() => handleRemoveFavorite(article.slug)}
-                className="absolute top-2 right-2 z-10 bg-white/80 rounded-full p-2 shadow hover:bg-red-100 transition-opacity opacity-0 group-hover:opacity-100"
-                title="Remove from favorites"
-              >
-                <span role="img" aria-label="remove">🗑️</span>
-              </button>
-            </div>
-          ))}
+          {articles.map((article) => {
+            // Format date outside of the callback to avoid hooks rules violation
+            const formattedDate = new Date(article.publishedAt).toLocaleDateString('en-GB');
+
+            return (
+              <div key={article.slug || `favorite-${article.url}`} className="relative group">
+                <Link href={`/article/${article.slug}`} className="article-card">
+                  <div className="relative w-full h-40 overflow-hidden">
+                    <OptimizedImage
+                      src={article.urlToImage || '/placeholder-news.jpg'}
+                      alt={article.title}
+                      fill
+                      className="object-cover w-full h-full"
+                      sizes="100vw"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <div className="text-xs text-red-600 font-bold mb-1">{article.source?.name}</div>
+                    <h3 className="text-lg font-bold mb-1 line-clamp-2 break-words text-balance">{article.title}</h3>
+                    <div className="text-xs text-gray-400">{formattedDate}</div>
+                  </div>
+                </Link>
+                <button
+                  onClick={() => handleRemove(article.slug)}
+                  className="absolute top-2 right-2 z-10 bg-white/80 rounded-full p-2 shadow hover:bg-red-100 transition-opacity opacity-0 group-hover:opacity-100"
+                  title="Remove from favorites"
+                >
+                  <span role="img" aria-label="remove">🗑️</span>
+                </button>
+              </div>
+            );
+          })}
         </div>
       )}
     </main>

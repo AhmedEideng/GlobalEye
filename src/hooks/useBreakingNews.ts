@@ -126,9 +126,20 @@ export const useBreakingNews = () => {
       setLoading(true);
       setError(null);
       const data = await fetchBreakingNews();
-      // Shuffle the news array to make it appear more dynamic
-      const shuffledData = [...data].sort(() => Math.random() - 0.5);
-      setNews(shuffledData);
+      // Sort by priority and timestamp instead of random shuffle for better performance
+      const sortedData = [...data].sort((a, b) => {
+        const priorityOrder = { high: 3, medium: 2, low: 1 };
+        const aPriority = priorityOrder[a.priority || 'low'];
+        const bPriority = priorityOrder[b.priority || 'low'];
+        
+        if (aPriority !== bPriority) {
+          return bPriority - aPriority; // Higher priority first
+        }
+        
+        // If same priority, sort by timestamp (newer first)
+        return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+      });
+      setNews(sortedData);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch breaking news');
     } finally {

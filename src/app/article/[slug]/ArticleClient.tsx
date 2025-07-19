@@ -11,32 +11,44 @@ import React from 'react';
 
 export default function ArticleClient({ article, slug }: { article: NewsArticle | null, slug: string }) {
   const [relatedArticles, setRelatedArticles] = useState<NewsArticle[]>([]);
-  const renderRelatedArticle = React.useCallback((related: NewsArticle, idx: number) => (
-    <React.Fragment key={related.slug || `related-${idx}-${related.url}`}> 
-      <Link
-        href={`/article/${related.slug}`}
-        className="article-card group transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl rounded-xl bg-white shadow-md overflow-hidden"
-      >
-        <div className="relative w-full h-48 overflow-hidden">
-          <Image
-            src={related.urlToImage || "/placeholder-news.jpg"}
-            alt={related.title}
-            fill
-            className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-          />
-        </div>
-        <div className="p-4">
-          <div className="article-category text-xs font-bold mb-1 bg-red-600 text-white rounded-full px-3 py-1 inline-block">{related.source?.name}</div>
-          <h3 className="article-title text-lg font-bold mb-2 line-clamp-2 group-hover:text-red-700 transition-colors duration-200">{related.title}</h3>
-          <p className="article-excerpt text-gray-600 text-sm mb-2 line-clamp-2">{related.description}</p>
-          <div className="article-meta text-xs flex flex-wrap gap-2 text-gray-400">
-            <span className="flex items-center gap-1 text-gray-400">{new Date(related.publishedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
-            {related.author && <span>by {related.author}</span>}
+  
+  const renderRelatedArticle = React.useCallback((related: NewsArticle, idx: number) => {
+    // Format date outside of the callback to avoid hooks rules violation
+    const formattedDate = new Date(related.publishedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
+    return (
+      <React.Fragment key={related.slug || `related-${idx}-${related.url}`}> 
+        <Link
+          href={`/article/${related.slug}`}
+          className="article-card group transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl rounded-xl bg-white shadow-md overflow-hidden"
+        >
+          <div className="relative w-full h-48 overflow-hidden">
+            <Image
+              src={related.urlToImage || "/placeholder-news.jpg"}
+              alt={related.title}
+              fill
+              className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+            />
           </div>
-        </div>
-      </Link>
-    </React.Fragment>
-  ), []);
+          <div className="p-4">
+            <div className="article-category text-xs font-bold mb-1 bg-red-600 text-white rounded-full px-3 py-1 inline-block">{related.source?.name}</div>
+            <h3 className="article-title text-lg font-bold mb-2 line-clamp-2 group-hover:text-red-700 transition-colors duration-200">{related.title}</h3>
+            <p className="article-excerpt text-gray-600 text-sm mb-2 line-clamp-2">{related.description}</p>
+            <div className="article-meta text-xs flex flex-wrap gap-2 text-gray-400">
+              <span className="flex items-center gap-1 text-gray-400">{formattedDate}</span>
+              {related.author && <span>by {related.author}</span>}
+            </div>
+          </div>
+        </Link>
+      </React.Fragment>
+    );
+  }, []);
+
+  const handleOutboundClick = React.useCallback(() => {
+    if (article) {
+      sendAnalyticsEvent('outbound_click', { url: article.url, slug: article.slug });
+    }
+  }, [article]);
 
   useEffect(() => {
     if (article) {
@@ -89,7 +101,7 @@ export default function ArticleClient({ article, slug }: { article: NewsArticle 
           target="_blank"
           rel="noopener noreferrer"
           className="inline-block bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-full shadow transition text-base sm:text-lg"
-          onClick={() => sendAnalyticsEvent('outbound_click', { url: article.url, slug: article.slug })}
+          onClick={handleOutboundClick}
         >
           Read on the official website
         </a>

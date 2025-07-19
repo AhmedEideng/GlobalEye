@@ -8,6 +8,14 @@ import React from "react";
 const HomeNewsGrid = React.memo(({ articles }: { articles: NewsArticle[] }) => {
   const renderArticle = React.useCallback((article: NewsArticle, idx: number) => {
     const cleanImage = cleanImageUrl(article.urlToImage);
+    
+    // Format date outside of the callback to avoid hooks rules violation
+    const formattedDate = new Date(article.publishedAt).toLocaleDateString('en-GB', { 
+      day: '2-digit', 
+      month: 'short', 
+      year: 'numeric' 
+    });
+    
     return (
       <Link
         key={article.slug || `article-${idx}-${article.url}`}
@@ -36,11 +44,7 @@ const HomeNewsGrid = React.memo(({ articles }: { articles: NewsArticle[] }) => {
           </p>
           <div className="article-meta text-xs flex flex-wrap gap-2 text-gray-400">
             <span className="flex items-center gap-1 text-gray-400">
-              {new Date(article.publishedAt).toLocaleDateString('en-GB', { 
-                day: '2-digit', 
-                month: 'short', 
-                year: 'numeric' 
-              })}
+              {formattedDate}
             </span>
             {article.author && <span>by {article.author}</span>}
           </div>

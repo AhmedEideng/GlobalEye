@@ -33,6 +33,11 @@ class ErrorBoundary extends Component<Props, State> {
     // logErrorToService(error, errorInfo);
   }
 
+  handleRefresh = () => {
+    this.setState({ hasError: false, error: null });
+    window.location.reload();
+  };
+
   override render() {
     if (this.state.hasError) {
       // You can render any custom fallback UI
@@ -47,10 +52,7 @@ class ErrorBoundary extends Component<Props, State> {
               We&apos;re sorry, but something unexpected happened. Please try refreshing the page.
             </p>
             <button
-              onClick={() => {
-                this.setState({ hasError: false, error: null });
-                window.location.reload();
-              }}
+              onClick={this.handleRefresh}
               className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors"
             >
               Refresh Page

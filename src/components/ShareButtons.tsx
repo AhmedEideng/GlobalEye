@@ -53,24 +53,28 @@ export default function ShareButtons({ url, title }: { url: string, title: strin
   // Memoize share buttons to prevent unnecessary re-renders
   const shareButtons = useMemo(() => [
     {
+      id: 'copy-link',
       label: 'Copy Link',
       icon: copied ? '✓' : '🔗',
       onClick: handleCopy,
       className: copied ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-600 hover:bg-gray-700'
     },
     {
+      id: 'whatsapp',
       label: 'WhatsApp',
       icon: '📱',
       onClick: handleWhatsAppShare,
       className: 'bg-green-500 hover:bg-green-600'
     },
     {
+      id: 'twitter',
       label: 'Twitter',
       icon: '🐦',
       onClick: handleTwitterShare,
       className: 'bg-blue-500 hover:bg-blue-600'
     },
     {
+      id: 'facebook',
       label: 'Facebook',
       icon: '📘',
       onClick: handleFacebookShare,
@@ -80,9 +84,9 @@ export default function ShareButtons({ url, title }: { url: string, title: strin
 
   return (
     <div className="flex flex-wrap gap-2 mt-6">
-      {shareButtons.map((button, index) => (
+      {shareButtons.map((button) => (
         <button
-          key={`${button.label}-${index}`}
+          key={button.id}
           onClick={button.onClick}
           className={`${button.className} text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2`}
           aria-label={button.label}
