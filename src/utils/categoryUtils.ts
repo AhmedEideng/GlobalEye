@@ -1,5 +1,7 @@
 import { supabase } from '@utils/supabaseClient';
 
+console.log('SUPABASE_URL:', process.env.SUPABASE_URL);
+
 /**
  * Fetch a category by slug from the categories table
  * @param slug Category slug
