@@ -1,5 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-module.exports = require('next-pwa')({
+const withPWA = require('next-pwa');
+
+const pwaConfig = {
   dest: 'public',
   register: true,
   skipWaiting: true,
@@ -39,9 +41,9 @@ module.exports = require('next-pwa')({
       },
     },
   ],
-});
+};
 
-module.exports = withPWA({
+const nextConfig = {
   output: 'standalone',
   images: {
     remotePatterns: [
@@ -51,7 +53,6 @@ module.exports = withPWA({
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 300, // 5 minutes
-    // تم حذف domains لأنه أصبح غير مدعوم
   },
   experimental: {
     optimizeCss: true,
@@ -65,17 +66,13 @@ module.exports = withPWA({
       },
     },
   },
-  // Performance improvements
   compress: true,
   poweredByHeader: false,
   generateEtags: true,
-  // Improve caching
   onDemandEntries: {
     maxInactiveAge: 25 * 1000,
     pagesBufferLength: 2,
   },
-  // تم حذف إعدادات webpack لأنها غير مدعومة مع Turbopack
-  // Security headers
   async headers() {
     return [
       {
@@ -86,7 +83,6 @@ module.exports = withPWA({
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
           { key: 'Permissions-Policy', value: 'geolocation=(), microphone=(), camera=()' },
-          // Updated CSP to allow necessary resources
           {
             key: 'Content-Security-Policy',
             value: [
@@ -109,4 +105,6 @@ module.exports = withPWA({
       },
     ];
   },
-}); 
+};
+
+module.exports = withPWA({ ...nextConfig, pwa: pwaConfig }); 
