@@ -1,33 +1,34 @@
 import { supabase } from '@utils/supabaseClient';
 
 /**
- * Fetch a category by name from the categories table
- * @param name Category name
+ * Fetch a category by slug from the categories table
+ * @param slug Category slug
  * @returns Category data or null
  */
-export async function getCategoryByName(name: string) {
+export async function getCategoryBySlug(slug: string) {
   const { data, error } = await supabase
     .from('categories')
     .select('*')
-    .ilike('name', name)
+    .eq('slug', slug)
     .single();
   if (error || !data) return null;
   return data;
 }
 
 /**
- * Add a new category if it doesn't exist
- * @param name Category name
+ * Add a new category if it doesn't exist (by slug)
+ * @param slug Category slug
+ * @param name Category name (optional)
  * @returns Category data after adding
  */
-export async function addCategoryIfNotExists(name: string) {
+export async function addCategoryIfNotExists(slug: string, name?: string) {
   // Try to fetch the category first
-  const category = await getCategoryByName(name);
+  const category = await getCategoryBySlug(slug);
   if (category) return category;
   // Add the category
   const { data, error } = await supabase
     .from('categories')
-    .insert([{ name }])
+    .insert([{ slug, name: name || slug }])
     .select()
     .single();
   if (error || !data) return null;
@@ -35,12 +36,13 @@ export async function addCategoryIfNotExists(name: string) {
 }
 
 /**
- * Get or add a category and return the id
- * @param name Category name
+ * Get or add a category and return the id (by slug)
+ * @param slug Category slug
+ * @param name Category name (optional)
  * @returns category_id or null
  */
-export async function getOrAddCategoryId(name: string): Promise<number|null> {
-  const category = await addCategoryIfNotExists(name);
+export async function getOrAddCategoryId(slug: string, name?: string): Promise<number|null> {
+  const category = await addCategoryIfNotExists(slug, name);
   return category ? category.id : null;
 }
 
