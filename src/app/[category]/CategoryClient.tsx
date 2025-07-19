@@ -6,7 +6,8 @@ import { sendAnalyticsEvent } from '@utils/fetchNews';
 import Link from 'next/link';
 import HomeFeatured from '@components/HomeFeatured';
 import HomeNewsGrid from '@components/HomeNewsGrid';
-import { NewsArticle } from '@utils/fetchNews';
+import { NewsArticle, formatDate, getImageUrl } from '@utils/fetchNews';
+import SafeText from '@components/SafeText';
 
 // Professional error logger for category client
 function logCategoryError(...args: unknown[]) {
@@ -172,29 +173,29 @@ export default function CategoryClient({
 
   const renderSuggestedArticle = React.useCallback((article: Article, idx: number) => {
     // Format date outside of the callback to avoid hooks rules violation
-    const formattedDate = new Date(article.publishedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    const formattedDate = formatDate(article.publishedAt);
 
     return (
-      <React.Fragment key={article.slug || `suggested-${idx}-${article.url}`}>
+      <React.Fragment key={article.slug || idx}>
         <Link
           href={`/article/${article.slug}`}
           className="article-card group transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl rounded-xl bg-white shadow-md overflow-hidden"
         >
           <div className="relative w-full h-48 overflow-hidden">
             <Image
-              src={article.urlToImage || "/placeholder-news.jpg"}
+              src={getImageUrl(article.urlToImage)}
               alt={article.title}
               fill
               className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
             />
           </div>
           <div className="p-4">
-            <div className="article-category text-xs font-bold mb-1 bg-red-600 text-white rounded-full px-3 py-1 inline-block">{article.source?.name}</div>
-            <h3 className="article-title text-lg font-bold mb-2 line-clamp-2 group-hover:text-red-700 transition-colors duration-200">{article.title}</h3>
-            <p className="article-excerpt text-gray-600 text-sm mb-2 line-clamp-2">{article.description}</p>
+            <div className="article-category text-xs font-bold mb-1 bg-red-600 text-white rounded-full px-3 py-1 inline-block"><SafeText fallback="Unknown Source">{article.source?.name}</SafeText></div>
+            <h3 className="article-title text-lg font-bold mb-2 line-clamp-2 group-hover:text-red-700 transition-colors duration-200"><SafeText fallback="Untitled">{article.title}</SafeText></h3>
+            <p className="article-excerpt text-gray-600 text-sm mb-2 line-clamp-2"><SafeText fallback="No description available">{article.description}</SafeText></p>
             <div className="article-meta text-xs flex flex-wrap gap-2 text-gray-400">
               <span className="flex items-center gap-1 text-gray-400">{formattedDate}</span>
-              {article.author && <span>by {article.author}</span>}
+              {article.author && <span>by <SafeText fallback="Unknown Author">{article.author}</SafeText></span>}
             </div>
           </div>
         </Link>
@@ -269,7 +270,7 @@ export default function CategoryClient({
       {/* Main News Grid */}
       {mainNews.length > 0 && <HomeNewsGrid articles={mainNews} />}
       {/* Suggested Articles Section */}
-      {suggestedNews.length > 0 && (
+      {suggestedNews.length > 0 ? (
         <section className="mt-12 bg-gradient-to-br from-gray-100 via-white to-gray-50 rounded-2xl p-6 shadow-lg">
           <div className="mb-4">
             <h2 className="text-2xl font-extrabold mb-2 text-red-800 flex items-center gap-2">
@@ -282,6 +283,13 @@ export default function CategoryClient({
             {suggestedNews.map(renderSuggestedArticle)}
           </div>
         </section>
+      ) : (
+        <div className="flex flex-col items-center justify-center text-gray-500 py-12">
+          <span className="text-4xl mb-4">📰</span>
+          <div className="text-lg font-semibold mb-2">No suggested articles found.</div>
+          <div className="mb-6">Try browsing other categories or check back later for more suggestions.</div>
+          <Link href="/" className="inline-block bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-full transition">Back to Home</Link>
+        </div>
       )}
     </div>
   );

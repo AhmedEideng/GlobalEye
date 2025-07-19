@@ -17,7 +17,11 @@ export default function ShareButtons({ url, title }: { url: string, title: strin
     try {
       await navigator.clipboard.writeText(fullUrl);
       setCopied(true);
-      sendAnalyticsEvent('share_article', { method: 'copy', url: fullUrl });
+      try {
+        await sendAnalyticsEvent('share_article', { method: 'copy', url: fullUrl });
+      } catch {
+        // Optionally log analytics error
+      }
       setTimeout(() => setCopied(false), 1500);
     } catch {
       // Fallback for older browsers
@@ -32,20 +36,32 @@ export default function ShareButtons({ url, title }: { url: string, title: strin
     }
   }, [fullUrl]);
 
-  const handleWhatsAppShare = useCallback(() => {
-    sendAnalyticsEvent('share_article', { method: 'whatsapp', url: fullUrl });
+  const handleWhatsAppShare = useCallback(async () => {
+    try {
+      await sendAnalyticsEvent('share_article', { method: 'whatsapp', url: fullUrl });
+    } catch {
+      // Optionally log analytics error
+    }
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${title} ${fullUrl}`)}`;
     window.open(whatsappUrl, '_blank');
   }, [fullUrl, title]);
 
-  const handleTwitterShare = useCallback(() => {
-    sendAnalyticsEvent('share_article', { method: 'twitter', url: fullUrl });
+  const handleTwitterShare = useCallback(async () => {
+    try {
+      await sendAnalyticsEvent('share_article', { method: 'twitter', url: fullUrl });
+    } catch {
+      // Optionally log analytics error
+    }
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`${title} ${fullUrl}`)}`;
     window.open(twitterUrl, '_blank');
   }, [fullUrl, title]);
 
-  const handleFacebookShare = useCallback(() => {
-    sendAnalyticsEvent('share_article', { method: 'facebook', url: fullUrl });
+  const handleFacebookShare = useCallback(async () => {
+    try {
+      await sendAnalyticsEvent('share_article', { method: 'facebook', url: fullUrl });
+    } catch {
+      // Optionally log analytics error
+    }
     const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(fullUrl)}`;
     window.open(facebookUrl, '_blank');
   }, [fullUrl]);
@@ -90,6 +106,7 @@ export default function ShareButtons({ url, title }: { url: string, title: strin
           onClick={button.onClick}
           className={`${button.className} text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2`}
           aria-label={button.label}
+          type="button"
         >
           <span>{button.icon}</span>
           <span>{button.label}</span>

@@ -113,13 +113,13 @@ export async function GET(req: NextRequest) {
     
     // If content-length is not available, read buffer and measure size
     const arrayBuffer = await response.arrayBuffer();
-    const imageBuffer: Buffer = Buffer.from(arrayBuffer);
+    const imageBuffer = Buffer.from(new Uint8Array(arrayBuffer));
     if (imageBuffer.length > MAX_IMAGE_SIZE) {
       return fallbackImageResponse();
     }
 
     // Compress images (jpeg/png/webp only)
-    let optimizedBuffer = imageBuffer;
+    let optimizedBuffer: Buffer = imageBuffer;
     let outContentType = contentType;
     if (
       contentType === 'image/jpeg' ||
@@ -127,10 +127,10 @@ export async function GET(req: NextRequest) {
       contentType === 'image/webp'
     ) {
       try {
-        optimizedBuffer = await sharp(imageBuffer)
+        optimizedBuffer = (await sharp(imageBuffer)
           .resize({ width: 1200, withoutEnlargement: true })
           .jpeg({ quality: 70 })
-          .toBuffer();
+          .toBuffer()) as Buffer;
         outContentType = 'image/jpeg';
       } catch (error) {
         // If optimization fails, use original buffer

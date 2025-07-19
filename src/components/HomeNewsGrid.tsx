@@ -2,29 +2,29 @@
 import Link from "next/link";
 import { NewsArticle } from '@utils/fetchNews';
 import { cleanImageUrl } from '@utils/cleanImageUrl';
+import { getImageUrl } from '@utils/fetchNews';
+import { formatDate } from '@utils/fetchNews';
 import Image from "next/image";
 import React from "react";
+import SafeText from './SafeText';
 
 const HomeNewsGrid = React.memo(({ articles }: { articles: NewsArticle[] }) => {
   const renderArticle = React.useCallback((article: NewsArticle, idx: number) => {
     const cleanImage = cleanImageUrl(article.urlToImage);
+    const imageSrc = getImageUrl(cleanImage);
     
     // Format date outside of the callback to avoid hooks rules violation
-    const formattedDate = new Date(article.publishedAt).toLocaleDateString('en-GB', { 
-      day: '2-digit', 
-      month: 'short', 
-      year: 'numeric' 
-    });
+    const formattedDate = formatDate(article.publishedAt);
     
     return (
       <Link
-        key={article.slug || `article-${idx}-${article.url}`}
+        key={article.slug || idx}
         href={`/article/${article.slug}`}
         className="article-card group"
       >
         <div className="relative w-full h-48 overflow-hidden">
           <Image
-            src={cleanImage || "/placeholder-news.jpg"}
+            src={imageSrc}
             alt={article.title}
             fill
             className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
@@ -34,26 +34,35 @@ const HomeNewsGrid = React.memo(({ articles }: { articles: NewsArticle[] }) => {
         </div>
         <div className="p-4">
           <div className="article-category text-xs font-bold mb-1 bg-red-600 text-white rounded-full px-3 py-1 inline-block">
-            {article.source?.name}
+            <SafeText fallback="Unknown Source">{article.source?.name}</SafeText>
           </div>
           <h3 className="article-title text-lg font-bold mb-2 line-clamp-2">
-            {article.title}
+            <SafeText fallback="Untitled">{article.title}</SafeText>
           </h3>
           <p className="article-excerpt text-gray-600 text-sm mb-2 line-clamp-2">
-            {article.description}
+            <SafeText fallback="No description available">{article.description}</SafeText>
           </p>
           <div className="article-meta text-xs flex flex-wrap gap-2 text-gray-400">
             <span className="flex items-center gap-1 text-gray-400">
               {formattedDate}
             </span>
-            {article.author && <span>by {article.author}</span>}
+            {article.author && <span>by <SafeText fallback="Unknown Author">{article.author}</SafeText></span>}
           </div>
         </div>
       </Link>
     );
   }, []);
 
-  if (!articles?.length) return null;
+  if (!articles?.length) {
+    return (
+      <div className="flex flex-col items-center justify-center text-gray-500 py-12">
+        <span className="text-4xl mb-4">📰</span>
+        <div className="text-lg font-semibold mb-2">No articles found.</div>
+        <div className="mb-6">Try searching for something else or browse other categories.</div>
+        <Link href="/" className="inline-block bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-full transition">Back to Home</Link>
+      </div>
+    );
+  }
 
   return (
     <section className="mt-12 bg-gradient-to-br from-gray-100 via-white to-gray-50 rounded-2xl p-6 shadow-lg">

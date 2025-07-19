@@ -285,3 +285,14 @@ export function sendAnalyticsEvent(eventName: string, params: Record<string, unk
     window.gtag('event', eventName, params);
   }
 } 
+
+// Helper function to format dates consistently across the app
+export function formatDate(date: string | Date): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+} 
+
+// Helper function to get a valid image URL or fallback to placeholder
+export function getImageUrl(url?: string | null): string {
+  return url && url.trim() !== '' ? url : '/placeholder-news.jpg';
+} 

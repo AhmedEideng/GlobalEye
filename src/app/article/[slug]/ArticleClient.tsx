@@ -5,38 +5,39 @@ import ArticleContent from '@components/ArticleContent';
 import ShareButtons from '@components/ShareButtons';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { sendAnalyticsEvent, fetchRelatedNews } from '@utils/fetchNews';
+import { sendAnalyticsEvent, fetchRelatedNews, formatDate, getImageUrl } from '@utils/fetchNews';
 import Link from 'next/link';
 import React from 'react';
+import SafeText from '@components/SafeText';
 
 export default function ArticleClient({ article, slug }: { article: NewsArticle | null, slug: string }) {
   const [relatedArticles, setRelatedArticles] = useState<NewsArticle[]>([]);
   
   const renderRelatedArticle = React.useCallback((related: NewsArticle, idx: number) => {
     // Format date outside of the callback to avoid hooks rules violation
-    const formattedDate = new Date(related.publishedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    const formattedDate = formatDate(related.publishedAt);
 
     return (
-      <React.Fragment key={related.slug || `related-${idx}-${related.url}`}> 
+      <React.Fragment key={related.slug || idx}> 
         <Link
           href={`/article/${related.slug}`}
           className="article-card group transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl rounded-xl bg-white shadow-md overflow-hidden"
         >
           <div className="relative w-full h-48 overflow-hidden">
             <Image
-              src={related.urlToImage || "/placeholder-news.jpg"}
+              src={getImageUrl(related.urlToImage)}
               alt={related.title}
               fill
               className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
             />
           </div>
           <div className="p-4">
-            <div className="article-category text-xs font-bold mb-1 bg-red-600 text-white rounded-full px-3 py-1 inline-block">{related.source?.name}</div>
-            <h3 className="article-title text-lg font-bold mb-2 line-clamp-2 group-hover:text-red-700 transition-colors duration-200">{related.title}</h3>
-            <p className="article-excerpt text-gray-600 text-sm mb-2 line-clamp-2">{related.description}</p>
+            <div className="article-category text-xs font-bold mb-1 bg-red-600 text-white rounded-full px-3 py-1 inline-block"><SafeText fallback="Unknown Source">{related.source?.name}</SafeText></div>
+            <h3 className="article-title text-lg font-bold mb-2 line-clamp-2 group-hover:text-red-700 transition-colors duration-200"><SafeText fallback="Untitled">{related.title}</SafeText></h3>
+            <p className="article-excerpt text-gray-600 text-sm mb-2 line-clamp-2"><SafeText fallback="No description available">{related.description}</SafeText></p>
             <div className="article-meta text-xs flex flex-wrap gap-2 text-gray-400">
               <span className="flex items-center gap-1 text-gray-400">{formattedDate}</span>
-              {related.author && <span>by {related.author}</span>}
+              {related.author && <span>by <SafeText fallback="Unknown Author">{related.author}</SafeText></span>}
             </div>
           </div>
         </Link>

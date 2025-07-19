@@ -1,5 +1,5 @@
 import { NewsArticle } from '@utils/fetchNews';
-import { sanitizeText } from '../utils/sanitizeText';
+import SafeText from './SafeText';
 
 /**
  * ⚠️ Security: Do not render any raw HTML from articles here, only plain text.
@@ -16,13 +16,13 @@ export default function ArticleContent({ article }: { article: NewsArticle }) {
       {/* Description */}
       {article.description && (
         <p className="text-base sm:text-lg text-gray-700 mb-6 font-medium break-words text-balance w-full">
-          {sanitizeText(article.description)}
+          <SafeText>{article.description}</SafeText>
         </p>
       )}
       {/* Content */}
       {article.content && (
         <div className="prose prose-lg max-w-none w-full mb-8 text-gray-900 dark:text-gray-100 break-words text-balance">
-          {sanitizeText(article.content)}
+          <SafeText>{article.content}</SafeText>
         </div>
       )}
     </>

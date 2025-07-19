@@ -5,6 +5,7 @@ import { NewsArticle } from '@utils/fetchNews';
 import { useAuth } from '@hooks/useAuth';
 import { isFavorite } from '@services/favorites';
 import { sanitizeText, sanitizeJsonLd } from '../utils/sanitizeText';
+import SafeText from './SafeText';
 
 export default function ArticleHeader({ article }: { article: NewsArticle }) {
   const { user } = useAuth();
@@ -70,10 +71,10 @@ export default function ArticleHeader({ article }: { article: NewsArticle }) {
         <div className="max-w-4xl mx-auto">
           <div className="mb-4">
             <h1 className="article-title text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 text-gray-900 leading-tight break-words text-balance">
-              {sanitizeText(article.title)}
+              <SafeText>{article.title}</SafeText>
             </h1>
             <p className="article-description text-lg sm:text-xl text-gray-700 mb-6 font-medium break-words text-balance">
-              {sanitizeText(article.description)}
+              <SafeText>{article.description}</SafeText>
             </p>
           </div>
           
@@ -99,12 +100,12 @@ export default function ArticleHeader({ article }: { article: NewsArticle }) {
             {article.author && (
               <div className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-4.418 0-8 1.79-8 4v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2c0-2.21-3.582-4-8-4z"/></svg>
-                <span>{sanitizeText(article.author)}</span>
+                <SafeText>{article.author}</SafeText>
               </div>
             )}
             <div className="flex items-center gap-2">
               <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold">
-                {sanitizeText(article.source?.name)}
+                <SafeText>{article.source?.name}</SafeText>
               </span>
             </div>
           </div>

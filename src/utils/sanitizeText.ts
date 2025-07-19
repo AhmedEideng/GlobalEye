@@ -7,17 +7,18 @@ export function sanitizeText(text: string | null | undefined): string {
   if (!text) return '';
   
   return text
-    // Remove all null bytes and control characters
+    // Remove all null bytes and control characters (prevents invisible/invalid chars)
     .replace(/[\x00-\x1F\x7F-\x9F]/gu, '')
-    // Remove non-printable characters except newlines, tabs, and spaces
+    // Remove non-printable characters except newlines, tabs, and spaces (for safe rendering)
     .replace(/[^\x20-\x7E\x0A\x09]/gu, '')
-    // Remove any remaining problematic Unicode characters
+    // Remove any remaining problematic Unicode characters (rare, but can break rendering)
     .replace(/[\uFFFE\uFFFF]/gu, '')
-    // Remove zero-width characters
+    // Remove zero-width characters (can be used for obfuscation)
     .replace(/[\u200B-\u200D\uFEFF]/gu, '')
-    // Normalize whitespace
+    // Normalize whitespace (prevents layout issues)
     .replace(/\s+/gu, ' ')
-    // Remove any remaining special characters that could be dangerous
+    // Remove any remaining special characters that could be dangerous (XSS, injection, etc.)
+    // This regex is intentionally strict for security reasons
     .replace(/[^\w\s\-.,+*()[\]{}|&^%#@!?=:;"'\\]/gu, '')
     .trim();
 }

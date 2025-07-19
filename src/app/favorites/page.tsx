@@ -1,12 +1,13 @@
 "use client";
 import { useAuth } from '@hooks/useAuth';
 import { getFavorites, removeFavorite } from '../../services/favorites';
-import { fetchNews, NewsArticle } from '@utils/fetchNews';
+import { fetchNews, NewsArticle, formatDate, getImageUrl } from '@utils/fetchNews';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import OptimizedImage from '@components/OptimizedImage';
 import { sendAnalyticsEvent } from '@utils/fetchNews';
 import React from 'react';
+import SafeText from '@components/SafeText';
 
 export default function FavoritesPage() {
   const { user, loading } = useAuth();
@@ -61,19 +62,26 @@ export default function FavoritesPage() {
     <main className="max-w-3xl mx-auto mt-10 p-4">
       <h1 className="text-2xl font-bold mb-6 text-gray-900">Your Favorite Articles</h1>
       {articles.length === 0 ? (
-        <div className="text-gray-500">You have no favorite articles yet.</div>
+        <div className="flex flex-col items-center justify-center text-gray-500 py-12">
+          <span className="text-4xl mb-4">⭐</span>
+          <div className="text-lg font-semibold mb-2">You have no favorite articles yet.</div>
+          <div className="mb-6">Start exploring and add articles to your favorites!</div>
+          <Link href="/">
+            <a className="inline-block bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-full transition">Back to Home</a>
+          </Link>
+        </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {articles.map((article) => {
             // Format date outside of the callback to avoid hooks rules violation
-            const formattedDate = new Date(article.publishedAt).toLocaleDateString('en-GB');
+            const formattedDate = formatDate(article.publishedAt);
 
             return (
-              <div key={article.slug || `favorite-${article.url}`} className="relative group">
+              <div key={article.slug || article.url} className="relative group">
                 <Link href={`/article/${article.slug}`} className="article-card">
                   <div className="relative w-full h-40 overflow-hidden">
                     <OptimizedImage
-                      src={article.urlToImage || '/placeholder-news.jpg'}
+                      src={getImageUrl(article.urlToImage)}
                       alt={article.title}
                       fill
                       className="object-cover w-full h-full"
@@ -81,8 +89,8 @@ export default function FavoritesPage() {
                     />
                   </div>
                   <div className="p-4">
-                    <div className="text-xs text-red-600 font-bold mb-1">{article.source?.name}</div>
-                    <h3 className="text-lg font-bold mb-1 line-clamp-2 break-words text-balance">{article.title}</h3>
+                    <div className="text-xs text-red-600 font-bold mb-1"><SafeText fallback="Unknown Source">{article.source?.name}</SafeText></div>
+                    <h3 className="text-lg font-bold mb-1 line-clamp-2 break-words text-balance"><SafeText fallback="Untitled">{article.title}</SafeText></h3>
                     <div className="text-xs text-gray-400">{formattedDate}</div>
                   </div>
                 </Link>
