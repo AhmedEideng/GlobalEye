@@ -53,7 +53,7 @@ export async function saveNewsToSupabase(articles: NewsArticle[], category: stri
 
     // Upsert articles to database
     const { error } = await supabase
-      .from('articles')
+      .from('news')
       .upsert(mapped, {
         onConflict: 'slug',
         ignoreDuplicates: false
