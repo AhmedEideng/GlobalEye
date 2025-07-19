@@ -32,8 +32,8 @@ export default function TeamPage() {
         Meet the dedicated journalists and editors behind GlobalEye News. Our team is committed to delivering accurate, timely, and insightful news coverage from around the world.
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-        {teamMembers.map((member, idx) => (
-          <div key={idx} className="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center hover:shadow-lg transition">
+        {teamMembers.map((member) => (
+          <div key={member.name} className="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center hover:shadow-lg transition">
             <div className="w-24 h-24 mb-4 rounded-full overflow-hidden border-4 border-red-600">
               <Image src={member.photo} alt={member.name} width={96} height={96} className="object-cover w-full h-full" />
             </div>

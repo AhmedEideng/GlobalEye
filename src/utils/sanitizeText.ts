@@ -8,18 +8,18 @@ export function sanitizeText(text: string | null | undefined): string {
   
   return text
     // Remove all null bytes and control characters (prevents invisible/invalid chars)
-    .replace(/[\u0000-\u001F\u007F-\u009F]/gu, '')
+    .replace(CONTROL_CHARS_REGEX, '')
     // Remove non-printable characters except newlines, tabs, and spaces (for safe rendering)
-    .replace(/[^\u0020-\u007E\u000A\u0009]/gu, '')
+    .replace(SAFE_PRINTABLE_REGEX, '')
     // Remove any remaining problematic Unicode characters (rare, but can break rendering)
-    .replace(/[\uFFFE\uFFFF]/gu, '')
+    .replace(UNICODE_SPECIAL_REGEX, '')
     // Remove zero-width characters (can be used for obfuscation)
-    .replace(/[\u200B-\u200D\uFEFF]/gu, '')
+    .replace(ZERO_WIDTH_REGEX, '')
     // Normalize whitespace (prevents layout issues)
-    .replace(/\s+/gu, ' ')
+    .replace(MULTI_SPACE_REGEX, ' ')
     // Remove any remaining special characters that could be dangerous (XSS, injection, etc.)
     // This regex is intentionally strict for security reasons
-    .replace(/[^\w\s\-.,+*()[\]{}|&^%#@!?=:;"'\\]/gu, '')
+    .replace(STRICT_SAFE_REGEX, '')
     .trim();
 }
 
@@ -120,15 +120,15 @@ export function sanitizeHtml(html: string): string {
   
   return html
     // Remove all null bytes and control characters
-    .replace(/[\u0000-\u001F\u007F-\u009F]/gu, '')
+    .replace(CONTROL_CHARS_REGEX, '')
     // Remove non-ASCII characters that might cause issues
     .replace(/[^\u0000-\u007F]/gu, '')
     // Remove any remaining problematic Unicode characters
-    .replace(/[\uFFFE\uFFFF]/gu, '')
+    .replace(UNICODE_SPECIAL_REGEX, '')
     // Remove zero-width characters
-    .replace(/[\u200B-\u200D\uFEFF]/gu, '')
+    .replace(ZERO_WIDTH_REGEX, '')
     // Normalize whitespace
-    .replace(/\s+/gu, ' ')
+    .replace(MULTI_SPACE_REGEX, ' ')
     .trim();
 }
 
@@ -193,11 +193,11 @@ export function sanitizeSvgPath(pathData: string): string {
   
   return pathData
     // Remove any non-printable characters
-    .replace(/[\u0000-\u001F\u007F-\u009F]/gu, '')
+    .replace(CONTROL_CHARS_REGEX, '')
     // Remove any invalid SVG path characters (simplified)
-    .replace(/[^\w\s\-.,+*()[\]{}|&^%#@!?=:;"'\\]/gu, '')
+    .replace(STRICT_SAFE_REGEX, '')
     // Clean up multiple spaces
-    .replace(/\s+/gu, ' ')
+    .replace(MULTI_SPACE_REGEX, ' ')
     .trim();
 }
 
@@ -209,8 +209,15 @@ export function sanitizeSvgContent(svgContent: string): string {
   
   return svgContent
     // Remove any non-printable characters
-    .replace(/[\u0000-\u001F\u007F-\u009F]/gu, '')
+    .replace(CONTROL_CHARS_REGEX, '')
     // Clean up multiple spaces
-    .replace(/\s+/gu, ' ')
+    .replace(MULTI_SPACE_REGEX, ' ')
     .trim();
 } 
+
+const CONTROL_CHARS_REGEX = /[\u0000-\u001F\u007F-\u009F]/gu;
+const SAFE_PRINTABLE_REGEX = /[^\u0020-\u007E\u000A\u0009]/gu;
+const UNICODE_SPECIAL_REGEX = /[\uFFFE\uFFFF]/gu;
+const ZERO_WIDTH_REGEX = /[\u200B-\u200D\uFEFF]/gu;
+const MULTI_SPACE_REGEX = /\s+/gu;
+const STRICT_SAFE_REGEX = /[^\w\s\-.,+*()[\]{}|&^%#@!?=:;"'\\]/gu; 
