@@ -39,7 +39,7 @@ export function useAuth() {
       }
       setLoading(false);
     };
-    void getUser();
+    getUser().catch(() => {});
     // Listen to session changes
     const { data: listener } = supabase.auth.onAuthStateChange(() => {
       getUser();

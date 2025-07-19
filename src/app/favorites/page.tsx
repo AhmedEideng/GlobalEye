@@ -47,7 +47,7 @@ export default function FavoritesPage() {
         setFavLoading(false);
       }
     };
-    if (user) void fetchFavorites();
+    if (user) fetchFavorites().catch(() => {});
   }, [user]);
 
   if (loading || favLoading) {
@@ -57,6 +57,8 @@ export default function FavoritesPage() {
   if (!user) {
     return <div className="min-h-[60vh] flex items-center justify-center text-lg">Please login to view your favorites.</div>;
   }
+
+  const handleRemoveCb = React.useCallback((slug: string) => handleRemove(slug), [handleRemove]);
 
   return (
     <main className="max-w-3xl mx-auto mt-10 p-4">
@@ -95,7 +97,7 @@ export default function FavoritesPage() {
                   </div>
                 </Link>
                 <button
-                  onClick={() => handleRemove(article.slug)}
+                  onClick={() => handleRemoveCb(article.slug)}
                   className="absolute top-2 right-2 z-10 bg-white/80 rounded-full p-2 shadow hover:bg-red-100 transition-opacity opacity-0 group-hover:opacity-100"
                   title="Remove from favorites"
                 >

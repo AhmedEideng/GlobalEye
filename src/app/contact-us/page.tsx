@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { FaEnvelope, FaUser, FaRegCommentDots } from 'react-icons/fa';
 import ArticleContactJsonLdHead from './ArticleContactJsonLdHead';
+import React from 'react';
 
 export default function ContactPage() {
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
@@ -24,6 +25,8 @@ export default function ContactPage() {
     }
   };
 
+  const handleSubmitCb = React.useCallback(handleSubmit, [handleSubmit]);
+
   return <>
     <ArticleContactJsonLdHead />
     <div className="container mx-auto px-4 py-12 max-w-2xl">
@@ -45,7 +48,7 @@ export default function ContactPage() {
           {error}
         </div>
       )}
-      <form className="bg-white rounded-lg shadow p-6 flex flex-col gap-4" onSubmit={handleSubmit}>
+      <form className="bg-white rounded-lg shadow p-6 flex flex-col gap-4" onSubmit={handleSubmitCb}>
         <div>
           <label htmlFor="name" className="block font-semibold mb-1 flex items-center gap-2"><FaUser /> Your Name</label>
           <input id="name" name="name" type="text" required className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-600" placeholder="Enter your name" />

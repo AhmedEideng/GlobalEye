@@ -117,6 +117,8 @@ export default function LoginPage() {
     setError("");
   }, [mode]);
   const handleGoogleSignInClick = React.useCallback(() => handleGoogleSignIn(), [handleGoogleSignIn]);
+  const handleEmailSubmitCb = React.useCallback(handleEmailSubmit, [handleEmailSubmit]);
+  const handleLoginOrSignupCb = React.useCallback(handleLoginOrSignup, [handleLoginOrSignup]);
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-[#FAFAFA] px-4">
@@ -126,7 +128,7 @@ export default function LoginPage() {
           {step === "loginOrSignup" && (mode === "login" ? "Enter your password" : "Create your free account")}
         </h1>
         {step === "email" && (
-          <form onSubmit={handleEmailSubmit} className="space-y-4">
+          <form onSubmit={handleEmailSubmitCb} className="space-y-4">
             <div>
               <label htmlFor="email" className="block font-semibold mb-1">Email Address</label>
               <input
@@ -175,7 +177,7 @@ export default function LoginPage() {
           </form>
         )}
         {step === "loginOrSignup" && (
-          <form onSubmit={handleLoginOrSignup} className="space-y-4">
+          <form onSubmit={handleLoginOrSignupCb} className="space-y-4">
             <div>
               <label className="block font-semibold mb-1">Email Address</label>
               <input
