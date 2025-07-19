@@ -1,16 +1,16 @@
 import { fetchNews, NewsArticle } from '@utils/fetchNews';
+import { logSnagEvent } from '@utils/logsnag';
 
 // Professional error logger for category server
 function logCategoryServerError(...args: unknown[]) {
   if (process.env.NODE_ENV === 'development') {
     // eslint-disable-next-line no-console
-    console.error('[CategoryServer]', ...args);
+    console.debug('[CategoryServer]', ...args);
   }
   // In production, you can send errors to a monitoring service here
 }
 
-// Function to fetch rotated news for categories
-async function fetchRotatedCategoryNews(category: string): Promise<{
+export async function fetchCategoryNews(category: string): Promise<{
   featured: NewsArticle | null;
   articles: NewsArticle[];
   suggestedArticles: NewsArticle[];
@@ -41,8 +41,9 @@ async function fetchRotatedCategoryNews(category: string): Promise<{
   } catch (error) {
     logCategoryServerError(`Failed to fetch rotated news for category ${category}:`, error);
     // Fallback to direct fetch
-    const allArticles: NewsArticle[] = await fetchNews(category); // الآن تجلب فقط من Supabase
-    const sortedArticles = allArticles;
+    const allArticles: NewsArticle[] = await fetchNews();
+    const categoryArticles = allArticles.filter(article => article.category === category);
+    const sortedArticles = categoryArticles.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
     const featured = sortedArticles[0] || null;
     const restArticles = featured ? sortedArticles.filter(a => a.slug !== featured.slug) : sortedArticles;
     const articles = restArticles.slice(0, 51);
@@ -58,7 +59,7 @@ async function fetchRotatedCategoryNews(category: string): Promise<{
 
 export default async function CategoryServer({ category }: { category: string }) {
   // Fetch rotated news with automatic 3-hour rotation for this category
-  const { featured, articles, suggestedArticles } = await fetchRotatedCategoryNews(category);
+  const { featured, articles, suggestedArticles } = await fetchCategoryNews(category);
 
   return {
     featured,

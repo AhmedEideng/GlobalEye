@@ -1,4 +1,4 @@
-export async function logSnagEvent(title: string, message: string) {
+export async function logSnagEvent(title: string, message: string, icon?: string) {
   const LOGSNAG_API_KEY = process.env.LOGSNAG_API_KEY;
   
   if (!LOGSNAG_API_KEY) {
@@ -7,26 +7,30 @@ export async function logSnagEvent(title: string, message: string) {
   }
 
   try {
-    await fetch("https://api.logsnag.com/v1/log", {
-      method: "POST",
+    const response = await fetch('https://api.logsnag.com/v1/log', {
+      method: 'POST',
       headers: {
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${LOGSNAG_API_KEY}`,
-        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        project: "GlobalEye",
-        channel: "news-fetch",
+        project: 'globaleye',
+        channel: 'general',
         event: title,
         description: message,
-        icon: "📰",
-        notify: true,
+        icon: icon || '📰',
+        tags: {
+          environment: process.env.NODE_ENV || 'development',
+        },
       }),
     });
-  } catch (error) {
-    // Silently fail in production, log in development
-    if (process.env.NODE_ENV === 'development') {
+
+    if (!response.ok) {
       // eslint-disable-next-line no-console
-      console.warn('Failed to send log to LogSnag:', error);
+      console.debug('Failed to send log to LogSnag:', response.statusText);
     }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.debug('Failed to send log to LogSnag:', error);
   }
 }

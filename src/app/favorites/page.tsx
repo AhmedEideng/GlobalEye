@@ -22,7 +22,7 @@ export default function FavoritesPage() {
       // Revert optimistic update on error
       if (process.env.NODE_ENV === 'development') {
         // eslint-disable-next-line no-console
-        console.error('Failed to remove favorite:', error);
+        console.debug('Failed to remove favorite:', error);
       }
     }
   }, [user]);
@@ -40,7 +40,7 @@ export default function FavoritesPage() {
       } catch (error) {
         if (process.env.NODE_ENV === 'development') {
           // eslint-disable-next-line no-console
-          console.error('Failed to fetch favorites:', error);
+          console.debug('Failed to fetch favorites:', error);
         }
       } finally {
         setFavLoading(false);

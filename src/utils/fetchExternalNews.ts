@@ -36,7 +36,7 @@ export async function fetchExternalNews(category: string = 'general'): Promise<E
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
         // eslint-disable-next-line no-console
-        console.warn('NewsAPI fetch failed:', error);
+        console.debug('NewsAPI fetch failed:', error);
       }
     }
   }
@@ -47,7 +47,7 @@ export async function fetchExternalNews(category: string = 'general'): Promise<E
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
         // eslint-disable-next-line no-console
-        console.warn('GNews fetch failed:', error);
+        console.debug('GNews fetch failed:', error);
       }
     }
   }
@@ -58,7 +58,7 @@ export async function fetchExternalNews(category: string = 'general'): Promise<E
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
         // eslint-disable-next-line no-console
-        console.warn('Guardian fetch failed:', error);
+        console.debug('Guardian fetch failed:', error);
       }
     }
   }
@@ -69,7 +69,7 @@ export async function fetchExternalNews(category: string = 'general'): Promise<E
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
         // eslint-disable-next-line no-console
-        console.warn('Mediastack fetch failed:', error);
+        console.debug('Mediastack fetch failed:', error);
       }
     }
   }

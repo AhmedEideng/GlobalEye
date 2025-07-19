@@ -27,7 +27,7 @@ export default function ArticleHeader({ article }: { article: NewsArticle }) {
           // Silently handle error for favorite check
           if (process.env.NODE_ENV === 'development') {
             // eslint-disable-next-line no-console
-            console.warn('Failed to check favorite status:', error);
+            console.debug('Failed to check favorite status:', error);
           }
         }
       };
