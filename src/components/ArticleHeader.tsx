@@ -42,6 +42,7 @@ export default function ArticleHeader({ article }: { article: NewsArticle }) {
   return (
     <>
       <Head>
+        {/* skipcq: JS-0440 - JSON-LD structured data requires dangerouslySetInnerHTML for SEO */}
         <script 
           type="application/ld+json" 
           dangerouslySetInnerHTML={{ __html: sanitizeJsonLd(jsonLd) }} 

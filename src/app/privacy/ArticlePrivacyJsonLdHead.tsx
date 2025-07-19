@@ -13,6 +13,7 @@ export default function ArticlePrivacyJsonLdHead() {
   };
   return (
     <Head>
+      {/* skipcq: JS-0440 - JSON-LD structured data requires dangerouslySetInnerHTML for SEO */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: sanitizeJsonLd(jsonLd) }} />
     </Head>
   );
