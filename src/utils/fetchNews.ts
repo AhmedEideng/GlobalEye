@@ -123,7 +123,7 @@ export function detectCategory(article: NewsArticle): string {
     let count = 0;
     for (const kw of keywords) {
       // Support Arabic and English
-      const regex = new RegExp(`\\b${kw.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`, 'gi');
+      const regex = new RegExp(`\\b${kw.replace(/[-/\\^$*+?.()|[\]{}]/gu, '\\$&')}\\b`, 'giu');
       count += (text.match(regex) || []).length;
     }
     if (count > maxCount) {
@@ -226,7 +226,7 @@ export async function getArticleBySlug(slug: string): Promise<NewsArticle | null
     }
     
     // Strategy 3: Search by title (convert slug back to title-like search)
-    const titleSearch = slug.replace(/-/g, ' ').replace(/\d+$/, '').trim();
+    const titleSearch = slug.replace(/-/gu, ' ').replace(/\d+$/u, '').trim();
     const { data: titleData, error: titleError } = await supabase
       .from('news')
       .select('*')

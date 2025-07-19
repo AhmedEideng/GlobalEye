@@ -8,17 +8,17 @@ export function sanitizeText(text: string | null | undefined): string {
   
   return text
     // Remove all null bytes and control characters
-    .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
+    .replace(/[\x00-\x1F\x7F-\x9F]/gu, '')
     // Remove non-printable characters except newlines, tabs, and spaces
-    .replace(/[^\x20-\x7E\x0A\x09]/g, '')
+    .replace(/[^\x20-\x7E\x0A\x09]/gu, '')
     // Remove any remaining problematic Unicode characters
-    .replace(/[\uFFFE\uFFFF]/g, '')
+    .replace(/[\uFFFE\uFFFF]/gu, '')
     // Remove zero-width characters
-    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    .replace(/[\u200B-\u200D\uFEFF]/gu, '')
     // Normalize whitespace
-    .replace(/\s+/g, ' ')
-    // Remove any remaining invalid characters
-    .replace(/[^\w\s\-\.\,\+\-\*\/\(\)\[\]\{\}\|\&\^\%\#\@\!\?\<\>\=\:\;\"\'\\]/g, '')
+    .replace(/\s+/gu, ' ')
+    // Remove any remaining invalid characters (simplified)
+    .replace(/[^\w\s\-.,+*()[\]{}|&^%#@!?=:;"'\\]/gu, '')
     .trim();
 }
 
@@ -37,22 +37,22 @@ export function sanitizeJsonLd(data: unknown): string {
     // Additional security layer: remove any potentially dangerous characters
     return jsonString
       // Remove all HTML/XML tags
-      .replace(/<[^>]*>/g, '')
+      .replace(/<[^>]*>/gu, '')
       // Remove script tags and their content
-      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+      .replace(/<script[^>]*>[\s\S]*?<\/script>/giu, '')
       // Remove event handlers
-      .replace(/\bon\w+\s*=/gi, '')
+      .replace(/\bon\w+\s*=/giu, '')
       // Remove javascript: protocol
-      .replace(/javascript:/gi, '')
+      .replace(/javascript:/giu, '')
       // Remove data: protocol
-      .replace(/data:/gi, '')
+      .replace(/data:/giu, '')
       // Remove vbscript: protocol
-      .replace(/vbscript:/gi, '')
+      .replace(/vbscript:/giu, '')
       // Remove any remaining potentially dangerous characters
-      .replace(/[<>]/g, '')
+      .replace(/[<>]/gu, '')
       // Ensure proper JSON structure
-      .replace(/,\s*}/g, '}')
-      .replace(/,\s*]/g, ']');
+      .replace(/,\s*\}/gu, '}')
+      .replace(/,\s*\]/gu, ']');
   } catch {
     // Return safe empty object if sanitization fails
     return '{}';
@@ -72,11 +72,11 @@ function sanitizeJsonLdDeep(data: unknown): unknown {
   if (typeof data === 'string') {
     return sanitizeText(data)
       // Additional security for JSON-LD strings
-      .replace(/[<>]/g, '') // Remove angle brackets
-      .replace(/javascript:/gi, '') // Remove javascript protocol
-      .replace(/data:/gi, '') // Remove data protocol
-      .replace(/vbscript:/gi, '') // Remove vbscript protocol
-      .replace(/\bon\w+\s*=/gi, '') // Remove event handlers
+      .replace(/[<>]/gu, '') // Remove angle brackets
+      .replace(/javascript:/giu, '') // Remove javascript protocol
+      .replace(/data:/giu, '') // Remove data protocol
+      .replace(/vbscript:/giu, '') // Remove vbscript protocol
+      .replace(/\bon\w+\s*=/giu, '') // Remove event handlers
       .substring(0, 1000); // Limit string length
   }
   
@@ -95,8 +95,8 @@ function sanitizeJsonLdDeep(data: unknown): unknown {
       if (count >= 50) break; // Limit object properties
       // Sanitize the key as well
       const sanitizedKey = sanitizeText(key)
-        .replace(/[<>]/g, '') // Remove angle brackets
-        .replace(/javascript:/gi, '') // Remove javascript protocol
+        .replace(/[<>]/gu, '') // Remove angle brackets
+        .replace(/javascript:/giu, '') // Remove javascript protocol
         .substring(0, 50); // Limit key length
       if (sanitizedKey) {
         sanitized[sanitizedKey] = sanitizeJsonLdDeep(value);
@@ -119,15 +119,15 @@ export function sanitizeHtml(html: string): string {
   
   return html
     // Remove all null bytes and control characters
-    .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
+    .replace(/[\x00-\x1F\x7F-\x9F]/gu, '')
     // Remove non-ASCII characters that might cause issues
-    .replace(/[^\x00-\x7F]/g, '')
+    .replace(/[^\x00-\x7F]/gu, '')
     // Remove any remaining problematic Unicode characters
-    .replace(/[\uFFFE\uFFFF]/g, '')
+    .replace(/[\uFFFE\uFFFF]/gu, '')
     // Remove zero-width characters
-    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    .replace(/[\u200B-\u200D\uFEFF]/gu, '')
     // Normalize whitespace
-    .replace(/\s+/g, ' ')
+    .replace(/\s+/gu, ' ')
     .trim();
 }
 
@@ -192,11 +192,11 @@ export function sanitizeSvgPath(pathData: string): string {
   
   return pathData
     // Remove any non-printable characters
-    .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
-    // Remove any invalid SVG path characters
-    .replace(/[^\w\s\-\.\,\+\-\*\/\(\)\[\]\{\}\|\&\^\%\#\@\!\?\<\>\=\:\;\"\'\\]/g, '')
+    .replace(/[\x00-\x1F\x7F-\x9F]/gu, '')
+    // Remove any invalid SVG path characters (simplified)
+    .replace(/[^\w\s\-.,+*()[\]{}|&^%#@!?=:;"'\\]/gu, '')
     // Clean up multiple spaces
-    .replace(/\s+/g, ' ')
+    .replace(/\s+/gu, ' ')
     .trim();
 }
 
@@ -208,8 +208,8 @@ export function sanitizeSvgContent(svgContent: string): string {
   
   return svgContent
     // Remove any non-printable characters
-    .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
+    .replace(/[\x00-\x1F\x7F-\x9F]/gu, '')
     // Clean up multiple spaces
-    .replace(/\s+/g, ' ')
+    .replace(/\s+/gu, ' ')
     .trim();
 } 

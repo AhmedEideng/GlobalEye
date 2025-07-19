@@ -4,21 +4,15 @@ import { supabase } from './supabaseClient';
 import { ExternalNewsArticle } from './fetchExternalNews';
 
 function generateSlug(title: string, url: string): string {
-  if (title && title.trim()) {
-    const cleanTitle = title
-      .toLowerCase()
-      .trim()
-      .replace(/[^-\w\s]/g, '')
-      .replace(/[\s\-]+/g, '-')
-      .replace(/^-+|-+$/g, '')
-      .slice(0, 50);
-    if (!cleanTitle) {
-      return `article-${Math.abs(hashCode(url)).toString()}`;
-    }
-    const urlHash = Math.abs(hashCode(url)).toString().slice(0, 8);
-    return `${cleanTitle}-${urlHash}`;
-  }
-  return `article-${Math.abs(hashCode(url)).toString()}`;
+  // Use title if available, otherwise use URL
+  const text = title || url;
+  
+  return text
+    .toLowerCase()
+    .replace(/[^-\w\s]/gu, '')
+    .replace(/[\s\-]+/gu, '-')
+    .replace(/^-+|-+$/gu, '')
+    .substring(0, 100);
 }
 
 function hashCode(str: string): number {
