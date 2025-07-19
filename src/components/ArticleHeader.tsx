@@ -120,7 +120,7 @@ export default function ArticleHeader({ article }: { article: NewsArticle }) {
       </Head>
       <header className="article-header mb-8">
         <div className="max-w-4xl mx-auto">
-          <ArticleTitleSection title={article.title} description={article.description} />
+          <ArticleTitleSection title={article.title ?? ''} description={article.description ?? ''} />
           {article.urlToImage && (
             <ArticleImageSection urlToImage={article.urlToImage} title={article.title} />
           )}
