@@ -23,61 +23,104 @@ const isValidApiKey = (key: string | undefined): boolean => {
   return typeof key === 'string' && key.length > 0 && key !== 'undefined';
 };
 
-export async function fetchExternalNews(category = 'general'): Promise<ExternalNewsArticle[]> {
-  let newsapi: ExternalNewsArticle[] = [];
-  let gnews: ExternalNewsArticle[] = [];
-  let guardian: ExternalNewsArticle[] = [];
-  let mediastack: ExternalNewsArticle[] = [];
+// Retry configuration
+const RETRY_CONFIG = {
+  maxRetries: 2,
+  delayMs: 1000,
+  backoffMultiplier: 2
+};
 
-  // Only fetch from APIs with valid keys
-  if (isValidApiKey(NEWS_API_KEY)) {
-    try { 
-      newsapi = await fetchFromNewsAPI(category); 
-    } catch (error) {
+// Helper function for retry logic
+async function fetchWithRetry<T>(
+  fetchFn: () => Promise<T>, 
+  sourceName: string, 
+  category: string,
+  retryCount = 0
+): Promise<T> {
+  try {
+    return await fetchFn();
+  } catch (error) {
+    if (retryCount < RETRY_CONFIG.maxRetries) {
+      const delay = RETRY_CONFIG.delayMs * Math.pow(RETRY_CONFIG.backoffMultiplier, retryCount);
+      await new Promise(resolve => setTimeout(resolve, delay));
+      
       if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line no-console
-        console.debug('NewsAPI fetch failed:', error);
+        console.debug(`${sourceName} retry ${retryCount + 1}/${RETRY_CONFIG.maxRetries} for ${category}`);
       }
+      
+      return fetchWithRetry(fetchFn, sourceName, category, retryCount + 1);
     }
+    
+    await logSnagEvent(`${sourceName} ❌`, `فشل نهائي بعد ${RETRY_CONFIG.maxRetries} محاولات: ${error instanceof Error ? error.message : error}`);
+    throw error;
+  }
+}
+
+export async function fetchExternalNews(category = 'general'): Promise<ExternalNewsArticle[]> {
+  const startTime = Date.now();
+  
+  // Prepare fetch promises for all valid sources
+  const fetchPromises: Promise<ExternalNewsArticle[]>[] = [];
+  
+  if (isValidApiKey(NEWS_API_KEY)) {
+    fetchPromises.push(
+      fetchWithRetry(
+        () => fetchFromNewsAPI(category),
+        'NewsAPI',
+        category
+      ).catch(() => [])
+    );
   }
   
   if (isValidApiKey(GNEWS_API_KEY)) {
-    try { 
-      gnews = await fetchFromGNews(category); 
-    } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line no-console
-        console.debug('GNews fetch failed:', error);
-      }
-    }
+    fetchPromises.push(
+      fetchWithRetry(
+        () => fetchFromGNews(category),
+        'GNews',
+        category
+      ).catch(() => [])
+    );
   }
   
   if (isValidApiKey(GUARDIAN_API_KEY)) {
-    try { 
-      guardian = await fetchFromGuardian(category); 
-    } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line no-console
-        console.debug('Guardian fetch failed:', error);
-      }
-    }
+    fetchPromises.push(
+      fetchWithRetry(
+        () => fetchFromGuardian(category),
+        'Guardian',
+        category
+      ).catch(() => [])
+    );
   }
   
   if (isValidApiKey(MEDIASTACK_KEY)) {
-    try { 
-      mediastack = await fetchFromMediastack(category); 
-    } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line no-console
-        console.debug('Mediastack fetch failed:', error);
-      }
-    }
+    fetchPromises.push(
+      fetchWithRetry(
+        () => fetchFromMediastack(category),
+        'Mediastack',
+        category
+      ).catch(() => [])
+    );
   }
 
-  const all = [...newsapi, ...gnews, ...guardian, ...mediastack];
-  const unique = all.filter((article, idx, arr) =>
+  // Execute all fetches in parallel
+  const results = await Promise.allSettled(fetchPromises);
+  
+  // Extract successful results
+  const allArticles: ExternalNewsArticle[] = [];
+  results.forEach((result) => {
+    if (result.status === 'fulfilled') {
+      allArticles.push(...result.value);
+    }
+  });
+
+  // Remove duplicates based on URL
+  const unique = allArticles.filter((article, idx, arr) =>
     article.url && arr.findIndex(a => a.url === article.url) === idx
   );
+
+  const duration = Date.now() - startTime;
+  await logSnagEvent("📊 جلب الأخبار", `تم جلب ${unique.length} مقال فريد من ${fetchPromises.length} مصدر في ${duration}ms (${category})`);
+
   return unique;
 }
 
@@ -86,11 +129,24 @@ async function fetchFromNewsAPI(category: string): Promise<ExternalNewsArticle[]
   const url = `https://newsapi.org/v2/top-headlines?country=us&category=${category}&pageSize=20&apiKey=${NEWS_API_KEY}`;
 
   try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error("NewsAPI response not ok");
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent': 'GlobalEye-News/1.0'
+      }
+    });
+    
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`NewsAPI HTTP ${res.status}: ${errorText}`);
+    }
+    
     const data = await res.json();
 
-    await logSnagEvent("NewsAPI ✅", `تم جلب ${data.articles.length} خبر من NewsAPI (${category})`);
+    if (data.status === 'error') {
+      throw new Error(`NewsAPI error: ${data.message}`);
+    }
+
+    await logSnagEvent("NewsAPI ✅", `تم جلب ${data.articles?.length || 0} خبر من NewsAPI (${category})`);
 
     return (data.articles || []).map((article: Record<string, unknown>) => ({
       source: {
@@ -107,7 +163,7 @@ async function fetchFromNewsAPI(category: string): Promise<ExternalNewsArticle[]
     }));
   } catch (error: unknown) {
     await logSnagEvent("NewsAPI ❌", `فشل جلب أخبار ${category}: ${error instanceof Error ? error.message : error}`);
-    return [];
+    throw error;
   }
 }
 
@@ -116,11 +172,24 @@ export async function fetchFromGNews(category: string): Promise<ExternalNewsArti
   const url = `https://gnews.io/api/v4/top-headlines?category=${category}&lang=en&country=us&max=20&apikey=${GNEWS_API_KEY}`;
 
   try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error("GNews response not ok");
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent': 'GlobalEye-News/1.0'
+      }
+    });
+    
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`GNews HTTP ${res.status}: ${errorText}`);
+    }
+    
     const data = await res.json();
 
-    await logSnagEvent("GNews ✅", `تم جلب ${data.articles.length} خبر من GNews (${category})`);
+    if (data.errors) {
+      throw new Error(`GNews error: ${JSON.stringify(data.errors)}`);
+    }
+
+    await logSnagEvent("GNews ✅", `تم جلب ${data.articles?.length || 0} خبر من GNews (${category})`);
 
     return (data.articles || []).map((article: Record<string, unknown>) => ({
       source: {
@@ -139,7 +208,7 @@ export async function fetchFromGNews(category: string): Promise<ExternalNewsArti
     }));
   } catch (error: unknown) {
     await logSnagEvent("GNews ❌", `فشل جلب أخبار ${category}: ${error instanceof Error ? error.message : error}`);
-    return [];
+    throw error;
   }
 }
 
@@ -148,9 +217,22 @@ export async function fetchFromGuardian(category: string): Promise<ExternalNewsA
   const url = `https://content.guardianapis.com/search?section=${category}&show-fields=all&page-size=20&api-key=${GUARDIAN_API_KEY}`;
 
   try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error("Guardian response not ok");
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent': 'GlobalEye-News/1.0'
+      }
+    });
+    
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`Guardian HTTP ${res.status}: ${errorText}`);
+    }
+    
     const data = await res.json();
+
+    if (data.response?.status === 'error') {
+      throw new Error(`Guardian error: ${data.response.message}`);
+    }
 
     await logSnagEvent("Guardian ✅", `تم جلب ${data.response?.results?.length || 0} خبر من Guardian (${category})`);
 
@@ -174,7 +256,7 @@ export async function fetchFromGuardian(category: string): Promise<ExternalNewsA
     }));
   } catch (error: unknown) {
     await logSnagEvent("Guardian ❌", `فشل جلب أخبار ${category}: ${error instanceof Error ? error.message : error}`);
-    return [];
+    throw error;
   }
 }
 
@@ -183,9 +265,22 @@ export async function fetchFromMediastack(category: string): Promise<ExternalNew
   const url = `http://api.mediastack.com/v1/news?access_key=${MEDIASTACK_KEY}&categories=${category}&languages=en&countries=us&limit=20`;
 
   try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error("Mediastack response not ok");
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent': 'GlobalEye-News/1.0'
+      }
+    });
+    
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`Mediastack HTTP ${res.status}: ${errorText}`);
+    }
+    
     const data = await res.json();
+
+    if (data.error) {
+      throw new Error(`Mediastack error: ${data.error.info || data.error.message}`);
+    }
 
     await logSnagEvent("Mediastack ✅", `تم جلب ${data.data?.length || 0} خبر من Mediastack (${category})`);
 
@@ -201,6 +296,6 @@ export async function fetchFromMediastack(category: string): Promise<ExternalNew
     }));
   } catch (error: unknown) {
     await logSnagEvent("Mediastack ❌", `فشل جلب أخبار ${category}: ${error instanceof Error ? error.message : error}`);
-    return [];
+    throw error;
   }
 }
