@@ -18,7 +18,7 @@ export default function ShareButtons({ url, title }: { url: string, title: strin
       await navigator.clipboard.writeText(fullUrl);
       setCopied(true);
       try {
-        await sendAnalyticsEvent('share_article', { method: 'copy', url: fullUrl });
+        sendAnalyticsEvent('share_article', { method: 'copy', url: fullUrl });
       } catch {
         // Optionally log analytics error
       }
@@ -38,7 +38,7 @@ export default function ShareButtons({ url, title }: { url: string, title: strin
 
   const handleWhatsAppShare = useCallback(async () => {
     try {
-      await sendAnalyticsEvent('share_article', { method: 'whatsapp', url: fullUrl });
+      sendAnalyticsEvent('share_article', { method: 'whatsapp', url: fullUrl });
     } catch {
       // Optionally log analytics error
     }
@@ -48,7 +48,7 @@ export default function ShareButtons({ url, title }: { url: string, title: strin
 
   const handleTwitterShare = useCallback(async () => {
     try {
-      await sendAnalyticsEvent('share_article', { method: 'twitter', url: fullUrl });
+      sendAnalyticsEvent('share_article', { method: 'twitter', url: fullUrl });
     } catch {
       // Optionally log analytics error
     }
@@ -58,7 +58,7 @@ export default function ShareButtons({ url, title }: { url: string, title: strin
 
   const handleFacebookShare = useCallback(async () => {
     try {
-      await sendAnalyticsEvent('share_article', { method: 'facebook', url: fullUrl });
+      sendAnalyticsEvent('share_article', { method: 'facebook', url: fullUrl });
     } catch {
       // Optionally log analytics error
     }
