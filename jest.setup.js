@@ -12,7 +12,7 @@ jest.mock('next/router', () => ({
       pop: jest.fn(),
       reload: jest.fn(),
       back: jest.fn(),
-      prefetch: jest.fn().mockResolvedValue(undefined),
+      prefetch: jest.fn().mockResolvedValue(),
       beforePopState: jest.fn(),
       events: {
         on: jest.fn(),

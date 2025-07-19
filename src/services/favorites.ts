@@ -34,5 +34,5 @@ export async function getFavorites(userId: string) {
  */
 export async function isFavorite(userId: string, slug: string) {
   const { data } = await supabase.from('favorites').select('id').eq('user_id', userId).eq('article_slug', slug).single();
-  return !!data;
+  return Boolean(data);
 } 

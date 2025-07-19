@@ -250,7 +250,7 @@ export default function CategoryClient({
         <h1
           className="category-title text-3xl sm:text-4xl md:text-6xl font-extrabold mb-2 tracking-tight text-red-700 break-words"
           style={{
-            fontFamily: `'Playfair Display', 'Merriweather', serif`,
+            fontFamily: 'Playfair Display, Merriweather, serif',
             textShadow: '0 2px 16px rgba(220,38,38,0.10)',
           }}
         >

@@ -140,7 +140,7 @@ export function detectCategory(article: NewsArticle): string {
  * @param category - The news category
  * @returns Promise<NewsArticle[]>
  */
-export async function fetchRelatedNews(currentArticle: NewsArticle, category: string = 'general'): Promise<NewsArticle[]> {
+export async function fetchRelatedNews(currentArticle: NewsArticle, category = 'general'): Promise<NewsArticle[]> {
   try {
     // Get news from the same category, excluding the current article
     const articles = await fetchNews(category);
