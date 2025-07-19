@@ -8,9 +8,9 @@ export function sanitizeText(text: string | null | undefined): string {
   
   return text
     // Remove all null bytes and control characters (prevents invisible/invalid chars)
-    .replace(/[\x00-\x1F\x7F-\x9F]/gu, '')
+    .replace(/[\u0000-\u001F\u007F-\u009F]/gu, '')
     // Remove non-printable characters except newlines, tabs, and spaces (for safe rendering)
-    .replace(/[^\x20-\x7E\x0A\x09]/gu, '')
+    .replace(/[^\u0020-\u007E\u000A\u0009]/gu, '')
     // Remove any remaining problematic Unicode characters (rare, but can break rendering)
     .replace(/[\uFFFE\uFFFF]/gu, '')
     // Remove zero-width characters (can be used for obfuscation)
@@ -120,9 +120,9 @@ export function sanitizeHtml(html: string): string {
   
   return html
     // Remove all null bytes and control characters
-    .replace(/[\x00-\x1F\x7F-\x9F]/gu, '')
+    .replace(/[\u0000-\u001F\u007F-\u009F]/gu, '')
     // Remove non-ASCII characters that might cause issues
-    .replace(/[^\x00-\x7F]/gu, '')
+    .replace(/[^\u0000-\u007F]/gu, '')
     // Remove any remaining problematic Unicode characters
     .replace(/[\uFFFE\uFFFF]/gu, '')
     // Remove zero-width characters
@@ -193,7 +193,7 @@ export function sanitizeSvgPath(pathData: string): string {
   
   return pathData
     // Remove any non-printable characters
-    .replace(/[\x00-\x1F\x7F-\x9F]/gu, '')
+    .replace(/[\u0000-\u001F\u007F-\u009F]/gu, '')
     // Remove any invalid SVG path characters (simplified)
     .replace(/[^\w\s\-.,+*()[\]{}|&^%#@!?=:;"'\\]/gu, '')
     // Clean up multiple spaces
@@ -209,7 +209,7 @@ export function sanitizeSvgContent(svgContent: string): string {
   
   return svgContent
     // Remove any non-printable characters
-    .replace(/[\x00-\x1F\x7F-\x9F]/gu, '')
+    .replace(/[\u0000-\u001F\u007F-\u009F]/gu, '')
     // Clean up multiple spaces
     .replace(/\s+/gu, ' ')
     .trim();
