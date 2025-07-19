@@ -72,7 +72,7 @@ export default function AdminStatsPage() {
       
       data.forEach((article: NewsArticle) => {
         const content = article.content || '';
-        const regex = /\u0627\u0644\u0645\u0635\u0627\u062f\u0631:/;
+        const regex = /\u0627\u0644\u0645\u0635\u0627\u062f\u0631:/u;
         const match = regex.exec(content);
         const mainContent = match ? content.slice(0, match.index || 0) : content;
         const paragraphs = mainContent.split(/\n+/).map((p: string) => p.trim()).filter(Boolean);
