@@ -7,6 +7,57 @@ import { isFavorite } from '@services/favorites';
 import { sanitizeText, sanitizeJsonLd } from '../utils/sanitizeText';
 import SafeText from './SafeText';
 
+function ArticleTitleSection({ title, description }: { title: string; description: string }) {
+  return (
+    <div className="mb-4">
+      <h1 className="article-title text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 text-gray-900 leading-tight break-words text-balance">
+        <SafeText>{title}</SafeText>
+      </h1>
+      <p className="article-description text-lg sm:text-xl text-gray-700 mb-6 font-medium break-words text-balance">
+        <SafeText>{description}</SafeText>
+      </p>
+    </div>
+  );
+}
+
+function ArticleImageSection({ urlToImage, title }: { urlToImage: string; title: string }) {
+  return (
+    <div className="relative w-full h-64 sm:h-80 md:h-96 lg:h-[500px] rounded-2xl overflow-hidden mb-6 shadow-lg">
+      <Image
+        src={urlToImage}
+        alt={title}
+        fill
+        className="object-cover w-full h-full"
+        priority
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+      />
+    </div>
+  );
+}
+
+function ArticleMetaSection({ formattedDate, author, sourceName }: { formattedDate: string; author?: string; sourceName?: string }) {
+  return (
+    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+      <div className="flex items-center gap-2">
+        <svg className="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" /></svg>
+        <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.682l-7.682-7.682a4.5 4.5 0 010-6.364z" /></svg>
+        <span>{formattedDate}</span>
+      </div>
+      {author && (
+        <div className="flex items-center gap-2">
+          <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-4.418 0-8 1.79-8 4v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2c0-2.21-3.582-4-8-4z"/></svg>
+          <SafeText>{author}</SafeText>
+        </div>
+      )}
+      <div className="flex items-center gap-2">
+        <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold">
+          <SafeText>{sourceName}</SafeText>
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export default function ArticleHeader({ article }: { article: NewsArticle }) {
   const { user } = useAuth();
 
@@ -69,46 +120,11 @@ export default function ArticleHeader({ article }: { article: NewsArticle }) {
       </Head>
       <header className="article-header mb-8">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-4">
-            <h1 className="article-title text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 text-gray-900 leading-tight break-words text-balance">
-              <SafeText>{article.title}</SafeText>
-            </h1>
-            <p className="article-description text-lg sm:text-xl text-gray-700 mb-6 font-medium break-words text-balance">
-              <SafeText>{article.description}</SafeText>
-            </p>
-          </div>
-          
+          <ArticleTitleSection title={article.title} description={article.description} />
           {article.urlToImage && (
-            <div className="relative w-full h-64 sm:h-80 md:h-96 lg:h-[500px] rounded-2xl overflow-hidden mb-6 shadow-lg">
-              <Image
-                src={article.urlToImage}
-                alt={article.title}
-                fill
-                className="object-cover w-full h-full"
-                priority
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
-              />
-            </div>
+            <ArticleImageSection urlToImage={article.urlToImage} title={article.title} />
           )}
-          
-          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-            <div className="flex items-center gap-2">
-              <svg className="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" /></svg>
-              <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.682l-7.682-7.682a4.5 4.5 0 010-6.364z" /></svg>
-              <span>{formattedDate}</span>
-            </div>
-            {article.author && (
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-4.418 0-8 1.79-8 4v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2c0-2.21-3.582-4-8-4z"/></svg>
-                <SafeText>{article.author}</SafeText>
-              </div>
-            )}
-            <div className="flex items-center gap-2">
-              <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold">
-                <SafeText>{article.source?.name}</SafeText>
-              </span>
-            </div>
-          </div>
+          <ArticleMetaSection formattedDate={formattedDate} author={article.author ?? ''} sourceName={article.source?.name} />
         </div>
       </header>
     </>
