@@ -1,5 +1,33 @@
+process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://localhost:54321';
+process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-key';
+
 /* global jest */
-import '@testing-library/jest-dom'
+require('@testing-library/jest-dom')
+
+// Mock supabase-js (ESM-only) for Jest
+jest.mock('@supabase/supabase-js', () => {
+  return {
+    createClient: jest.fn(() => ({
+      from: jest.fn().mockReturnThis(),
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      order: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockReturnThis(),
+      single: jest.fn().mockReturnThis(),
+      ilike: jest.fn().mockReturnThis(),
+      insert: jest.fn().mockReturnThis(),
+      update: jest.fn().mockReturnThis(),
+      delete: jest.fn().mockReturnThis(),
+      then: jest.fn(),
+      auth: {
+        onAuthStateChange: jest.fn(() => ({ data: { subscription: { unsubscribe: jest.fn() } } })),
+        getSession: jest.fn().mockResolvedValue({ data: { session: null } }),
+        signInWithPassword: jest.fn().mockResolvedValue({ data: { session: null }, error: null }),
+        signOut: jest.fn().mockResolvedValue({ error: null }),
+      },
+    }) ),
+  }
+})
 
 // Mock Next.js router
 jest.mock('next/router', () => ({
@@ -30,7 +58,7 @@ jest.mock('next/image', () => ({
   __esModule: true,
   default: (props) => {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img {...props} />
+    return require('react').createElement('img', props)
   },
 }))
 

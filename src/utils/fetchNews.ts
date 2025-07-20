@@ -65,12 +65,16 @@ export async function forceRefreshNews(category = 'general') {
 /**
  * Fetches news articles for a given category from the database only, sorted from newest to oldest.
  * @param category - The news category (default: 'general')
+ * @param limit - Maximum number of articles to return (default: 50)
+ * @param offset - Number of articles to skip for pagination (default: 0)
  * @returns Promise<NewsArticle[]>
  */
-export async function fetchNews(category = 'general'): Promise<NewsArticle[]> {
-  // Check cache first
-  const cached = newsCache.get(category);
-  if (cached) return cached;
+export async function fetchNews(category = 'general', limit = 50, offset = 0): Promise<NewsArticle[]> {
+  // Check cache first (only for default parameters to avoid cache pollution)
+  if (limit === 50 && offset === 0) {
+    const cached = newsCache.get(category);
+    if (cached) return cached;
+  }
 
   // Fetch latest news from the database
   const { data: dbArticles, error } = await supabase
@@ -78,7 +82,7 @@ export async function fetchNews(category = 'general'): Promise<NewsArticle[]> {
     .select('*, categories(name)')
     .eq('category_id', await getOrAddCategoryId(category))
     .order('published_at', { ascending: false })
-    .limit(50);
+    .range(offset, offset + limit - 1);
 
   if (!error && dbArticles && dbArticles.length > 0) {
     const result = dbArticles.map((article: NewsWithCategory) => ({
@@ -93,7 +97,12 @@ export async function fetchNews(category = 'general'): Promise<NewsArticle[]> {
       slug: article.slug,
       category: article.categories?.name || category,
     }) as NewsArticle);
-    newsCache.set(category, result); // Store the result in cache
+    
+    // Only cache when using default parameters to avoid cache pollution
+    if (limit === 50 && offset === 0) {
+      newsCache.set(category, result);
+    }
+    
     return result;
   }
 
@@ -297,4 +306,20 @@ export function formatDate(date: string | Date): string {
 // Helper function to get a valid image URL or fallback to placeholder
 export function getImageUrl(url?: string | null): string {
   return url && url.trim() !== '' ? url : '/placeholder-news.jpg';
+}
+
+/**
+ * Calculate Jaccard similarity between two strings
+ * @param str1 - First string
+ * @param str2 - Second string
+ * @returns Similarity score between 0 and 1
+ */
+export function jaccardSimilarity(str1: string, str2: string): number {
+  const set1 = new Set(str1.toLowerCase().split(/\s+/));
+  const set2 = new Set(str2.toLowerCase().split(/\s+/));
+  
+  const intersection = new Set([...set1].filter(x => set2.has(x)));
+  const union = new Set([...set1, ...set2]);
+  
+  return union.size === 0 ? 1 : intersection.size / union.size;
 } 

@@ -47,6 +47,18 @@ const nextConfig = {
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '**' },
+      { protocol: 'https', hostname: 'www.rollingstone.com' },
+      { protocol: 'https', hostname: 'media.pitchfork.com' },
+      { protocol: 'https', hostname: 'platform.theverge.com' },
+      { protocol: 'https', hostname: 'dmn-dallas-news-prod.cdn.arcpublishing.com' },
+      { protocol: 'https', hostname: 'cdn.mos.cms.futurecdn.net' },
+      { protocol: 'https', hostname: 'a1.espncdn.com' },
+      { protocol: 'https', hostname: 'ichef.bbci.co.uk' },
+      { protocol: 'https', hostname: 'www.mercurynews.com' },
+      { protocol: 'https', hostname: 'cdn.nba.com' },
+      { protocol: 'https', hostname: 'i.guim.co.uk' },
+      { protocol: 'https', hostname: 'images.unsplash.com' },
+      { protocol: 'https', hostname: 'via.placeholder.com' },
     ],
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
