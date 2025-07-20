@@ -44,8 +44,7 @@ export async function GET() {
             name: category.name,
             slug: category.slug,
             description: category.description,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            created_at: new Date().toISOString()
           })
           .select()
           .single();
