@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@utils/supabaseClient';
+import { supabaseAdmin } from '@utils/supabaseClient';
 import { logSnagEvent } from '@utils/logsnag';
 
 const categories = [
@@ -21,7 +21,7 @@ export async function GET() {
     for (const category of categories) {
       try {
         // Check if category already exists
-        const { data: existingCategory } = await supabase
+        const { data: existingCategory } = await supabaseAdmin
           .from('categories')
           .select('id')
           .eq('slug', category.slug)
@@ -38,7 +38,7 @@ export async function GET() {
         }
 
         // Insert new category
-        const { data, error } = await supabase
+        const { data, error } = await supabaseAdmin
           .from('categories')
           .insert({
             name: category.name,
