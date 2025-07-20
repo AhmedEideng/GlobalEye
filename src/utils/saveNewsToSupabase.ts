@@ -1,6 +1,6 @@
 // src/app/utils/saveNewsToSupabase.ts
 
-import { supabase } from './supabaseClient';
+import { supabaseAdmin } from './supabaseClient';
 import { NewsArticle } from './fetchNews';
 import { logSnagEvent } from './logsnag';
 import { measureAsyncOperation } from './performanceMonitor';
@@ -109,7 +109,7 @@ async function getCategoryId(category: string): Promise<number | null> {
   }
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('categories')
       .select('id')
       .eq('slug', category)
@@ -164,7 +164,7 @@ async function processBatch(
 
     // Insert new articles
     if (newArticles.length > 0) {
-      const { error: insertError } = await supabase
+      const { error: insertError } = await supabaseAdmin
         .from('news')
         .insert(newArticles);
 
@@ -213,7 +213,7 @@ async function processBatch(
 
 async function checkExistingSlugs(slugs: string[]): Promise<Set<string>> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('news')
       .select('slug')
       .in('slug', slugs);
