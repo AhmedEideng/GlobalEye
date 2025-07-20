@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@utils/supabaseClient';
+import { supabase } from '@utils/supabaseClient';
 import { logSnagEvent } from '@utils/logsnag';
 
 const categories = [
@@ -14,6 +14,10 @@ const categories = [
 
 export async function GET() {
   try {
+    // Note: This endpoint requires RLS policies to be disabled or configured properly
+    // for the categories table in Supabase. The current error suggests that
+    // row-level security is preventing insertions.
+    
     const results = [];
     let successCount = 0;
     let errorCount = 0;
@@ -21,7 +25,7 @@ export async function GET() {
     for (const category of categories) {
       try {
         // Check if category already exists
-        const { data: existingCategory } = await supabaseAdmin
+        const { data: existingCategory } = await supabase
           .from('categories')
           .select('id')
           .eq('slug', category.slug)
@@ -38,7 +42,7 @@ export async function GET() {
         }
 
         // Insert new category
-        const { data, error } = await supabaseAdmin
+        const { data, error } = await supabase
           .from('categories')
           .insert({
             name: category.name,
