@@ -20,5 +20,10 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Admin client with service role for operations that require higher privileges
 export const supabaseAdmin = supabaseServiceKey 
-  ? createClient(supabaseUrl, supabaseServiceKey)
+  ? createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    })
   : supabase; 

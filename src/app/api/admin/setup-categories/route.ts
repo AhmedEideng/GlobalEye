@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { headers } from 'next/headers';
 import { supabaseAdmin } from '@utils/supabaseClient';
 import { logSnagEvent } from '@utils/logsnag';
 
@@ -12,12 +13,18 @@ const categories = [
   { name: 'Entertainment', slug: 'entertainment', description: 'Entertainment and celebrity news' }
 ];
 
-export async function GET() {
+export async function POST() {
   try {
-    // Note: This endpoint requires RLS policies to be disabled or configured properly
-    // for the categories table in Supabase. The current error suggests that
-    // row-level security is preventing insertions.
-    
+    // Verify admin access (you can add more security here)
+    const headersList = await headers();
+    const authHeader = headersList.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({
+        success: false,
+        error: 'Unauthorized - Admin access required'
+      }, { status: 401 });
+    }
+
     const results = [];
     let successCount = 0;
     let errorCount = 0;
@@ -41,7 +48,7 @@ export async function GET() {
           continue;
         }
 
-        // Insert new category
+        // Insert new category using admin client
         const { data, error } = await supabaseAdmin
           .from('categories')
           .insert({
@@ -81,13 +88,13 @@ export async function GET() {
     }
 
     await logSnagEvent(
-      '🔧 Categories Setup', 
+      '🔧 Admin Categories Setup', 
       `Created ${successCount} categories, ${errorCount} errors`
     );
 
     return NextResponse.json({
       success: errorCount === 0,
-      message: `Categories setup completed: ${successCount} successful, ${errorCount} failed`,
+      message: `Admin categories setup completed: ${successCount} successful, ${errorCount} failed`,
       results,
       summary: {
         total: categories.length,
@@ -99,7 +106,7 @@ export async function GET() {
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    await logSnagEvent('❌ Categories Setup Error', errorMessage);
+    await logSnagEvent('❌ Admin Categories Setup Error', errorMessage);
     
     return NextResponse.json({
       success: false,
@@ -107,4 +114,11 @@ export async function GET() {
       timestamp: new Date().toISOString()
     }, { status: 500 });
   }
+}
+
+export async function GET() {
+  return NextResponse.json({
+    success: false,
+    error: 'Use POST method for admin operations'
+  }, { status: 405 });
 } 
