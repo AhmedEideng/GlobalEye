@@ -44,7 +44,9 @@ async function fetchWithRetry<T>(
       const delay = RETRY_CONFIG.delayMs * Math.pow(RETRY_CONFIG.backoffMultiplier, retryCount);
       await new Promise(resolve => setTimeout(resolve, delay));
       
+      // Debug logging only in development
       if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
         console.debug(`${sourceName} retry ${retryCount + 1}/${RETRY_CONFIG.maxRetries} for ${category}`);
       }
       

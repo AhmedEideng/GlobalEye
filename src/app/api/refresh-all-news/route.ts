@@ -149,7 +149,7 @@ export async function GET(request: NextRequest) {
           console.error(`Error with category "${category}":`, err);
         }
         
-        await logSnagEvent(`❌ خطأ في ${category}`, errorMessage);
+        await logSnagEvent(`❌ Error in ${category}`, errorMessage);
         
         return {
           category,
@@ -173,11 +173,11 @@ export async function GET(request: NextRequest) {
       totalQualityStats.averageScore = totalQualityStats.passed / totalQualityStats.total;
     }
 
-    await logSnagEvent("✅ انتهاء تحديث الأخبار", `تم حفظ ${total} مقال في Supabase (جودة: ${(totalQualityStats.averageScore * 100).toFixed(1)}%)`);
+    await logSnagEvent("✅ News Update Complete", `Saved ${total} articles in Supabase (Quality: ${(totalQualityStats.averageScore * 100).toFixed(1)}%)`);
 
     return NextResponse.json({
       success: true,
-      message: `تم تحديث الأخبار (${total}) مقال`,
+      message: `News updated successfully (${total} articles)`,
       details: results,
       qualityStats: totalQualityStats,
       errors: errors.length > 0 ? errors : undefined,
@@ -185,7 +185,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    await logSnagEvent("❌ خطأ عام في تحديث الأخبار", errorMessage);
+    await logSnagEvent("❌ General News Update Error", errorMessage);
     
     return NextResponse.json({
       success: false,

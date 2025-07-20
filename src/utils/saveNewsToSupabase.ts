@@ -68,7 +68,7 @@ export async function saveNewsToSupabase(articles: NewsArticle[], category: stri
         }
 
         await logSnagEvent(
-          '✅ Articles Saved', 
+          '✅ Articles Saved Successfully', 
           `Saved ${totalNewArticles} new articles, ${totalDuplicates} duplicates for ${category}`
         );
 
@@ -84,7 +84,7 @@ export async function saveNewsToSupabase(articles: NewsArticle[], category: stri
         const errorMessage = err instanceof Error ? err.message : 'Unknown error';
         errors.push(`Exception: ${errorMessage}`);
         
-        await logSnagEvent('❌ Save Error', `Failed to save articles for ${category}: ${errorMessage}`);
+        await logSnagEvent('❌ Save Articles Error', `Failed to save articles for ${category}: ${errorMessage}`);
         
         return {
           success: false,
