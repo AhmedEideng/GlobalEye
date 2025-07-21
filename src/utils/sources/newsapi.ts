@@ -1,20 +1,26 @@
-import { NewsArticle } from './gnews';
-
-export async function getNewsFromNewsAPI(category: string): Promise<NewsArticle[]> {
+export async function getNewsFromNewsAPI(category: string) {
   const apiKey = process.env.NEWSAPI_KEY;
-  if (!apiKey) throw new Error('Missing NEWSAPI_KEY');
-
   const response = await fetch(`https://newsapi.org/v2/top-headlines?category=${category}&language=en&apiKey=${apiKey}`);
+
   if (!response.ok) throw new Error('Failed to fetch from NewsAPI');
 
-  const data = await response.json();
+  const data: { articles: NewsAPIArticle[] } = await response.json();
 
-  return data.articles.map((article: any) => ({
+  return data.articles.map((article) => ({
     title: article.title,
     description: article.description,
     url: article.url,
-    image: article.urlToImage ?? null,
+    image: article.urlToImage,
     publishedAt: article.publishedAt,
-    source: 'NewsAPI',
+    source: article.source.name,
   }));
+}
+
+interface NewsAPIArticle {
+  title: string;
+  description: string;
+  url: string;
+  urlToImage: string;
+  publishedAt: string;
+  source: { name: string };
 }
