@@ -21,7 +21,8 @@ export async function fetchExternalNews(category: string): Promise<NewsItem[]> {
 
     return uniqueNews;
   } catch (error) {
-    console.error('Error fetching external news:', error);
+    // eslint-disable-next-line no-console
+console.error('Error fetching external news:', error);
     return [];
   }
 }
