@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { fetchExternalNews } from '@utils/fetchExternalNews'
 import { saveNewsToSupabase } from '@utils/saveNewsToSupabase'
-import { getCategoriesFromSupabase } from '@/utils/getCategoriesFromSupabase'
+import { getCategoriesFromSupabase } from '@utils/getCategoriesFromSupabase'
 
 export async function GET() {
   try {
@@ -15,8 +15,17 @@ export async function GET() {
     }
 
     return NextResponse.json({ message: 'News updated successfully' })
-  } catch (error: any) {
-    console.error('Error refreshing news:', error)
+  } catch (error: unknown) {
+    let errorMessage = 'Unknown error'
+    if (error instanceof Error) {
+      errorMessage = error.message
+    }
+
+    // إظهار الخطأ فقط في وضع التطوير
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error refreshing news:', errorMessage)
+    }
+
     return NextResponse.json({ error: 'Failed to refresh news' }, { status: 500 })
   }
 }
