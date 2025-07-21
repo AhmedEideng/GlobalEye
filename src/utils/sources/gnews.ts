@@ -9,7 +9,7 @@ export async function fetchNewsFromGEnews(category: string): Promise<ExternalNew
   const response = await fetch(url);
   const data = await response.json();
 
-  return data.articles.map((article: any) => ({
+  return data.articles.map((article: unknown) => ({
     title: article.title,
     description: article.description,
     url: article.url,
