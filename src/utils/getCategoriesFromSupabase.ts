@@ -15,14 +15,11 @@ export async function getCategoriesFromSupabase(): Promise<Category[]> {
     const { data, error } = await supabase.from('categories').select('*')
 
     if (error || !data) {
-      throw new Error(error?.message || 'Failed to fetch categories')
+      throw new Error()
     }
 
     return data as Category[]
-  } catch (error: unknown) {
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Error getting categories:', error)
-    }
+  } catch {
     return []
   }
 }
