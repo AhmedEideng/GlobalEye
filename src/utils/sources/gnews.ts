@@ -1,21 +1,16 @@
-import { Article } from '@/utils/types';
+export async function getNewsFromGNews(category: string) {
+  const apiKey = process.env.GNEWS_KEY;
+  const url = `https://gnews.io/api/v4/top-headlines?topic=${category}&token=${apiKey}&lang=en`;
 
-export async function getGNews(category: string): Promise<Article[]> {
-  const API_KEY = process.env.GNEWS_KEY;
-  if (!API_KEY) return [];
-
-  const url = `https://gnews.io/api/v4/top-headlines?category=${category}&lang=en&apikey=${API_KEY}`;
   const res = await fetch(url);
-  const json = await res.json();
+  const data = await res.json();
 
-  return (json.articles || []).map((article: any) => ({
+  return data.articles.map((article: any) => ({
+    source: 'GNews',
     title: article.title,
     description: article.description,
-    content: article.content,
     url: article.url,
-    urlToImage: article.image,
+    image: article.image,
     publishedAt: article.publishedAt,
-    source: { name: article.source.name },
-    author: article.author,
   }));
 }
