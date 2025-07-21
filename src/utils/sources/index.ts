@@ -1,6 +1,6 @@
 import { getGNews } from './gnews';
 import { getNewsAPI } from './newsapi';
-import { getGuardianNews } from './guardian';
+import { getGuardianNews } from './theguardian';
 import { getMediastackNews } from './mediastack';
 
 export const sources = [
