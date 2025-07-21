@@ -1,7 +1,7 @@
-import { fetchNewsFromNewsapi } from './sources/newsapi';
-import { fetchNewsFromGNews } from './sources/gnews';
-import { fetchNewsFromGuardian } from './sources/theguardian';
-import { fetchNewsFromMediastack } from './sources/mediastack';
+import { fetchNewsFromnewsapi } from './sources/newsapi';
+import { fetchNewsFromgenews } from './sources/gnews';
+import { fetchNewsFromguardian } from './sources/theguardian';
+import { fetchNewsFrommediastack } from './sources/mediastack';
 
 // ✅ إضافة تعريف ExternalNewsArticle
 export interface ExternalNewsArticle {
