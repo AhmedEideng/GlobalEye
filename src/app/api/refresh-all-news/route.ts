@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 import { fetchExternalNews } from '@/utils/fetchExternalNews';
 import { saveNewsToSupabase } from '@/utils/saveNewsToSupabase';
 import { getOrAddCategoryId } from '@/utils/categoryHelpers';
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@/utils/server';
 
 export const dynamic = 'force-dynamic'; // لمنع التخزين المؤقت عند تنفيذ الكرون
 
