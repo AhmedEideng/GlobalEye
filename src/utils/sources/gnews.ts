@@ -16,7 +16,7 @@ export async function fetchNewsFromGENews(category: string) {
   }));
 }
 
-interface GNewsArticle {
+export interface ExternalNewsArticle {
   title: string;
   description: string;
   url: string;
