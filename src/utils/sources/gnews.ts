@@ -1,17 +1,23 @@
-export async function fetchNewsFromGEnews(category: string) {
+import type { ExternalNewsArticle } from '@/types';
+
+export async function fetchNewsFromGEnews(category: string): Promise<ExternalNewsArticle[]> {
   const apiKey = process.env.GNEWS_KEY;
-  const response = await fetch(`https://gnews.io/api/v4/top-headlines?topic=${category}&lang=en&token=${apiKey}`);
+  if (!apiKey) throw new Error('Missing GNEWS_KEY');
 
-  if (!response.ok) throw new Error('Failed to fetch from GNews');
+  const url = `https://gnews.io/api/v4/top-headlines?category=${category}&lang=en&token=${apiKey}`;
 
-  const data: { articles: GNewsArticle[] } = await response.json();
+  const response = await fetch(url);
+  const data = await response.json();
 
-  return data.articles.map((article) => ({
+  return data.articles.map((article: any) => ({
     title: article.title,
     description: article.description,
     url: article.url,
     image: article.image,
     publishedAt: article.publishedAt,
-    source: 'GNews',
+    source: {
+      name: article.source?.name || 'GNews',
+    },
+    author: article.author,
   }));
 }
