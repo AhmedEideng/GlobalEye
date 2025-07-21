@@ -1,31 +1,46 @@
 // src/app/api/refresh-all-news/route.ts
 
-import { fetchExternalNews } from "@/app/utils/fetchExternalNews";
-import { saveNewsToSupabase } from "@/app/utils/saveNewsToSupabase";
-import { getOrAddCategoryId } from "@/app/utils/categoryHelpers";
-import { supabase } from "@/utils/supabase/server";
+import { NextResponse } from 'next/server';
+import { fetchExternalNews } from '@/utils/fetchExternalNews';
+import { saveNewsToSupabase } from '@/utils/saveNewsToSupabase';
+import { getOrAddCategoryId } from '@/utils/categoryHelpers';
+import { createClient } from '@/utils/supabase/server';
+
+export const dynamic = 'force-dynamic'; // لمنع التخزين المؤقت عند تنفيذ الكرون
 
 export async function GET() {
   try {
-    const { data: categories, error: catError } = await supabase.from("categories").select();
+    const supabase = createClient();
 
+    // جلب كل التصنيفات من قاعدة البيانات
+    const { data: categories, error: catError } = await supabase.from('categories').select('*');
     if (catError) throw catError;
 
-    if (!categories) throw new Error("No categories found");
-
-    for (const category of categories) {
-      const externalNews = await fetchExternalNews(category.name);
-      for (const news of externalNews) {
-        const categoryId = await getOrAddCategoryId(news.category);
-        await saveNewsToSupabase({ ...news, category_id: categoryId });
-      }
+    if (!categories || categories.length === 0) {
+      return NextResponse.json({ message: 'No categories found in database' }, { status: 404 });
     }
 
-    return new Response(JSON.stringify({ success: true }), { status: 200 });
-  } catch (error) {
-    console.error("Error refreshing all news:", error);
-    return new Response(JSON.stringify({ success: false, error: String(error) }), {
-      status: 500,
+    const allSavedNews = [];
+
+    for (const category of categories) {
+      const categoryName = category.name;
+      const categoryId = category.id;
+
+      // جلب أخبار كل تصنيف
+      const externalNews = await fetchExternalNews(categoryName);
+      if (!externalNews || externalNews.length === 0) continue;
+
+      // تخزين الأخبار مع ربطها بالتصنيف الصحيح
+      const saved = await saveNewsToSupabase(externalNews, categoryId);
+      allSavedNews.push(...saved);
+    }
+
+    return NextResponse.json({
+      message: 'News refreshed successfully for all categories.',
+      totalSaved: allSavedNews.length,
     });
+  } catch (error) {
+    console.error('[refresh-all-news ERROR]', error);
+    return NextResponse.json({ error: 'Failed to refresh news' }, { status: 500 });
   }
 }
