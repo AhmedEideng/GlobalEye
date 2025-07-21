@@ -1,4 +1,4 @@
-import { Article } from '@/app/utils/types';
+import { Article } from '@/utils/types';
 
 export async function getGNews(category: string): Promise<Article[]> {
   const API_KEY = process.env.GNEWS_KEY;
