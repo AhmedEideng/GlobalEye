@@ -1,27 +1,40 @@
-import { getNewsFromGNews } from './sources/gnews'
-import { getNewsFromNewsAPI } from './sources/newsapi'
-import { getNewsFromGuardian } from './sources/guardian'
-import { getNewsFromMediastack } from './sources/mediastack'
+import { fetchNewsFromNewsAPI } from './sources/newsapi';
+import { fetchNewsFromGNews } from './sources/gnews';
+import { fetchNewsFromGuardian } from './sources/theguardian';
+import { fetchNewsFromMediastack } from './sources/mediastack';
 
-import type { NewsItem } from './types'
+// ✅ إضافة تعريف ExternalNewsArticle
+export interface ExternalNewsArticle {
+  title: string;
+  description: string;
+  content?: string;
+  url: string;
+  urlToImage?: string;
+  publishedAt: string;
+  source: {
+    name: string;
+    url?: string;
+  };
+  category?: string;
+  country?: string;
+  language?: string;
+}
 
-export async function fetchExternalNews(category: string): Promise<NewsItem[]> {
-  try {
-    const [gnews, newsapi, guardian, mediastack] = await Promise.all([
-      getNewsFromGNews(category),
-      getNewsFromNewsAPI(category),
-      getNewsFromGuardian(category),
-      getNewsFromMediastack(category)
-    ])
+// ✅ الدالة المسؤولة عن جلب الأخبار من كل المصادر
+export async function fetchExternalNewsFromAllSources(category: string): Promise<ExternalNewsArticle[]> {
+  const [newsApiArticles, gnewsArticles, guardianArticles, mediastackArticles] = await Promise.all([
+    fetchNewsFromNewsAPI(category),
+    fetchNewsFromGNews(category),
+    fetchNewsFromGuardian(category),
+    fetchNewsFromMediastack(category),
+  ]);
 
-    const allNews = [...gnews, ...newsapi, ...guardian, ...mediastack]
+  const allArticles = [
+    ...newsApiArticles,
+    ...gnewsArticles,
+    ...guardianArticles,
+    ...mediastackArticles,
+  ];
 
-    const uniqueNews = allNews.filter((item, index, self) =>
-      index === self.findIndex((t) => t.url === item.url)
-    )
-
-    return uniqueNews
-  } catch {
-    return []
-  }
+  return allArticles;
 }
