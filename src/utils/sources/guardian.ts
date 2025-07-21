@@ -1,21 +1,16 @@
-import { Article } from '@/utils/types';
+export async function getNewsFromGuardian(category: string) {
+  const apiKey = process.env.GUARDIAN_KEY;
+  const url = `https://content.guardianapis.com/search?section=${category}&api-key=${apiKey}&show-fields=all`;
 
-export async function getGuardianNews(category: string): Promise<Article[]> {
-  const API_KEY = process.env.GUARDIAN_KEY;
-  if (!API_KEY) return [];
-
-  const url = `https://content.guardianapis.com/search?q=${category}&api-key=${API_KEY}&show-fields=all`;
   const res = await fetch(url);
-  const json = await res.json();
+  const data = await res.json();
 
-  return (json.response.results || []).map((item: any) => ({
-    title: item.webTitle,
-    description: item.fields?.trailText || null,
-    content: item.fields?.bodyText || null,
-    url: item.webUrl,
-    urlToImage: item.fields?.thumbnail || null,
-    publishedAt: item.webPublicationDate,
-    source: { name: 'The Guardian' },
-    author: item.fields?.byline || null,
+  return data.response.results.map((article: any) => ({
+    source: 'The Guardian',
+    title: article.webTitle,
+    description: article.fields?.trailText || '',
+    url: article.webUrl,
+    image: article.fields?.thumbnail || '',
+    publishedAt: article.webPublicationDate,
   }));
 }
