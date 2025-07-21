@@ -1,4 +1,4 @@
-import { fetchNewsFromNewsAPI } from './sources/newsapi';
+import { fetchNewsFromNewsapi } from './sources/newsapi';
 import { fetchNewsFromGNews } from './sources/gnews';
 import { fetchNewsFromGuardian } from './sources/theguardian';
 import { fetchNewsFromMediastack } from './sources/mediastack';
