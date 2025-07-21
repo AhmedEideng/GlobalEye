@@ -22,4 +22,5 @@ export interface ExternalNewsArticle {
   url: string;
   image: string;
   publishedAt: string;
+  source: string;
 }
