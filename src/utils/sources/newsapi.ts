@@ -1,4 +1,4 @@
-export async function getNewsFromNewsAPI(category: string) {
+export async function fetchNewsFromNewsAPI(category: string) {
   const apiKey = process.env.NEWSAPI_KEY;
   const response = await fetch(`https://newsapi.org/v2/top-headlines?category=${category}&language=en&apiKey=${apiKey}`);
 
