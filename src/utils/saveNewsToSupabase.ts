@@ -1,7 +1,7 @@
 'use server';
 
-import { createClient } from '@/utils/supabase/server';
-import { getOrAddCategoryId } from './getOrAddCategoryId';
+import { createClient } from '@/utils/server';
+import { getOrAddCategoryId } from '@/utils/categoryUtils';
 import { Article } from './types'; // ← استخدام النوع الجديد
 
 export async function saveNewsToSupabase(category: string, articles: Article[]) {
