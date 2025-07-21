@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
-import { fetchExternalNews } from '@/app/utils/fetchExternalNews'
-import { saveNewsToSupabase } from '@/app/utils/saveNewsToSupabase'
-import { getCategoriesFromSupabase } from '@/app/utils/getCategoriesFromSupabase'
+import { fetchExternalNews } from '@utils/fetchExternalNews'
+import { saveNewsToSupabase } from '@utils/saveNewsToSupabase'
+import { getCategoriesFromSupabase } from '@utils/getCategoriesFromSupabase'
 
 export async function GET() {
   try {
