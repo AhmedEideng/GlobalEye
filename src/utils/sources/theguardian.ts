@@ -1,4 +1,4 @@
-export async function getNewsFromGuardian(category: string) {
+export async function getNewsFromTheguardian(category: string) {
   const apiKey = process.env.GUARDIAN_KEY;
   const response = await fetch(`https://content.guardianapis.com/search?q=${category}&api-key=${apiKey}&show-fields=thumbnail,trailText`);
 
