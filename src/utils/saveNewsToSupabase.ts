@@ -1,46 +1,45 @@
-import { supabase } from "@/lib/supabaseClient";
-import { Article } from "./types";
-import { getOrAddCategoryId } from "./categories";
+'use server';
 
-export async function saveNewsToSupabase(articles: Article[], category: string) {
-  if (!articles || articles.length === 0) return;
+import { createClient } from '@/utils/supabase/server';
+import { getOrAddCategoryId } from './getOrAddCategoryId';
+import { Article } from './types'; // ← استخدام النوع الجديد
 
-  const categoryId = await getOrAddCategoryId(category);
+export async function saveNewsToSupabase(category: string, articles: Article[]) {
+  const supabase = createClient();
 
-  // ✅ فلترة المقالات التي لا تحتوي على title أو url
-  const filteredArticles = articles.filter(article => article.title && article.url);
+  for (const article of articles) {
+    const categoryId = await getOrAddCategoryId(category);
 
-  for (const article of filteredArticles) {
-    const { title, description, content, url, urlToImage, publishedAt, source, author } = article;
+    // تجاهل المقالات بدون رابط (url مطلوب في قاعدة البيانات)
+    if (!article.url) continue;
 
-    const slug = title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)+/g, "");
+    const { data: existing, error: fetchError } = await supabase
+      .from('news')
+      .select('id')
+      .eq('url', article.url)
+      .maybeSingle();
 
-    const { data, error } = await supabase
-      .from("news")
-      .upsert(
-        [{
-          title,
-          description,
-          content,
-          url,
-          url_to_image: urlToImage,
-          published_at: publishedAt,
-          source_name: source?.name || null,
-          author: author || null,
-          slug,
-          category_id: categoryId,
-        }],
-        { onConflict: "url" }
-      );
+    if (fetchError) {
+      console.error('Fetch Error:', fetchError.message);
+      continue;
+    }
 
-    if (error) {
-      console.error(`❌ Error saving article: ${title}`);
-      console.error(error);
-    } else {
-      console.log(`✅ Article saved: ${title}`);
+    if (!existing) {
+      const { error: insertError } = await supabase.from('news').insert({
+        title: article.title || null,
+        description: article.description || null,
+        content: article.content || null,
+        url: article.url,
+        url_to_image: article.urlToImage || null,
+        published_at: article.publishedAt || null,
+        source_name: article.source?.name || null,
+        author: article.author || null,
+        category_id: categoryId,
+      });
+
+      if (insertError) {
+        console.error('Insert Error:', insertError.message);
+      }
     }
   }
 }
