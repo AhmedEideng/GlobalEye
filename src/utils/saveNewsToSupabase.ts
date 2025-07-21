@@ -1,17 +1,20 @@
 'use server';
 
-import { createClient } from '@/utils/server';
+import { createClient } from '@supabase/supabase-js';
 import { getOrAddCategoryId } from '@/utils/categoryUtils';
-import { Article } from './types'; // ← استخدام النوع الجديد
+import { Article } from './types';
+
+// إنشاء عميل Supabase عادي
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export async function saveNewsToSupabase(category: string, articles: Article[]) {
-  const supabase = createClient();
-
   for (const article of articles) {
     const categoryId = await getOrAddCategoryId(category);
 
-    // تجاهل المقالات بدون رابط (url مطلوب في قاعدة البيانات)
-    if (!article.url) continue;
+    if (!article.url) continue; // تجاهل المقالات بدون رابط
 
     const { data: existing, error: fetchError } = await supabase
       .from('news')
