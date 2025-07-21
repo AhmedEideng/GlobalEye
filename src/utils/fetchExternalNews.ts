@@ -1,4 +1,4 @@
-import { fetchNewsFromNewsapi } from './sources/newsapi';
+import { fetchNewsFromNewsAPI } from './sources/newsapi';
 import { fetchNewsFromGEnews } from './sources/gnews';
 import { fetchNewsFromTheguardian } from './sources/theguardian';
 import { fetchNewsFromMediastack } from './sources/mediastack';
@@ -7,10 +7,10 @@ import type { NewsItem } from '../types';
 export async function fetchExternalNews(category: string): Promise<NewsItem[]> {
   try {
     const [gnews, newsapi, guardian, mediastack] = await Promise.all([
-      fetchNewsFromgenews(category),
-      fetchNewsFromnewsapi(category),
-      fetchNewsFromtheguardian(category),
-      fetchNewsFrommediastack(category),
+      fetchNewsFromGEnews(category),
+      fetchNewsFromNewsAPI(category),
+      fetchNewsFromTheguardian(category),
+      fetchNewsFromMediastack(category),
     ]);
 
     const allNews = [...gnews, ...newsapi, ...guardian, ...mediastack];
