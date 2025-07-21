@@ -1,48 +1,38 @@
-'use server';
+import { createClient } from '@supabase/supabase-js'
+import type { NewsItem } from './types'
 
-import { createClient } from '@supabase/supabase-js';
-import { getOrAddCategoryId } from '@/utils/categoryUtils';
-import { Article } from './types';
-
-// إنشاء عميل Supabase عادي
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+  process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
+  process.env.SUPABASE_SERVICE_ROLE_KEY ?? '',
+)
 
-export async function saveNewsToSupabase(category: string, articles: Article[]) {
-  for (const article of articles) {
-    const categoryId = await getOrAddCategoryId(category);
-
-    if (!article.url) continue; // تجاهل المقالات بدون رابط
-
-    const { data: existing, error: fetchError } = await supabase
+export async function saveNewsToSupabase(newsItems: NewsItem[], categoryId: string): Promise<void> {
+  try {
+    const { data: existingNews } = await supabase
       .from('news')
-      .select('id')
-      .eq('url', article.url)
-      .maybeSingle();
+      .select('url')
+      .in('url', newsItems.map((item) => item.url))
 
-    if (fetchError) {
-      console.error('Fetch Error:', fetchError.message);
-      continue;
+    const existingUrls = new Set(existingNews?.map((item) => item.url))
+
+    const newItems = newsItems.filter((item) => !existingUrls.has(item.url))
+
+    if (newItems.length > 0) {
+      await supabase.from('news').insert(
+        newItems.map((item) => ({
+          title: item.title,
+          description: item.description,
+          url: item.url,
+          image_url: item.image_url,
+          published_at: item.published_at,
+          source: item.source,
+          category_id: categoryId,
+        })),
+      )
     }
-
-    if (!existing) {
-      const { error: insertError } = await supabase.from('news').insert({
-        title: article.title || null,
-        description: article.description || null,
-        content: article.content || null,
-        url: article.url,
-        url_to_image: article.urlToImage || null,
-        published_at: article.publishedAt || null,
-        source_name: article.source?.name || null,
-        author: article.author || null,
-        category_id: categoryId,
-      });
-
-      if (insertError) {
-        console.error('Insert Error:', insertError.message);
-      }
+  } catch (error: unknown) {
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error saving news to Supabase:', error)
     }
   }
 }
