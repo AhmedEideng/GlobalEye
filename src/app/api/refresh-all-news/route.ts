@@ -1,29 +1,31 @@
 // src/app/api/refresh-all-news/route.ts
 
-import { NextResponse } from 'next/server';
-import { fetchExternalNews } from '../../utils/fetchExternalNews';
-import { saveNewsToSupabase } from '../../utils/saveNewsToSupabase';
-import { getOrAddCategoryId } from '../../utils/categoryHelpers';
-import { supabase } from '../../../utils/supabase/server';
+import { fetchExternalNews } from "@/app/utils/fetchExternalNews";
+import { saveNewsToSupabase } from "@/app/utils/saveNewsToSupabase";
+import { getOrAddCategoryId } from "@/app/utils/categoryHelpers";
+import { supabase } from "@/utils/supabase/server";
 
 export async function GET() {
   try {
-    const { data: categories, error } = await supabase.from('categories').select('*');
+    const { data: categories, error: catError } = await supabase.from("categories").select();
 
-    if (error) {
-      console.error('Error fetching categories:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
+    if (catError) throw catError;
+
+    if (!categories) throw new Error("No categories found");
 
     for (const category of categories) {
-      const categoryId = await getOrAddCategoryId(category.name);
       const externalNews = await fetchExternalNews(category.name);
-      await saveNewsToSupabase(externalNews, categoryId);
+      for (const news of externalNews) {
+        const categoryId = await getOrAddCategoryId(news.category);
+        await saveNewsToSupabase({ ...news, category_id: categoryId });
+      }
     }
 
-    return NextResponse.json({ message: 'All news refreshed successfully.' });
-  } catch (err) {
-    console.error('Unexpected error:', err);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return new Response(JSON.stringify({ success: true }), { status: 200 });
+  } catch (error) {
+    console.error("Error refreshing all news:", error);
+    return new Response(JSON.stringify({ success: false, error: String(error) }), {
+      status: 500,
+    });
   }
 }
