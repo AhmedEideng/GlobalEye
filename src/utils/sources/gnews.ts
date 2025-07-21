@@ -1,4 +1,4 @@
-export async function fetchNewsFromGENews(category: string) {
+export async function fetchNewsFromGEnews(category: string) {
   const apiKey = process.env.GNEWS_KEY;
   const response = await fetch(`https://gnews.io/api/v4/top-headlines?topic=${category}&lang=en&token=${apiKey}`);
 
@@ -14,13 +14,4 @@ export async function fetchNewsFromGENews(category: string) {
     publishedAt: article.publishedAt,
     source: 'GNews',
   }));
-}
-
-export interface ExternalNewsArticle {
-  title: string;
-  description: string;
-  url: string;
-  image: string;
-  publishedAt: string;
-  source: string;
 }
