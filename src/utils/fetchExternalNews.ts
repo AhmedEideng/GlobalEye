@@ -9,7 +9,7 @@ export async function fetchExternalNews(category: string): Promise<NewsItem[]> {
   try {
     const [gnews, newsapi, guardian, mediastack] = await Promise.all([
       getNewsFromGNews(category),
-      getNewsFromNewsApi(category),
+      getNewsFromNewsAPI(category),
       getNewsFromGuardian(category),
       getNewsFromMediastack(category)
     ])
