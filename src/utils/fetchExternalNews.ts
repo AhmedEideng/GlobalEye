@@ -1,5 +1,5 @@
 import { getNewsFromGNews } from './sources/gnews'
-import { getNewsFromNewsApi } from './sources/newsapi'
+import { getNewsFromNewsAPI } from './sources/newsapi'
 import { getNewsFromGuardian } from './sources/guardian'
 import { getNewsFromMediastack } from './sources/mediastack'
 
