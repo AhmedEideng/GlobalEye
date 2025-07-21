@@ -9,7 +9,7 @@ const supabase = createClient(
 export async function saveNewsToSupabase(newsItems: NewsItem[], categoryId: string): Promise<void> {
   if (!newsItems.length) return
 
-  const { data, error } = await supabase.from('news').upsert(
+  const { error } = await supabase.from('news').upsert(
     newsItems.map((item) => ({
       ...item,
       category_id: categoryId
