@@ -1,4 +1,3 @@
-// src/app/api/refresh-all-news/route.ts
 import { NextResponse } from 'next/server'
 import { fetchExternalNews } from '@/app/utils/fetchExternalNews'
 import { saveNewsToSupabase } from '@/app/utils/saveNewsToSupabase'
