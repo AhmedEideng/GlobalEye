@@ -1,4 +1,4 @@
-export async function fetchNewsFromGNews(category: string) {
+export async function fetchNewsFromGENews(category: string) {
   const apiKey = process.env.GNEWS_KEY;
   const response = await fetch(`https://gnews.io/api/v4/top-headlines?topic=${category}&lang=en&token=${apiKey}`);
 
