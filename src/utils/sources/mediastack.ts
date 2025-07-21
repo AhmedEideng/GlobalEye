@@ -1,4 +1,4 @@
-export async function getNewsFromMediastack(category: string) {
+export async function fetchNewsFromMediastack(category: string) {
   const apiKey = process.env.MEDIASTACK_KEY;
   const response = await fetch(`http://api.mediastack.com/v1/news?access_key=${apiKey}&languages=en&categories=${category}`);
 
