@@ -15,6 +15,19 @@ const ExternalNewsArticleSchema = z.object({
   source: z.object({ name: z.string().optional() }).optional(),
 });
 
+// توافق أسماء التصنيفات مع APIs الخارجية
+const API_CATEGORY_MAP: Record<string, string> = {
+  business: 'business',
+  entertainment: 'entertainment',
+  general: 'general',
+  health: 'health',
+  science: 'science',
+  sports: 'sports',
+  technology: 'technology',
+  world: 'general',
+  politics: 'general',
+};
+
 export async function GET(request: Request) {
   // حماية endpoint بتوكن سري
   const url = new URL(request.url);
@@ -43,11 +56,13 @@ export async function GET(request: Request) {
     const categories = await getCategoriesFromSupabase()
 
     for (const category of categories) {
+      // استخدم التصنيف المتوافق مع APIs الخارجية
+      const apiCategory = API_CATEGORY_MAP[category.name.toLowerCase()] || 'general';
       let newsItems = [];
       const validNewsItems = [];
       let fetchError = null;
       try {
-        newsItems = await fetchExternalNews(category.name)
+        newsItems = await fetchExternalNews(apiCategory)
         totalFetched += newsItems.length;
         // Validate each news item using zod
         for (const item of newsItems) {
