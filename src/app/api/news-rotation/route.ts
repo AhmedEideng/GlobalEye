@@ -37,12 +37,6 @@ export async function GET(request: NextRequest) {
         const mainArticles = featured ? rotatedNews.filter(a => a.slug !== featured.slug).slice(0, 51) : rotatedNews.slice(0, 51);
         const suggestedArticles = mainArticles.slice(0, 40);
 
-        console.log('API /api/news-rotation response:', {
-          featured,
-          mainArticles,
-          suggestedArticles
-        });
-
         await logSnagEvent(
           '🔄 News Rotation', 
           `Rotated ${rotatedNews.length} articles for category: ${category}`

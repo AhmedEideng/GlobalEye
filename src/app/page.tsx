@@ -62,7 +62,6 @@ async function fetchRotatedNews(): Promise<{
     }
 
     const data = await response.json();
-    console.log('fetchRotatedNews API response:', data);
     if (data && data.success && data.data && typeof data.data === 'object') {
       return {
         featured: data.data.featured || null,

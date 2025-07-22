@@ -3,6 +3,7 @@ import { fetchExternalNews } from '@utils/fetchExternalNews'
 import { saveNewsToSupabase } from '@utils/saveNewsToSupabase'
 import { getCategoriesFromSupabase } from '@utils/getCategoriesFromSupabase'
 import { z } from 'zod';
+import type { NewsArticle } from '@utils/fetchNews';
 
 const ExternalNewsArticleSchema = z.object({
   title: z.string(),
@@ -15,29 +16,33 @@ const ExternalNewsArticleSchema = z.object({
 });
 
 export async function GET() {
-  console.log('Starting refresh-all-news API');
+  const results = [];
+  let totalFetched = 0;
+  let totalSaved = 0;
+  let allSampleNews: NewsArticle[] = [];
+  const errors = [];
   try {
-    console.log('Fetching categories from Supabase...');
     const categories = await getCategoriesFromSupabase()
-    console.log('Categories:', categories);
 
     for (const category of categories) {
-      console.log('Processing category:', category.name, 'ID:', category.id);
-      const newsItems = await fetchExternalNews(category.name)
-      console.log('Fetched newsItems:', newsItems.length);
-      if (newsItems.length > 0) {
+      let newsItems = [];
+      const validNewsItems = [];
+      let fetchError = null;
+      try {
+        newsItems = await fetchExternalNews(category.name)
+        totalFetched += newsItems.length;
         // Validate each news item using zod
-        const validNewsItems = [];
         for (const item of newsItems) {
           const parsed = ExternalNewsArticleSchema.safeParse(item);
           if (parsed.success) {
             validNewsItems.push(parsed.data);
-          } else {
-            console.warn('Invalid news item skipped:', parsed.error);
           }
         }
-        console.log('Valid news items after zod validation:', validNewsItems.length);
-        if (validNewsItems.length === 0) continue;
+      } catch (err) {
+        fetchError = err instanceof Error ? err.message : String(err);
+        errors.push({ category: category.name, error: fetchError });
+      }
+      if (validNewsItems.length > 0) {
         const toSlug = (title: string) =>
           title
             .toLowerCase()
@@ -55,15 +60,32 @@ export async function GET() {
           slug: toSlug(item.title),
           category: category.name,
         }));
-        console.log('Saving newsArticles to Supabase:', newsArticles.length);
-        await saveNewsToSupabase(newsArticles, category.id)
-        console.log('Saved newsArticles for category:', category.name);
+        try {
+          await saveNewsToSupabase(newsArticles, category.id)
+          totalSaved += newsArticles.length;
+        } catch (err) {
+          errors.push({ category: category.name, error: err instanceof Error ? err.message : String(err) });
+        }
+        allSampleNews = allSampleNews.concat(newsArticles.slice(0, 3));
       }
+      results.push({
+        name: category.name,
+        fetched: newsItems.length,
+        saved: validNewsItems.length,
+        sample: validNewsItems.slice(0, 3),
+        error: fetchError
+      });
     }
 
-    return NextResponse.json({ message: 'News updated successfully' })
+    return NextResponse.json({
+      message: 'News updated successfully',
+      categories: results,
+      totalFetched,
+      totalSaved,
+      sampleNews: allSampleNews.slice(0, 10),
+      errors
+    })
   } catch (err) {
-    console.error('Error in refresh-all-news API:', err);
-    return NextResponse.json({ error: 'Failed to refresh news' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to refresh news', details: err instanceof Error ? err.message : String(err) }, { status: 500 })
   }
 }
