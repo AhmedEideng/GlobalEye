@@ -7,4 +7,5 @@ export interface ExternalNewsArticle {
   source: string;
   category: string;
   urlToImage?: string;
+  author?: string;
 }
