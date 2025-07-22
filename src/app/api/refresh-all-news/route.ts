@@ -59,16 +59,16 @@ export async function GET(request: Request) {
             .replace(/[^a-z0-9]+/g, '-')
             .replace(/(^-|-$)+/g, '');
         const newsArticles = validNewsItems.map(item => ({
-          source: { id: null, name: item.source?.name || '' },
-          author: item.author || null,
           title: item.title,
           description: item.description || null,
+          content: item.content || null,
           url: item.url,
-          urlToImage: item.urlToImage || null,
-          publishedAt: item.publishedAt || '',
-          content: null,
+          url_to_image: item.urlToImage || null,
+          published_at: item.publishedAt || null,
           slug: toSlug(item.title),
-          category: category.name,
+          author: item.author || null,
+          source_name: item.source?.name || null,
+          category_id: category.id ? Number(category.id) : null,
         }));
         try {
           await saveNewsToSupabase(newsArticles, category.id)
