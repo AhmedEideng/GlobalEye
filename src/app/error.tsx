@@ -1,6 +1,6 @@
 "use client";
 
-export default function Error({ _error, reset }: { _error?: Error; reset: () => void }) {
+export default function Error({ reset }: { reset: () => void }) {
   return (
     <div style={{padding: 40, textAlign: 'center', color: 'red'}}>
       <h1 style={{fontSize: 48, marginBottom: 16}}>500 - Server Error</h1>
