@@ -6,14 +6,16 @@ import type { ExternalNewsArticle } from '../../externalNewsArticle';
 
 export async function fetchExternalNews(category: string): Promise<ExternalNewsArticle[]> {
   try {
-    const [gnews, newsapi, guardian, mediastack] = await Promise.all([
+    const results = await Promise.allSettled([
       fetchNewsFromGEnews(category),
       fetchNewsFromNewsAPI(category),
       fetchNewsFromTheguardian(category),
       fetchNewsFromMediastack(category),
     ]);
 
-    const allNews = [...gnews, ...newsapi, ...guardian, ...mediastack];
+    const allNews = results
+      .filter(r => r.status === 'fulfilled')
+      .flatMap(r => (r as PromiseFulfilledResult<ExternalNewsArticle[]>).value);
 
     const uniqueNews = allNews.filter((item, index, self) =>
       index === self.findIndex((t) => t.url === item.url)
@@ -21,8 +23,6 @@ export async function fetchExternalNews(category: string): Promise<ExternalNewsA
 
     return uniqueNews;
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Error fetching external news:', error);
     return [];
   }
 }
