@@ -19,7 +19,7 @@ interface NewsDbItem {
 // Check if news exists in DB by url or title (last 7 days)
 export async function newsExists({ url, title }: { url: string; title: string }): Promise<boolean> {
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-  const { data, error } = await supabase
+  const { data } = await supabase
     .from('news')
     .select('id')
     .or(`url.eq.${url},title.eq.${title}`)
@@ -42,7 +42,7 @@ export async function saveNewsToSupabase(newsItems: NewsDbItem[]): Promise<void>
   }
   if (!filtered.length) return;
 
-  const { error } = await supabase.from('news').upsert(
+  await supabase.from('news').upsert(
     filtered,
     { onConflict: 'url' }
   );
