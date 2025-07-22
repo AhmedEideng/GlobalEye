@@ -16,7 +16,13 @@ export async function fetchCategoryNews(category: string): Promise<{
   suggestedArticles: NewsArticle[];
 }> {
   try {
-    const response = await fetch(`/api/news-rotation?category=${category}`, {
+    // استخدم عنوان مطلق عند التنفيذ على الخادم
+    const isServer = typeof window === 'undefined';
+    const baseUrl = isServer
+      ? (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3002')
+      : '';
+    const url = `${baseUrl}/api/news-rotation?category=${category}`;
+    const response = await fetch(url, {
       next: { revalidate: 180 }, // 3 minutes cache
       headers: {
         'Accept': 'application/json',

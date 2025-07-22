@@ -3,7 +3,7 @@ import { fetchExternalNews } from '@utils/fetchExternalNews'
 import { saveNewsToSupabase } from '@utils/saveNewsToSupabase'
 import { getCategoriesFromSupabase } from '@utils/getCategoriesFromSupabase'
 import { z } from 'zod';
-import type { NewsArticle } from '@utils/fetchNews';
+// تم حذف NewsArticle لأنه غير مستخدم
 
 const ExternalNewsArticleSchema = z.object({
   title: z.string(),
@@ -26,7 +26,18 @@ export async function GET(request: Request) {
   const results = [];
   let totalFetched = 0;
   let totalSaved = 0;
-  let allSampleNews: NewsArticle[] = [];
+  const allSampleNews: {
+    source: { id: null; name: string | null };
+    author: string | null;
+    title: string;
+    description: string | null;
+    url: string;
+    urlToImage: string | null;
+    publishedAt: string | null;
+    content: null;
+    slug: string;
+    category: string;
+  }[] = [];
   const errors = [];
   try {
     const categories = await getCategoriesFromSupabase()
@@ -58,33 +69,49 @@ export async function GET(request: Request) {
             .toLowerCase()
             .replace(/[^a-z0-9]+/g, '-')
             .replace(/(^-|-$)+/g, '');
+        // أولاً: newsArticles بصيغة NewsArticle (للاستخدام الداخلي)
         const newsArticles = validNewsItems.map(item => ({
+          source: { id: null, name: item.source?.name || null },
+          author: item.author || null,
           title: item.title,
           description: item.description || null,
-          content: item.content || null,
           url: item.url,
-          url_to_image: item.urlToImage || null,
-          published_at: item.publishedAt || null,
+          urlToImage: item.urlToImage || null,
+          publishedAt: item.publishedAt || null,
+          content: null, // Content is null as external APIs don't provide it
           slug: toSlug(item.title),
-          author: item.author || null,
+          category: category.name,
+        }));
+        // ثانياً: newsArticlesForDb بصيغة snake_case (للحفظ في Supabase)
+        const newsArticlesForDb = newsArticles.map(item => ({
+          title: item.title,
+          description: item.description,
+          content: null, // لا يوجد محتوى من المصدر الخارجي
+          url: item.url,
+          url_to_image: item.urlToImage,
+          published_at: item.publishedAt,
+          slug: item.slug,
+          author: item.author,
           source_name: item.source?.name || null,
           category_id: category.id ? Number(category.id) : null,
+          is_featured: false,
+          views_count: 0,
         }));
         try {
-          await saveNewsToSupabase(newsArticles, category.id)
+          await saveNewsToSupabase(newsArticlesForDb); // مرر فقط البيانات بصيغة snake_case
           totalSaved += newsArticles.length;
         } catch (err) {
           errors.push({ category: category.name, error: err instanceof Error ? err.message : String(err) });
         }
-        allSampleNews = allSampleNews.concat(newsArticles.slice(0, 3));
+        newsArticles.slice(0, 3).forEach(article => allSampleNews.push(article));
+        results.push({
+          name: category.name,
+          fetched: newsItems.length,
+          saved: validNewsItems.length,
+          sample: newsArticles.slice(0, 3),
+          error: fetchError
+        });
       }
-      results.push({
-        name: category.name,
-        fetched: newsItems.length,
-        saved: validNewsItems.length,
-        sample: validNewsItems.slice(0, 3),
-        error: fetchError
-      });
     }
 
     return NextResponse.json({
@@ -92,7 +119,7 @@ export async function GET(request: Request) {
       categories: results,
       totalFetched,
       totalSaved,
-      sampleNews: allSampleNews.slice(0, 10),
+      sampleNews: allSampleNews.length > 10 ? allSampleNews.filter((_, i) => i < 10) : allSampleNews,
       errors
     })
   } catch (err) {
