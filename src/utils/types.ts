@@ -1,11 +1,9 @@
-export interface ExternalNewsArticle {
+export type NewsItem = {
   title: string;
-  description: string;
+  description?: string;
   url: string;
-  image?: string;
-  publishedAt: string;
-  source: string;
-  category: string;
-  urlToImage?: string;
   author?: string;
-}
+  urlToImage?: string;
+  publishedAt?: string;
+  sourceName?: string;
+};
