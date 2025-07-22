@@ -238,8 +238,7 @@ export class ContentQualityService {
     const hasTitle = article.title && article.title.trim().length > 0;
     const hasUrl = article.url && article.url.trim().length > 0;
     const hasPublishedAt = article.publishedAt && article.publishedAt.trim().length > 0;
-    const hasSource = article.source?.name && article.source.name.trim().length > 0;
-
+    const hasSource = typeof article.source === 'string' && article.source.trim().length > 0;
     if (hasTitle) {
       score += 0.05;
       reasons.push('Has title');
