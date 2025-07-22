@@ -6,6 +6,7 @@ import { formatDate } from '@utils/fetchNews';
 import Image from "next/image";
 import React from "react";
 import SafeText from './SafeText';
+import OptimizedImage from './OptimizedImage';
 
 const HomeNewsGrid = React.memo(({ articles }: { articles: NewsArticle[] }) => {
   const renderArticle = React.useCallback((article: NewsArticle, idx: number) => {
@@ -20,13 +21,13 @@ const HomeNewsGrid = React.memo(({ articles }: { articles: NewsArticle[] }) => {
       >
         <div className="relative w-full h-48 overflow-hidden">
           {imageSrc && (
-            <Image
+            <OptimizedImage
               src={imageSrc}
               alt={article.title}
               fill
               className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              loading={idx < 6 ? "eager" : "lazy"}
+              priority={idx < 6}
             />
           )}
         </div>

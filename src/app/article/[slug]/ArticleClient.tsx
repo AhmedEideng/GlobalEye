@@ -4,7 +4,7 @@ import ArticleHeader from '@components/ArticleHeader';
 import ArticleContent from '@components/ArticleContent';
 import ShareButtons from '@components/ShareButtons';
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
+import OptimizedImage from '@components/OptimizedImage';
 import { sendAnalyticsEvent, fetchRelatedNews, formatDate, getImageUrl } from '@utils/fetchNews';
 import Link from 'next/link';
 import React from 'react';
@@ -24,7 +24,7 @@ export default function ArticleClient({ article, slug }: { article: NewsArticle 
           className="article-card group transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl rounded-xl bg-white shadow-md overflow-hidden"
         >
           <div className="relative w-full h-48 overflow-hidden">
-            <Image
+            <OptimizedImage
               src={getImageUrl(related.urlToImage)}
               alt={related.title}
               fill
