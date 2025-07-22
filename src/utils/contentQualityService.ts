@@ -1,4 +1,4 @@
-import { ExternalNewsArticle } from './fetchExternalNews';
+import { ExternalNewsArticle } from './types';
 
 export interface ContentQualityScore {
   score: number;
