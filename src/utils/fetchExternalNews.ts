@@ -2,7 +2,7 @@ import { fetchNewsFromNewsAPI } from './sources/newsapi';
 import { fetchNewsFromGEnews } from './sources/gnews';
 import { fetchNewsFromTheguardian } from './sources/theguardian';
 import { fetchNewsFromMediastack } from './sources/mediastack';
-import type { ExternalNewsArticle } from './types/externalNewsArticle';
+import type { ExternalNewsArticle } from './types/article';
 
 export async function fetchExternalNews(category: string): Promise<ExternalNewsArticle[]> {
   try {
