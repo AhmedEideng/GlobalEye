@@ -6,6 +6,7 @@ import { useAuth } from '@hooks/useAuth';
 import { isFavorite } from '@services/favorites';
 import { sanitizeText, sanitizeJsonLd } from '../utils/sanitizeText';
 import SafeText from './SafeText';
+import { getImageUrl } from '@utils/fetchNews';
 
 function ArticleTitleSection({ title, description }: { title: string; description: string }) {
   return (
@@ -21,10 +22,11 @@ function ArticleTitleSection({ title, description }: { title: string; descriptio
 }
 
 function ArticleImageSection({ urlToImage, title }: { urlToImage: string; title: string }) {
+  const imageSrc = getImageUrl(urlToImage);
   return (
     <div className="relative w-full h-64 sm:h-80 md:h-96 lg:h-[500px] rounded-2xl overflow-hidden mb-6 shadow-lg">
       <Image
-        src={urlToImage}
+        src={imageSrc}
         alt={title}
         fill
         className="object-cover w-full h-full"

@@ -260,10 +260,6 @@ export default function CategoryClient({
         <p className="category-description text-base sm:text-lg md:text-xl text-gray-500 mt-3 font-medium max-w-2xl mx-auto">
           Stay updated with the latest, most important, and trending news in <span className="text-red-600 font-semibold">{categoryLabel}</span> from trusted sources around the world.
         </p>
-        {/* Rotation indicator */}
-        <div className="text-xs text-gray-400 mt-2">
-          News automatically updates every 3 hours
-        </div>
       </div>
       {/* Featured Article */}
       {featuredNews && <HomeFeatured article={featuredNews} />}

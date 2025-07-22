@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
 import { NewsArticle } from '@utils/fetchNews';
-import { cleanImageUrl } from '@utils/cleanImageUrl';
 import { getImageUrl } from '@utils/fetchNews';
 import { formatDate } from '@utils/fetchNews';
 import Image from "next/image";
@@ -10,8 +9,7 @@ import SafeText from './SafeText';
 
 const HomeNewsGrid = React.memo(({ articles }: { articles: NewsArticle[] }) => {
   const renderArticle = React.useCallback((article: NewsArticle, idx: number) => {
-    const cleanImage = cleanImageUrl(article.urlToImage);
-    const imageSrc = getImageUrl(cleanImage);
+    const imageSrc = getImageUrl(article.urlToImage);
     
     // Format date outside of the callback to avoid hooks rules violation
     const formattedDate = formatDate(article.publishedAt);

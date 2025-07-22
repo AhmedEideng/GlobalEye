@@ -58,11 +58,11 @@ export default function ArticleClient({ article, slug }: { article: NewsArticle 
         category: article.category,
         source: article.source?.name || '',
       });
-      // Fetch related articles (at least 20) with error handling
+      // Fetch related articles (up to 50) with error handling
       const fetchAndSetRelatedArticles = async () => {
         try {
           const res = await fetchRelatedNews(article, article.category);
-          setRelatedArticles(res.slice(0, 20));
+          setRelatedArticles(res.slice(0, 50));
         } catch {
           // Optionally log or handle the error
         }

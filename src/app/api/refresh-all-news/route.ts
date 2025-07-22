@@ -83,7 +83,7 @@ export async function GET(request: Request) {
           category: category.name,
         }));
         // ثانياً: newsArticlesForDb بصيغة snake_case (للحفظ في Supabase)
-        const newsArticlesForDb = newsArticles.map(item => ({
+        let newsArticlesForDb = newsArticles.map(item => ({
           title: item.title,
           description: item.description,
           content: null, // لا يوجد محتوى من المصدر الخارجي
@@ -97,9 +97,13 @@ export async function GET(request: Request) {
           is_featured: false,
           views_count: 0,
         }));
+        // رتب عشوائيًا
+        newsArticlesForDb = newsArticlesForDb.sort(() => Math.random() - 0.5);
+        // خذ أول 10 فقط
+        newsArticlesForDb = newsArticlesForDb.slice(0, 10);
         try {
           await saveNewsToSupabase(newsArticlesForDb); // مرر فقط البيانات بصيغة snake_case
-          totalSaved += newsArticles.length;
+          totalSaved += newsArticlesForDb.length;
         } catch (err) {
           errors.push({ category: category.name, error: err instanceof Error ? err.message : String(err) });
         }
@@ -107,7 +111,7 @@ export async function GET(request: Request) {
         results.push({
           name: category.name,
           fetched: newsItems.length,
-          saved: validNewsItems.length,
+          saved: newsArticlesForDb.length,
           sample: newsArticles.slice(0, 3),
           error: fetchError
         });
