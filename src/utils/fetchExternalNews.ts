@@ -22,7 +22,7 @@ export async function fetchExternalNews(category: string): Promise<ExternalNewsA
     );
 
     return uniqueNews;
-  } catch (error) {
+  } catch {
     return [];
   }
 }
