@@ -1,11 +1,11 @@
-import { getGNews } from './gnews';
-import { getNewsAPI } from './newsapi';
-import { getGuardianNews } from './theguardian';
-import { getMediastackNews } from './mediastack';
+import { fetchNewsFromGEnews } from './gnews';
+import { fetchNewsFromNewsAPI } from './newsapi';
+import { fetchNewsFromTheguardian } from './theguardian';
+import { fetchNewsFromMediastack } from './mediastack';
 
 export const sources = [
-  getGNews,
-  getNewsAPI,
-  getGuardianNews,
-  getMediastackNews,
+  fetchNewsFromGEnews,
+  fetchNewsFromNewsAPI,
+  fetchNewsFromTheguardian,
+  fetchNewsFromMediastack,
 ];

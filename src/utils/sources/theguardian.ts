@@ -10,9 +10,10 @@ export async function fetchNewsFromTheguardian(category: string) {
     title: article.webTitle,
     description: article.fields?.trailText || '',
     url: article.webUrl,
-    image: article.fields?.thumbnail || '',
+    urlToImage: article.fields?.thumbnail || '',
     publishedAt: article.webPublicationDate,
-    source: 'The Guardian',
+    source: { name: 'The Guardian' },
+    author: undefined,
   }));
 }
 

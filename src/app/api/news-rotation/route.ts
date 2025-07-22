@@ -32,6 +32,17 @@ export async function GET(request: NextRequest) {
         // Rotate articles (shuffle for variety)
         const rotatedNews = shuffleArray([...news]);
 
+        // Featured, main, suggested
+        const featured = rotatedNews[0] || null;
+        const mainArticles = featured ? rotatedNews.filter(a => a.slug !== featured.slug).slice(0, 51) : rotatedNews.slice(0, 51);
+        const suggestedArticles = mainArticles.slice(0, 40);
+
+        console.log('API /api/news-rotation response:', {
+          featured,
+          mainArticles,
+          suggestedArticles
+        });
+
         await logSnagEvent(
           '🔄 News Rotation', 
           `Rotated ${rotatedNews.length} articles for category: ${category}`
@@ -39,9 +50,13 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json({
           success: true,
+          data: {
+            featured,
+            mainArticles,
+            suggestedArticles
+          },
           category,
           count: rotatedNews.length,
-          articles: rotatedNews,
           timestamp: new Date().toISOString()
         });
 

@@ -1,4 +1,14 @@
-import type { ExternalNewsArticle } from '@/types';
+import type { ExternalNewsArticle } from '../../../externalNewsArticle';
+
+interface GNewsApiArticle {
+  title: string;
+  description?: string;
+  url: string;
+  image?: string;
+  publishedAt?: string;
+  source?: { name?: string };
+  author?: string;
+}
 
 export async function fetchNewsFromGEnews(category: string): Promise<ExternalNewsArticle[]> {
   const apiKey = process.env.GNEWS_KEY;
@@ -9,11 +19,11 @@ export async function fetchNewsFromGEnews(category: string): Promise<ExternalNew
   const response = await fetch(url);
   const data = await response.json();
 
-  return data.articles.map((article: unknown) => ({
+  return data.articles.map((article: GNewsApiArticle) => ({
     title: article.title,
     description: article.description,
     url: article.url,
-    image: article.image,
+    urlToImage: article.image,
     publishedAt: article.publishedAt,
     source: {
       name: article.source?.name || 'GNews',

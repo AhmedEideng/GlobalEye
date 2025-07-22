@@ -62,16 +62,20 @@ async function fetchRotatedNews(): Promise<{
     }
 
     const data = await response.json();
-    
-    if (data.success && data.data) {
+    console.log('fetchRotatedNews API response:', data);
+    if (data && data.success && data.data && typeof data.data === 'object') {
       return {
         featured: data.data.featured || null,
         articles: data.data.mainArticles || [],
         suggestedArticles: data.data.suggestedArticles || []
       };
     }
-    
-    throw new Error('Invalid response format');
+    // إذا كانت الاستجابة لا تحتوي على الحقول المطلوبة، أعد قيم فارغة بدل رمي خطأ
+    return {
+      featured: null,
+      articles: [],
+      suggestedArticles: []
+    };
   } catch (error) {
     logHomeError('Failed to fetch rotated news:', error);
     // Fallback to direct fetch

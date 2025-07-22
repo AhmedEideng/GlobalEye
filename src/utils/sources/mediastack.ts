@@ -10,9 +10,10 @@ export async function fetchNewsFromMediastack(category: string) {
     title: article.title,
     description: article.description,
     url: article.url,
-    image: article.image || '',
+    urlToImage: article.image || '',
     publishedAt: article.published_at,
-    source: article.source,
+    source: { name: article.source },
+    author: undefined,
   }));
 }
 

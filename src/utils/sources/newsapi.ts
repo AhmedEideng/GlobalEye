@@ -10,9 +10,10 @@ export async function fetchNewsFromNewsAPI(category: string) {
     title: article.title,
     description: article.description,
     url: article.url,
-    image: article.urlToImage,
+    urlToImage: article.urlToImage,
     publishedAt: article.publishedAt,
-    source: article.source.name,
+    source: { name: article.source.name },
+    author: undefined,
   }));
 }
 

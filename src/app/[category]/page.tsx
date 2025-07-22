@@ -10,6 +10,10 @@ interface CategoryPageProps {
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { category } = await params;
+  if (category === 'favicon.ico') {
+    // يمكنك إرجاع صفحة خطأ أو إعادة توجيه أو null
+    return <div style={{padding: 40, textAlign: 'center', color: 'red'}}>Invalid category</div>;
+  }
   
   // Fetch rotated news data from server
   const { featured, articles, suggestedArticles } = await CategoryServer({ category });

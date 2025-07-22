@@ -1,12 +1,7 @@
-import { createClient } from '@supabase/supabase-js'
-import type { NewsItem } from './types'
+import { supabase } from './supabaseClient'
+import type { NewsArticle } from './fetchNews'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-)
-
-export async function saveNewsToSupabase(newsItems: NewsItem[], categoryId: string): Promise<void> {
+export async function saveNewsToSupabase(newsItems: NewsArticle[], categoryId: string): Promise<void> {
   if (!newsItems.length) return
 
   const { error } = await supabase.from('news').upsert(
