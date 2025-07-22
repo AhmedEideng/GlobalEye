@@ -2,9 +2,9 @@ import { fetchNewsFromNewsAPI } from './sources/newsapi';
 import { fetchNewsFromGEnews } from './sources/gnews';
 import { fetchNewsFromTheguardian } from './sources/theguardian';
 import { fetchNewsFromMediastack } from './sources/mediastack';
-import type { NewsItem } from './types';
+import type { ExternalNewsArticle } from './types/externalNewsArticle';
 
-export async function fetchExternalNews(category: string): Promise<NewsItem[]> {
+export async function fetchExternalNews(category: string): Promise<ExternalNewsArticle[]> {
   try {
     const [gnews, newsapi, guardian, mediastack] = await Promise.all([
       fetchNewsFromGEnews(category),
@@ -22,7 +22,7 @@ export async function fetchExternalNews(category: string): Promise<NewsItem[]> {
     return uniqueNews;
   } catch (error) {
     // eslint-disable-next-line no-console
-console.error('Error fetching external news:', error);
+    console.error('Error fetching external news:', error);
     return [];
   }
 }
