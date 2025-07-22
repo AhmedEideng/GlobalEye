@@ -10,10 +10,8 @@ import SafeText from './SafeText';
 const HomeNewsGrid = React.memo(({ articles }: { articles: NewsArticle[] }) => {
   const renderArticle = React.useCallback((article: NewsArticle, idx: number) => {
     const imageSrc = getImageUrl(article.urlToImage);
-    
     // Format date outside of the callback to avoid hooks rules violation
     const formattedDate = formatDate(article.publishedAt);
-    
     return (
       <Link
         key={article.slug || idx}
@@ -21,14 +19,16 @@ const HomeNewsGrid = React.memo(({ articles }: { articles: NewsArticle[] }) => {
         className="article-card group"
       >
         <div className="relative w-full h-48 overflow-hidden">
-          <Image
-            src={imageSrc}
-            alt={article.title}
-            fill
-            className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            loading={idx < 6 ? "eager" : "lazy"}
-          />
+          {imageSrc && (
+            <Image
+              src={imageSrc}
+              alt={article.title}
+              fill
+              className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              loading={idx < 6 ? "eager" : "lazy"}
+            />
+          )}
         </div>
         <div className="p-4">
           <div className="article-category text-xs font-bold mb-1 bg-red-600 text-white rounded-full px-3 py-1 inline-block">

@@ -305,20 +305,7 @@ export function formatDate(date: string | Date): string {
 
 // Helper function to get a valid image URL or fallback to placeholder
 export function getImageUrl(url?: string | null): string {
-  if (!url || typeof url !== 'string' || url.trim() === '') {
-    return '/placeholder-news.jpg';
-  }
-  let clean = url.trim();
-  if (clean.startsWith('//')) clean = 'https:' + clean;
-  if (
-    clean.startsWith('http://') ||
-    clean.startsWith('https://') ||
-    clean.startsWith('/')
-  ) {
-    return clean;
-  }
-  // أي رابط غير صالح
-  return '/placeholder-news.jpg';
+  return url?.trim() || '';
 }
 
 /**

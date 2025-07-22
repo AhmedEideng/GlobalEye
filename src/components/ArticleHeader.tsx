@@ -124,7 +124,7 @@ export default function ArticleHeader({ article }: { article: NewsArticle }) {
       <header className="article-header mb-8">
         <div className="max-w-4xl mx-auto">
           <ArticleTitleSection title={article.title ?? ''} description={article.description ?? ''} />
-          {article.urlToImage && (
+          {article.urlToImage && article.urlToImage.trim() && (
             <ArticleImageSection urlToImage={article.urlToImage} title={article.title} />
           )}
           <ArticleMetaSection formattedDate={formattedDate} author={article.author ?? ''} sourceName={article.source?.name} />
