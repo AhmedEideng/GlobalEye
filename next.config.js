@@ -47,6 +47,7 @@ const nextConfig = {
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '**' },
+      { protocol: 'http', hostname: '**' },
       { protocol: 'https', hostname: 'www.rollingstone.com' },
       { protocol: 'https', hostname: 'media.pitchfork.com' },
       { protocol: 'https', hostname: 'platform.theverge.com' },
