@@ -3,7 +3,6 @@ import Link from "next/link";
 import { NewsArticle } from '@utils/fetchNews';
 import { getImageUrl } from '@utils/fetchNews';
 import { formatDate } from '@utils/fetchNews';
-import Image from "next/image";
 import React from "react";
 import SafeText from './SafeText';
 import OptimizedImage from './OptimizedImage';
