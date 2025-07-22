@@ -70,7 +70,7 @@ export class ContentQualityService {
     reasons.push(...descriptionScore.reasons);
 
     // Source reliability (0-0.3 points)
-    const sourceScore = this.evaluateSource(article.source.name);
+    const sourceScore = this.evaluateSource(article.source);
     score += sourceScore.score;
     reasons.push(...sourceScore.reasons);
 
