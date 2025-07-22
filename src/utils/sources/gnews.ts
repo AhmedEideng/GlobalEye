@@ -11,8 +11,8 @@ interface GNewsApiArticle {
 }
 
 export async function fetchNewsFromGEnews(category: string): Promise<ExternalNewsArticle[]> {
-  const apiKey = process.env.GNEWS_KEY;
-  if (!apiKey) throw new Error('Missing GNEWS_KEY');
+  const apiKey = process.env.GNEWS_KEY || process.env.NEXT_PUBLIC_GNEWS_API_KEY;
+  if (!apiKey) throw new Error('Missing GNEWS_KEY or NEXT_PUBLIC_GNEWS_API_KEY');
 
   const url = `https://gnews.io/api/v4/top-headlines?category=${category}&lang=en&token=${apiKey}`;
 

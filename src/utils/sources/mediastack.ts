@@ -1,5 +1,5 @@
 export async function fetchNewsFromMediastack(category: string) {
-  const apiKey = process.env.MEDIASTACK_KEY;
+  const apiKey = process.env.MEDIASTACK_KEY || process.env.NEXT_PUBLIC_MEDIASTACK_KEY;
   const response = await fetch(`http://api.mediastack.com/v1/news?access_key=${apiKey}&languages=en&categories=${category}`);
 
   if (!response.ok) throw new Error('Failed to fetch from Mediastack');
