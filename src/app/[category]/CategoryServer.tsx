@@ -16,7 +16,7 @@ export async function fetchCategoryNews(category: string): Promise<{
   suggestedArticles: NewsArticle[];
 }> {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/news-rotation?category=${category}`, {
+    const response = await fetch(`/api/news-rotation?category=${category}`, {
       next: { revalidate: 180 }, // 3 minutes cache
       headers: {
         'Accept': 'application/json',

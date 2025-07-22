@@ -15,7 +15,14 @@ const ExternalNewsArticleSchema = z.object({
   source: z.object({ name: z.string().optional() }).optional(),
 });
 
-export async function GET() {
+export async function GET(request: Request) {
+  // حماية endpoint بتوكن سري
+  const url = new URL(request.url);
+  const token = url.searchParams.get('token') || request.headers.get('x-api-token');
+  const SECRET_TOKEN = process.env.REFRESH_NEWS_TOKEN || 'my_secret_token';
+  if (token !== SECRET_TOKEN) {
+    return NextResponse.json({ error: 'Unauthorized: invalid or missing token' }, { status: 401 });
+  }
   const results = [];
   let totalFetched = 0;
   let totalSaved = 0;
@@ -37,6 +44,9 @@ export async function GET() {
           if (parsed.success) {
             validNewsItems.push(parsed.data);
           }
+        }
+        if (!newsItems || newsItems.length === 0) {
+          errors.push({ category: category.name, error: 'No news fetched from API' });
         }
       } catch (err) {
         fetchError = err instanceof Error ? err.message : String(err);

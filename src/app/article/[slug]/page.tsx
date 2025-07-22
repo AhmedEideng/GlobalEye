@@ -5,8 +5,8 @@ import ArticleJsonLdHead from './ArticleJsonLdHead';
 export const revalidate = 120;
 
 export async function generateMetadata(props: unknown) {
-  const { params } = props as { params: { slug: string } };
-  const { slug } = params;
+  const { params } = props as { params: Promise<{ slug: string }> };
+  const { slug } = await params;
   const article: NewsArticle | null = await getArticleBySlug(slug);
   if (!article) {
     return {
@@ -42,8 +42,8 @@ export async function generateMetadata(props: unknown) {
 }
 
 export default async function Page(props: unknown) {
-  const { params } = props as { params: { slug: string } };
-  const { slug } = params;
+  const { params } = props as { params: Promise<{ slug: string }> };
+  const { slug } = await params;
   const article: NewsArticle | null = await getArticleBySlug(slug);
   return <>
     <ArticleJsonLdHead article={article} />
