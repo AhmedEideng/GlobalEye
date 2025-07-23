@@ -1,38 +1,46 @@
-import { fetchNewsFromNewsAPI } from './sources/newsapi';
-import { fetchNewsFromGEnews } from './sources/gnews';
-import { fetchNewsFromTheguardian } from './sources/theguardian';
-import { fetchNewsFromMediastack } from './sources/mediastack';
-import type { ExternalNewsArticle } from '../../externalNewsArticle';
+import { NewsItem } from '../types';
 
-export async function fetchExternalNews(category: string): Promise<ExternalNewsArticle[]> {
+export async function fetchExternalNews(): Promise<NewsItem[]> {
+  const apiKey = process.env.NEWS_API_KEY;
+  if (!apiKey) {
+    console.error('Error: NEWS_API_KEY is not set in environment variables');
+    return [];
+  }
+
+  const url = `https://newsapi.org/v2/top-headlines?country=us&apiKey=${apiKey}`;
+
   try {
-    const results = await Promise.allSettled([
-      fetchNewsFromGEnews(category),
-      fetchNewsFromNewsAPI(category),
-      fetchNewsFromTheguardian(category),
-      fetchNewsFromMediastack(category),
-    ]);
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
 
-    const allNews = results
-      .filter(r => r.status === 'fulfilled')
-      .flatMap(r => (r as PromiseFulfilledResult<ExternalNewsArticle[]>).value);
+    console.log('Fetched articles:', data.articles.length); // تسجيل عدد الأخبار المجلوبة
 
-    // تصفية الأخبار المنشورة خلال آخر 24 ساعة فقط
-    const now = Date.now();
-    const oneDayMs = 24 * 60 * 60 * 1000;
-    const recentNews = allNews.filter(item => {
-      if (!item.publishedAt) return false;
-      const published = new Date(item.publishedAt).getTime();
-      return !isNaN(published) && (now - published) < oneDayMs;
-    });
+    const validNewsItems = data.articles
+      .map((article: any) => {
+        if (!article.url) {
+          console.warn('Skipping article with missing URL:', article.title);
+          return null;
+        }
+        return {
+          title: article.title,
+          description: article.description,
+          content: article.content,
+          url: article.url,
+          image_url: article.urlToImage,
+          published_at: article.publishedAt,
+          source: article.source.name,
+          author: article.author,
+        };
+      })
+      .filter(Boolean); // إزالة العناصر null
 
-    // إزالة التكرار بناءً على url أو title (داخل نفس الدفعة)
-    const uniqueNews = recentNews.filter((item, index, self) =>
-      index === self.findIndex((t) => t.url === item.url || t.title.trim() === item.title.trim())
-    );
-
-    return uniqueNews;
-  } catch {
+    console.log('Valid news items after filtering:', validNewsItems.length);
+    return validNewsItems;
+  } catch (error) {
+    console.error('Error fetching news:', error);
     return [];
   }
 }
