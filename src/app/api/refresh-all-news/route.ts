@@ -64,19 +64,24 @@ export async function GET(request: Request) {
       try {
         newsItems = await fetchExternalNews(apiCategory)
         totalFetched += newsItems.length;
+        console.log(`[DEBUG] Category: ${category.name}, API Category: ${apiCategory}, Fetched: ${newsItems.length} items`);
         // Validate each news item using zod
         for (const item of newsItems) {
           const parsed = ExternalNewsArticleSchema.safeParse(item);
           if (parsed.success) {
             validNewsItems.push(parsed.data);
+          } else {
+            console.log(`[DEBUG] Validation failed for item:`, item.title, parsed.error);
           }
         }
+        console.log(`[DEBUG] Valid items after validation: ${validNewsItems.length}`);
         if (!newsItems || newsItems.length === 0) {
           errors.push({ category: category.name, error: 'No news fetched from API' });
         }
       } catch (err) {
         fetchError = err instanceof Error ? err.message : String(err);
         errors.push({ category: category.name, error: fetchError });
+        console.log(`[DEBUG] Fetch error for ${category.name}:`, fetchError);
       }
       if (validNewsItems.length > 0) {
         const toSlug = (title: string) =>
@@ -119,8 +124,10 @@ export async function GET(request: Request) {
         try {
           await saveNewsToSupabase(newsArticlesForDb); // مرر فقط البيانات بصيغة snake_case
           totalSaved += newsArticlesForDb.length;
+          console.log(`[DEBUG] Saved ${newsArticlesForDb.length} items to database for category: ${category.name}`);
         } catch (err) {
           errors.push({ category: category.name, error: err instanceof Error ? err.message : String(err) });
+          console.log(`[DEBUG] Save error for ${category.name}:`, err);
         }
         newsArticles.slice(0, 3).forEach(article => allSampleNews.push(article));
         results.push({

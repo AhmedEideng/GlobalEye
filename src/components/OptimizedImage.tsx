@@ -29,17 +29,18 @@ export default function OptimizedImage({
   // تحقق من صلاحية الرابط (يقبل أي رابط يبدأ بـ http/https)
   const isValidImageUrl = !!cleanSrc && /^https?:\/\//i.test(cleanSrc);
   if (!isValidImageUrl) return null;
+  
+  // استخدم img العادي بدلاً من next/image لحل مشكلة الصور
   return (
-    <Image
+    <img
       src={cleanSrc}
       alt={alt}
-      fill={fill}
-      width={width}
-      height={height}
       className={className}
-      priority={priority}
-      sizes={sizes}
-      quality={quality}
+      style={{
+        width: fill ? '100%' : width,
+        height: fill ? '100%' : height,
+        objectFit: 'cover'
+      }}
     />
   );
 } 
