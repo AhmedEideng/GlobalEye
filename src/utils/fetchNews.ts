@@ -20,8 +20,8 @@ export type NewsArticle = {
   title: string;
   description: string | null;
   url: string;
-  urlToImage: string | null;
-  publishedAt: string;
+  image_url: string | null;
+  published_at: string;
   content: string | null;
   slug: string;
   category: string;
@@ -36,7 +36,7 @@ interface NewsWithCategory {
   title: string;
   description: string | null;
   url: string;
-  url_to_image: string | null;
+  image_url: string | null;
   published_at: string;
   content: string | null;
   slug: string;
@@ -91,8 +91,8 @@ export async function fetchNews(category = 'general', limit = 50, offset = 0): P
       title: article.title,
       description: article.description,
       url: article.url,
-      urlToImage: article.url_to_image,
-      publishedAt: article.published_at,
+      image_url: article.image_url,
+      published_at: article.published_at,
       content: article.content,
       slug: article.slug,
       category: article.categories?.name || category,
@@ -204,8 +204,8 @@ export async function getArticleBySlug(slug: string): Promise<NewsArticle | null
         title: data.title,
         description: data.description,
         url: data.url,
-        urlToImage: data.url_to_image,
-        publishedAt: data.published_at,
+        image_url: data.image_url,
+        published_at: data.published_at,
         content: data.content,
         slug: data.slug,
         category: data.category || 'general',
@@ -228,8 +228,8 @@ export async function getArticleBySlug(slug: string): Promise<NewsArticle | null
         title: article.title,
         description: article.description,
         url: article.url,
-        urlToImage: article.url_to_image,
-        publishedAt: article.published_at,
+        image_url: article.image_url,
+        published_at: article.published_at,
         content: article.content,
         slug: article.slug,
         category: article.category || 'general',
@@ -252,8 +252,8 @@ export async function getArticleBySlug(slug: string): Promise<NewsArticle | null
         title: article.title,
         description: article.description,
         url: article.url,
-        urlToImage: article.url_to_image,
-        publishedAt: article.published_at,
+        image_url: article.image_url,
+        published_at: article.published_at,
         content: article.content,
         slug: article.slug,
         category: article.category || 'general',

@@ -25,17 +25,17 @@ export async function generateMetadata(props: unknown) {
       url: `https://globaleye.live/article/${article.slug}`,
       siteName: 'GlobalEye News',
       images: [
-        { url: article.urlToImage || '/placeholder-news.jpg', width: 1200, height: 630, alt: article.title }
+        { url: article.image_url || '/placeholder-news.jpg', width: 1200, height: 630, alt: article.title }
       ],
       locale: 'en_US',
       type: 'article',
-      publishedTime: article.publishedAt,
+      publishedTime: article.published_at,
     },
     twitter: {
       card: 'summary_large_image',
       title: article.title,
       description: article.description || article.title,
-      images: [article.urlToImage || '/placeholder-news.jpg'],
+      images: [article.image_url || '/placeholder-news.jpg'],
       site: '@globaleyenews',
     },
   };

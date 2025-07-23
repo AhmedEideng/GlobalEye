@@ -96,7 +96,7 @@ async function fetchRotatedNews(): Promise<{
 // Move renderSuggestedArticle outside HomePage to avoid calling useCallback in an async function
 const renderSuggestedArticle = (article: NewsArticle, idx: number) => {
   // Memoize date formatting to avoid creating new Date objects on every render
-  const formattedDate = formatDate(article.publishedAt);
+  const formattedDate = formatDate(article.published_at);
 
   return (
     <React.Fragment key={article.slug || idx}>
@@ -106,7 +106,7 @@ const renderSuggestedArticle = (article: NewsArticle, idx: number) => {
       >
         <div className="relative w-full h-48 overflow-hidden">
           <OptimizedImage
-            src={getImageUrl(article.urlToImage)}
+            src={getImageUrl(article.image_url)}
             alt={article.title}
             fill
             className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"

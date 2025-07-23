@@ -9,9 +9,9 @@ import OptimizedImage from './OptimizedImage';
 
 const HomeNewsGrid = React.memo(({ articles }: { articles: NewsArticle[] }) => {
   const renderArticle = React.useCallback((article: NewsArticle, idx: number) => {
-    const imageSrc = getImageUrl(article.urlToImage);
+    const imageSrc = getImageUrl(article.image_url);
     // Format date outside of the callback to avoid hooks rules violation
-    const formattedDate = formatDate(article.publishedAt);
+    const formattedDate = formatDate(article.published_at);
     return (
       <Link
         key={article.slug || idx}

@@ -91,7 +91,7 @@ export async function GET(request: Request) {
           title: item.title,
           description: item.description || null,
           url: item.url,
-          urlToImage: item.urlToImage || null,
+          image_url: item.urlToImage || null,
           publishedAt: item.publishedAt || null,
           content: null, // Content is null as external APIs don't provide it
           slug: toSlug(item.title),
@@ -101,9 +101,10 @@ export async function GET(request: Request) {
         let newsArticlesForDb = newsArticles.map(item => ({
           title: item.title,
           description: item.description,
-          content: null, // لا يوجد محتوى من المصدر الخارجي
+          content: null,
           url: item.url,
-          url_to_image: item.urlToImage,
+          image_url: item.image_url,
+          url_to_image: item.image_url,
           published_at: item.publishedAt,
           slug: item.slug,
           author: item.author,
@@ -122,7 +123,14 @@ export async function GET(request: Request) {
         } catch (err) {
           errors.push({ category: category.name, error: err instanceof Error ? err.message : String(err) });
         }
-        newsArticles.slice(0, 3).forEach(article => allSampleNews.push(article));
+        // عند تمرير المقالات إلى allSampleNews أو أي متغيرات أخرى، تأكد من استخدام image_url و published_at فقط
+        newsArticles.slice(0, 3).forEach(article => {
+          allSampleNews.push({
+            ...article,
+            urlToImage: article.image_url,
+            publishedAt: article.publishedAt
+          });
+        });
         results.push({
           name: category.name,
           fetched: newsItems.length,

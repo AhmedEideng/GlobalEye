@@ -76,18 +76,13 @@ export default function FavoritesPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {articles.map((article) => {
             // Format date outside of the callback to avoid hooks rules violation
-            const formattedDate = formatDate(article.publishedAt);
+            const formattedDate = formatDate(article.published_at);
 
             return (
               <div key={article.slug || article.url} className="relative group">
                 <Link href={`/article/${article.slug}`} className="article-card">
                   <div className="relative w-full h-40 overflow-hidden">
-                    <OptimizedImage
-                      src={getImageUrl(article.urlToImage)}
-                      alt={article.title}
-                      fill
-                      className="object-cover w-full h-full"
-                    />
+                    <OptimizedImage src={getImageUrl(article.image_url)} alt={article.title} fill className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300" />
                   </div>
                   <div className="p-4">
                     <div className="text-xs text-red-600 font-bold mb-1"><SafeText fallback="Unknown Source">{article.source?.name}</SafeText></div>

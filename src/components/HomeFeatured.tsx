@@ -6,7 +6,7 @@ import OptimizedImage from './OptimizedImage';
 export default function HomeFeatured({ article }: { article: NewsArticle }) {
   if (!article) return null;
   
-  const imageSrc = getImageUrl(article.urlToImage);
+  const imageSrc = getImageUrl(article.image_url);
   return (
     <section className="mb-10">
       <div className="article-card relative w-full h-[320px] md:h-[420px] lg:h-[500px] rounded-2xl overflow-hidden sm:h-[320px]" style={{ height: 'min(60vw, 420px)', minHeight: '220px' }}>

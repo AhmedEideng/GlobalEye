@@ -15,7 +15,7 @@ export default function ArticleClient({ article, slug }: { article: NewsArticle 
   
   const renderRelatedArticle = React.useCallback((related: NewsArticle, idx: number) => {
     // Format date outside of the callback to avoid hooks rules violation
-    const formattedDate = formatDate(related.publishedAt);
+    const formattedDate = formatDate(related.published_at);
 
     return (
       <React.Fragment key={related.slug || idx}> 
@@ -24,12 +24,7 @@ export default function ArticleClient({ article, slug }: { article: NewsArticle 
           className="article-card group transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl rounded-xl bg-white shadow-md overflow-hidden"
         >
           <div className="relative w-full h-48 overflow-hidden">
-            <OptimizedImage
-              src={getImageUrl(related.urlToImage)}
-              alt={related.title}
-              fill
-              className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-            />
+            <OptimizedImage src={getImageUrl(related.image_url)} alt={related.title} fill className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300" />
           </div>
           <div className="p-4">
             <div className="article-category text-xs font-bold mb-1 bg-red-600 text-white rounded-full px-3 py-1 inline-block"><SafeText fallback="Unknown Source">{related.source?.name}</SafeText></div>

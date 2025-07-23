@@ -21,8 +21,8 @@ function ArticleTitleSection({ title, description }: { title: string; descriptio
   );
 }
 
-function ArticleImageSection({ urlToImage, title }: { urlToImage: string; title: string }) {
-  const imageSrc = getImageUrl(urlToImage);
+function ArticleImageSection({ image_url, title }: { image_url: string; title: string }) {
+  const imageSrc = getImageUrl(image_url);
   return (
     <div className="relative w-full h-64 sm:h-80 md:h-96 lg:h-[500px] rounded-2xl overflow-hidden mb-6 shadow-lg">
       <OptimizedImage
@@ -63,12 +63,12 @@ export default function ArticleHeader({ article }: { article: NewsArticle }) {
 
   // Memoize date formatting to avoid creating new Date objects on every render
   const formattedDate = React.useMemo(() => {
-    return new Date(article.publishedAt).toLocaleDateString('en-GB', { 
+    return new Date(article.published_at).toLocaleDateString('en-GB', { 
       day: '2-digit', 
       month: 'short', 
       year: 'numeric' 
     });
-  }, [article.publishedAt]);
+  }, [article.published_at]);
 
   React.useEffect(() => {
     if (user) {
@@ -93,8 +93,8 @@ export default function ArticleHeader({ article }: { article: NewsArticle }) {
     '@type': 'NewsArticle',
     headline: sanitizeText(article.title),
     description: sanitizeText(article.description),
-    datePublished: article.publishedAt,
-    image: article.urlToImage ? [article.urlToImage] : undefined,
+    datePublished: article.published_at,
+    image: article.image_url ? [article.image_url] : undefined,
     author: article.author ? [{ '@type': 'Person', name: sanitizeText(article.author) }] : undefined,
     publisher: {
       '@type': 'Organization',
@@ -122,8 +122,8 @@ export default function ArticleHeader({ article }: { article: NewsArticle }) {
       <header className="article-header mb-8">
         <div className="max-w-4xl mx-auto">
           <ArticleTitleSection title={article.title ?? ''} description={article.description ?? ''} />
-          {article.urlToImage && article.urlToImage.trim() && (
-            <ArticleImageSection urlToImage={article.urlToImage} title={article.title} />
+          {article.image_url && article.image_url.trim() && (
+            <ArticleImageSection image_url={article.image_url} title={article.title} />
           )}
           <ArticleMetaSection formattedDate={formattedDate} author={article.author ?? ''} sourceName={article.source?.name} />
         </div>

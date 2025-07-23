@@ -49,7 +49,7 @@ export async function fetchCategoryNews(category: string): Promise<{
     // Fallback to direct fetch
     const allArticles: NewsArticle[] = await fetchNews();
     const categoryArticles = allArticles.filter(article => article.category === category);
-    const sortedArticles = categoryArticles.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+    const sortedArticles = categoryArticles.sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime());
     const featured = sortedArticles[0] || null;
     const restArticles = featured ? sortedArticles.filter(a => a.slug !== featured.slug) : sortedArticles;
     const articles = restArticles.slice(0, 51);

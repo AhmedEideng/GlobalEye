@@ -22,8 +22,8 @@ interface Article {
   title: string;
   description: string | null;
   url: string;
-  urlToImage: string | null;
-  publishedAt: string;
+  image_url: string | null;
+  published_at: string;
   source: { name: string };
   category?: string;
   slug: string;
@@ -68,8 +68,8 @@ export default function CategoryClient({
       title: newsArticle.title,
       description: newsArticle.description,
       url: newsArticle.url,
-      urlToImage: newsArticle.urlToImage,
-      publishedAt: newsArticle.publishedAt,
+      image_url: newsArticle.image_url,
+      published_at: newsArticle.published_at,
       source: { name: newsArticle.source?.name || '' },
       category: newsArticle.category,
       slug: newsArticle.slug,
@@ -160,8 +160,8 @@ export default function CategoryClient({
     title: a.title,
     description: a.description || '',
     url: a.url,
-    urlToImage: a.urlToImage || '',
-    publishedAt: a.publishedAt,
+    image_url: a.image_url || '',
+    published_at: a.published_at,
     content: '',
     slug: a.slug,
     category: a.category || '',
@@ -173,7 +173,7 @@ export default function CategoryClient({
 
   const renderSuggestedArticle = React.useCallback((article: Article, idx: number) => {
     // Format date outside of the callback to avoid hooks rules violation
-    const formattedDate = formatDate(article.publishedAt);
+    const formattedDate = formatDate(article.published_at);
 
     return (
       <React.Fragment key={article.slug || idx}>
@@ -183,7 +183,7 @@ export default function CategoryClient({
         >
           <div className="relative w-full h-48 overflow-hidden">
             <OptimizedImage
-              src={getImageUrl(article.urlToImage)}
+              src={getImageUrl(article.image_url)}
               alt={article.title}
               fill
               className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"

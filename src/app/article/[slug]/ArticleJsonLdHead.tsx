@@ -9,8 +9,8 @@ export default function ArticleJsonLdHead({ article }: { article: NewsArticle | 
     "@context": "https://schema.org",
     "@type": "NewsArticle",
     "headline": sanitizeText(article.title),
-    "image": [article.urlToImage || 'https://globaleye.live/placeholder-news.jpg'],
-    "datePublished": article.publishedAt,
+    "image": [article.image_url || 'https://globaleye.live/placeholder-news.jpg'],
+    "datePublished": article.published_at,
     "author": article.author ? [{ "@type": "Person", "name": sanitizeText(article.author) }] : undefined,
     "publisher": {
       "@type": "Organization",
