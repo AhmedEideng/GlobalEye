@@ -1,9 +1,20 @@
 import { NewsItem } from '../types';
 
+// واجهة لتتناسب مع استجابة NewsAPI
+interface NewsApiArticle {
+  title: string | null;
+  description: string | null;
+  content: string | null;
+  url: string;
+  urlToImage: string | null;
+  publishedAt: string | null;
+  source: { name: string };
+  author: string | null;
+}
+
 export async function fetchExternalNews(): Promise<NewsItem[]> {
   const apiKey = process.env.NEWS_API_KEY;
   if (!apiKey) {
-    console.error('Error: NEWS_API_KEY is not set in environment variables');
     return [];
   }
 
@@ -16,12 +27,9 @@ export async function fetchExternalNews(): Promise<NewsItem[]> {
     }
     const data = await response.json();
 
-    console.log('Fetched articles:', data.articles.length); // تسجيل عدد الأخبار المجلوبة
-
     const validNewsItems = data.articles
-      .map((article: any) => {
+      .map((article: NewsApiArticle) => {
         if (!article.url) {
-          console.warn('Skipping article with missing URL:', article.title);
           return null;
         }
         return {
@@ -35,12 +43,10 @@ export async function fetchExternalNews(): Promise<NewsItem[]> {
           author: article.author,
         };
       })
-      .filter(Boolean); // إزالة العناصر null
+      .filter(Boolean);
 
-    console.log('Valid news items after filtering:', validNewsItems.length);
     return validNewsItems;
   } catch (error) {
-    console.error('Error fetching news:', error);
     return [];
   }
 }
