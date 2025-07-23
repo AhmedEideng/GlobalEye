@@ -4,37 +4,27 @@ import { NewsItem } from '../types';
 const supabaseUrl = process.env.SUPABASE_URL!;
 const supabaseKey = process.env.SUPABASE_KEY!;
 if (!supabaseUrl || !supabaseKey) {
-  console.error('Error: SUPABASE_URL or SUPABASE_KEY is not set');
+  throw new Error('SUPABASE_URL or SUPABASE_KEY is not set');
 }
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function saveNewsToSupabase(newsItems: NewsItem[]): Promise<void> {
   if (!newsItems.length) {
-    console.warn('No news items to save');
     return;
   }
 
   try {
     const validNewsItems = newsItems.filter(item => {
       if (!item.url) {
-        console.warn('Skipping news item with missing URL:', item.title);
         return false;
       }
       return true;
     });
 
-    console.log('Attempting to save news items:', validNewsItems.length);
-
-    // التحقق من slugs الموجودة لتجنب التعارض
-    const slugs = validNewsItems
-      .map(item => 
-        item.title
-          ? `${item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}-${Date.now()}`
-          : null
-      )
-      .filter(Boolean);
-    console.log('Generated slugs:', slugs);
+    if (!validNewsItems.length) {
+      return;
+    }
 
     const { error } = await supabase
       .from('news')
@@ -55,15 +45,13 @@ export async function saveNewsToSupabase(newsItems: NewsItem[]): Promise<void> {
           is_featured: false,
           views_count: 0,
         })),
-        { onConflict: 'url' } // التعامل مع تعارض url فقط
+        { onConflict: 'url' }
       );
 
     if (error) {
-      console.error('Supabase error details:', error);
       throw new Error(`Supabase error: ${error.message}`);
     }
-    console.log('News saved successfully:', validNewsItems.length);
   } catch (error) {
-    console.error('Error saving news to Supabase:', error);
+    throw error;
   }
 }
