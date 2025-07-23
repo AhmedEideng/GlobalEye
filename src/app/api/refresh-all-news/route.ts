@@ -18,7 +18,7 @@ export async function GET(request: Request) {
 
     await saveNewsToSupabase(newsItems);
     return NextResponse.json({ message: `News refreshed successfully: ${newsItems.length} items` });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to refresh news' }, { status: 500 });
   }
 }
