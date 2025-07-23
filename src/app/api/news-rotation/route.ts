@@ -3,6 +3,9 @@ import { fetchNews } from '@/utils/fetchNews';
 import { logSnagEvent } from '@/utils/logsnag';
 import { measureAsyncOperation } from '@/utils/performanceMonitor';
 
+// جعل المسار ديناميكي لتجنب التنفيذ أثناء البناء
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   return measureAsyncOperation(
     'news-rotation-api',
@@ -13,9 +16,8 @@ export async function GET(request: NextRequest) {
         const limit = parseInt(searchParams.get('limit') || '10');
         const offset = parseInt(searchParams.get('offset') || '0');
 
-        // Validate category
         const validCategories = [
-          'general', 'business', 'technology', 'sports', 
+          'general', 'business', 'technology', 'sports',
           'entertainment', 'health', 'science', 'politics'
         ];
 
@@ -26,19 +28,16 @@ export async function GET(request: NextRequest) {
           );
         }
 
-        // Fetch news for the category
         const news = await fetchNews(category, limit, offset);
 
-        // Rotate articles (shuffle for variety)
         const rotatedNews = shuffleArray([...news]);
 
-        // Featured, main, suggested
         const featured = rotatedNews[0] || null;
         const mainArticles = featured ? rotatedNews.filter(a => a.slug !== featured.slug).slice(0, 51) : rotatedNews.slice(0, 51);
         const suggestedArticles = mainArticles.slice(0, 40);
 
         await logSnagEvent(
-          '🔄 News Rotation', 
+          '🔄 News Rotation',
           `Rotated ${rotatedNews.length} articles for category: ${category}`
         );
 
@@ -56,16 +55,16 @@ export async function GET(request: NextRequest) {
 
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        
+
         await logSnagEvent(
-          '❌ News Rotation Error', 
+          '❌ News Rotation Error',
           `Failed to rotate news: ${errorMessage}`
         );
 
         return NextResponse.json(
-          { 
+          {
             error: 'Failed to fetch rotated news',
-            details: errorMessage 
+            details: errorMessage
           },
           { status: 500 }
         );
@@ -74,7 +73,7 @@ export async function GET(request: NextRequest) {
   );
 }
 
-// Helper function to shuffle array
+// دالة لخلط المقالات
 function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -82,4 +81,4 @@ function shuffleArray<T>(array: T[]): T[] {
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
   return shuffled;
-} 
+}
