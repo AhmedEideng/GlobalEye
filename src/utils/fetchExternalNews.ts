@@ -46,7 +46,7 @@ export async function fetchExternalNews(): Promise<NewsItem[]> {
       .filter(Boolean);
 
     return validNewsItems;
-  } catch (error) {
+  } catch {
     return [];
   }
 }
