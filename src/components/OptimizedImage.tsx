@@ -26,9 +26,8 @@ export default function OptimizedImage({
   quality = 70
 }: OptimizedImageProps) {
   const cleanSrc = cleanImageUrl(src);
-  // تحقق من صلاحية الرابط
-  const isValidImageUrl = !!cleanSrc &&
-    /^https?:\/\/.+\.(jpg|jpeg|png|webp|gif|svg)$/i.test(cleanSrc);
+  // تحقق من صلاحية الرابط (يقبل أي رابط يبدأ بـ http/https)
+  const isValidImageUrl = !!cleanSrc && /^https?:\/\//i.test(cleanSrc);
   if (!isValidImageUrl) return null;
   return (
     <Image
