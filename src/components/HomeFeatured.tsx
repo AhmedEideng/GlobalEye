@@ -15,8 +15,6 @@ export default function HomeFeatured({ article }: { article: NewsArticle }) {
           alt={article.title}
           fill
           className="object-cover w-full h-full"
-          priority
-          sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
         <div className="absolute bottom-0 left-0 p-8 text-white z-10 max-w-2xl">

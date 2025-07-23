@@ -25,8 +25,6 @@ const HomeNewsGrid = React.memo(({ articles }: { articles: NewsArticle[] }) => {
               alt={article.title}
               fill
               className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              priority={idx < 6}
             />
           )}
         </div>

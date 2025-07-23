@@ -30,8 +30,6 @@ function ArticleImageSection({ urlToImage, title }: { urlToImage: string; title:
         alt={title}
         fill
         className="object-cover w-full h-full"
-        priority
-        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
       />
     </div>
   );

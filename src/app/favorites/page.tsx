@@ -87,7 +87,6 @@ export default function FavoritesPage() {
                       alt={article.title}
                       fill
                       className="object-cover w-full h-full"
-                      sizes="100vw"
                     />
                   </div>
                   <div className="p-4">
