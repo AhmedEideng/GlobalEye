@@ -1,5 +1,4 @@
 "use client";
-import Image from 'next/image';
 import { cleanImageUrl } from '@utils/cleanImageUrl';
 
 interface OptimizedImageProps {
@@ -9,9 +8,6 @@ interface OptimizedImageProps {
   width?: number;
   height?: number;
   className?: string;
-  priority?: boolean;
-  sizes?: string;
-  quality?: number;
 }
 
 export default function OptimizedImage({
@@ -21,9 +17,6 @@ export default function OptimizedImage({
   width,
   height,
   className,
-  priority = false,
-  sizes,
-  quality = 70
 }: OptimizedImageProps) {
   const cleanSrc = cleanImageUrl(src);
   // تحقق من صلاحية الرابط (يقبل أي رابط يبدأ بـ http/https)
