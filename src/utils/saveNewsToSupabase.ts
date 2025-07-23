@@ -6,11 +6,11 @@ interface NewsDbItem {
   description: string | null;
   content: string | null;
   url: string;
-  url_to_image: string | null;
+  image_url: string | null;
   published_at: string | null;
   slug: string;
   author: string | null;
-  source_name: string | null;
+  source: string | null;
   category_id: number | null;
   is_featured: boolean;
   views_count: number;
