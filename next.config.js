@@ -58,6 +58,7 @@ const nextConfig = {
       { protocol: 'https', hostname: 'www.mercurynews.com' },
       { protocol: 'https', hostname: 'cdn.nba.com' },
       { protocol: 'https', hostname: 'i.guim.co.uk' },
+      { protocol: 'https', hostname: 'media.guim.co.uk' },
       { protocol: 'https', hostname: 'images.unsplash.com' },
       { protocol: 'https', hostname: 'via.placeholder.com' },
     ],
