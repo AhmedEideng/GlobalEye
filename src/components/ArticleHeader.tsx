@@ -1,12 +1,12 @@
 import React from 'react';
 import Head from 'next/head';
-import Image from 'next/image';
 import { NewsArticle } from '@utils/fetchNews';
 import { useAuth } from '@hooks/useAuth';
 import { isFavorite } from '@services/favorites';
 import { sanitizeText, sanitizeJsonLd } from '../utils/sanitizeText';
 import SafeText from './SafeText';
 import { getImageUrl } from '@utils/fetchNews';
+import OptimizedImage from './OptimizedImage';
 
 function ArticleTitleSection({ title, description }: { title: string; description: string }) {
   return (
@@ -25,7 +25,7 @@ function ArticleImageSection({ urlToImage, title }: { urlToImage: string; title:
   const imageSrc = getImageUrl(urlToImage);
   return (
     <div className="relative w-full h-64 sm:h-80 md:h-96 lg:h-[500px] rounded-2xl overflow-hidden mb-6 shadow-lg">
-      <Image
+      <OptimizedImage
         src={imageSrc}
         alt={title}
         fill
