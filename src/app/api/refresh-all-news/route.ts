@@ -108,7 +108,7 @@ export async function GET(request: Request) {
           published_at: item.publishedAt,
           slug: item.slug,
           author: item.author,
-          source_name: item.source?.name || null,
+          source: item.source?.name || null,
           category_id: category.id ? Number(category.id) : null,
           is_featured: false,
           views_count: 0,
