@@ -1,4 +1,5 @@
 "use client";
+import Image from 'next/image';
 import { cleanImageUrl } from '@utils/cleanImageUrl';
 
 interface OptimizedImageProps {
@@ -19,49 +20,50 @@ export default function OptimizedImage({
   className,
 }: OptimizedImageProps) {
   const cleanSrc = cleanImageUrl(src);
-  
+
   // تحقق من صلاحية الرابط (يقبل أي رابط يبدأ بـ http/https)
   const isValidImageUrl = !!cleanSrc && /^https?:\/\//i.test(cleanSrc);
-  
-  // Debug logging in development
-  if (process.env.NODE_ENV === 'development') {
-    console.log('OptimizedImage Debug:', {
-      originalSrc: src,
-      cleanSrc,
-      isValidImageUrl,
-      alt
-    });
-  }
-  
+
   // إذا لم يكن الرابط صالحًا، لا تعرض شيئًا
   if (!isValidImageUrl) {
     return null;
   }
-  
-  // استخدم img العادي بدلاً من next/image لحل مشكلة الصور
+
+  // إذا تم تحديد fill، استخدم layout="fill" مع objectFit="cover"
+  if (fill) {
+    return (
+      <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+        <Image
+          src={cleanSrc}
+          alt={alt}
+          className={className}
+          fill
+          style={{ objectFit: 'cover' }}
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.style.display = 'none';
+          }}
+        />
+      </div>
+    );
+  }
+
+  // إذا لم يتم تحديد width أو height، استخدم قيم افتراضية
+  const finalWidth = width || 500;
+  const finalHeight = height || 500;
+
   return (
-    <img
+    <Image
       src={cleanSrc}
       alt={alt}
+      width={finalWidth}
+      height={finalHeight}
       className={className}
-      style={{
-        width: fill ? '100%' : width,
-        height: fill ? '100%' : height,
-        objectFit: 'cover'
-      }}
+      style={{ objectFit: 'cover' }}
       onError={(e) => {
-        // إذا فشل تحميل الصورة، أخفي العنصر
         const target = e.target as HTMLImageElement;
         target.style.display = 'none';
-        if (process.env.NODE_ENV === 'development') {
-          console.error('Image failed to load:', cleanSrc);
-        }
-      }}
-      onLoad={() => {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Image loaded successfully:', cleanSrc);
-        }
       }}
     />
   );
-} 
+}
