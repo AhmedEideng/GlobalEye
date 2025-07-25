@@ -47,6 +47,11 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  experimental: {
+    optimizeCss: true,
+    optimizePackageImports: ['react-icons'],
+    serverComponentsExternalPackages: ['@supabase/supabase-js'],
+  },
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '**' },
@@ -70,10 +75,6 @@ const nextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 300, // 5 minutes
   },
-  experimental: {
-    optimizeCss: true,
-    optimizePackageImports: ['react-icons'],
-  },
   turbopack: {
     rules: {
       '*.svg': {
@@ -88,6 +89,10 @@ const nextConfig = {
   onDemandEntries: {
     maxInactiveAge: 25 * 1000,
     pagesBufferLength: 2,
+  },
+  swcMinify: true,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
   },
   async headers() {
     return [
