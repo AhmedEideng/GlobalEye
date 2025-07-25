@@ -177,23 +177,20 @@ class PerformanceMonitor {
   }
 }
 
-// Export singleton instance
-export const performanceMonitor = PerformanceMonitor.getInstance();
-
 // Helper function to measure async operations
 export async function measureAsyncOperation<T>(
   operation: string,
   asyncFn: () => Promise<T>,
   category?: string
 ): Promise<T> {
-  const stopTimer = performanceMonitor.startTimer(operation);
+  const stopTimer = PerformanceMonitor.getInstance().startTimer(operation);
   
   try {
     const result = await asyncFn();
     stopTimer(undefined, category, { articlesCount: 0 });
     return result;
   } catch (error) {
-    performanceMonitor.recordMetric({
+    PerformanceMonitor.getInstance().recordMetric({
       operation,
       duration: 0, // Will be calculated by stopTimer
       success: false,
@@ -211,14 +208,14 @@ export function measureSyncOperation<T>(
   syncFn: () => T,
   category?: string
 ): T {
-  const stopTimer = performanceMonitor.startTimer(operation);
+  const stopTimer = PerformanceMonitor.getInstance().startTimer(operation);
   
   try {
     const result = syncFn();
     stopTimer(undefined, category, { articlesCount: 0 });
     return result;
   } catch (error) {
-    performanceMonitor.recordMetric({
+    PerformanceMonitor.getInstance().recordMetric({
       operation,
       duration: 0,
       success: false,

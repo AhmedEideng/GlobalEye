@@ -46,14 +46,14 @@ export class ContentQualityService {
     if (title.length >= 30 && title.length <= 100) {
       score += 0.1;
     } else {
-      reasons.push("العنوان قصير جدًا أو طويل جدًا");
+      reasons.push("The title is too short or too long");
     }
 
     const words = removeStopWords(title);
     if (words.length >= 5) {
       score += 0.1;
     } else {
-      reasons.push("العنوان يفتقر إلى كلمات دالة كافية");
+      reasons.push("The title lacks sufficient functional words");
     }
 
     return { score, reasons };
@@ -64,21 +64,21 @@ export class ContentQualityService {
     let score = 0;
 
     if (!description) {
-      reasons.push("الوصف غير موجود");
+      reasons.push("Description not found");
       return { score, reasons };
     }
 
     if (description.length >= 100) {
       score += 0.1;
     } else {
-      reasons.push("الوصف قصير جدًا");
+      reasons.push("The description is too short");
     }
 
     const words = removeStopWords(description);
     if (words.length >= 20) {
       score += 0.1;
     } else {
-      reasons.push("الوصف يفتقر إلى تفاصيل كافية");
+      reasons.push("The description lacks sufficient details");
     }
 
     return { score, reasons };
@@ -91,14 +91,14 @@ export class ContentQualityService {
     if (tags.length >= 3) {
       score += 0.1;
     } else {
-      reasons.push("عدد الوسوم قليل");
+      reasons.push("Too few tags");
     }
 
     const uniqueTags = new Set(tags);
     if (uniqueTags.size === tags.length) {
       score += 0.1;
     } else {
-      reasons.push("الوسوم تحتوي على تكرار");
+      reasons.push("Tags contain duplicates");
     }
 
     return { score, reasons };
@@ -111,7 +111,7 @@ export class ContentQualityService {
     if (media.length > 0) {
       score += 0.1;
     } else {
-      reasons.push("لا توجد وسائط مرفقة");
+      reasons.push("No media attached");
     }
 
     const imageTypes = media.filter((url) => url.match(/\.(jpeg|jpg|png|gif)$/));
@@ -120,7 +120,7 @@ export class ContentQualityService {
     if (imageTypes.length > 0 || videoTypes.length > 0) {
       score += 0.1;
     } else {
-      reasons.push("نوع الوسائط غير مدعوم أو غير موجود");
+      reasons.push("Unsupported or missing media type");
     }
 
     return { score, reasons };
@@ -133,7 +133,7 @@ export class ContentQualityService {
     if (article.isOriginal) {
       score += 0.2;
     } else {
-      reasons.push("المحتوى غير أصلي");
+      reasons.push("Content is not original");
     }
 
     return { score, reasons };

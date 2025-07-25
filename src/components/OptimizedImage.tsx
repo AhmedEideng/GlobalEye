@@ -39,6 +39,7 @@ export default function OptimizedImage({
           className={className}
           fill
           style={{ objectFit: 'cover' }}
+          loading="lazy"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             target.style.display = 'none';
@@ -60,6 +61,7 @@ export default function OptimizedImage({
       height={finalHeight}
       className={className}
       style={{ objectFit: 'cover' }}
+      loading="lazy"
       onError={(e) => {
         const target = e.target as HTMLImageElement;
         target.style.display = 'none';

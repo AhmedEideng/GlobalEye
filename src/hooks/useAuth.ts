@@ -7,6 +7,7 @@ export type User = {
   email: string;
   name?: string;
   avatar_url?: string;
+  is_admin?: boolean;
 };
 
 /**
@@ -28,11 +29,25 @@ export function useAuth() {
       setLoading(true);
       const { data } = await supabase.auth.getUser();
       if (data?.user) {
+        // Fetch admin status from users table
+        let is_admin = false;
+        try {
+          const { data: userRow } = await supabase
+            .from('users')
+            .select('is_admin')
+            .eq('id', data.user.id)
+            .single();
+          is_admin = !!userRow?.is_admin;
+        } catch {
+          // In a real application, you would log this error
+          // console.error('Error fetching user admin status:', error);
+        }
         setUser({
           id: data.user.id,
           email: data.user.email || '',
           name: data.user.user_metadata?.full_name || data.user.user_metadata?.name || '',
           avatar_url: data.user.user_metadata?.avatar_url || '',
+          is_admin,
         });
       } else {
         setUser(null);

@@ -11,6 +11,7 @@ export default function ArticleJsonLdHead({ article }: { article: NewsArticle | 
     "headline": sanitizeText(article.title),
     "image": [article.image_url || 'https://globaleye.live/placeholder-news.jpg'],
     "datePublished": article.published_at,
+    "dateModified": sanitizeText(article.published_at),
     "author": article.author ? [{ "@type": "Person", "name": sanitizeText(article.author) }] : undefined,
     "publisher": {
       "@type": "Organization",
@@ -20,9 +21,11 @@ export default function ArticleJsonLdHead({ article }: { article: NewsArticle | 
         "url": 'https://globaleye.live/favicon.ico.jpg',
       },
     },
-    "mainEntityOfPage": `https://globaleye.live/article/${article.slug}`,
-    "url": `https://globaleye.live/article/${article.slug}`,
+    "mainEntityOfPage": `https://globaleye.live/article/${sanitizeText(article.slug)}`,
+    "url": `https://globaleye.live/article/${sanitizeText(article.slug)}`,
     "description": sanitizeText(article.description || article.title),
+    "keywords": sanitizeText(article.category || ''),
+    "articleSection": sanitizeText(article.category || ''),
   };
   return (
     <Head>

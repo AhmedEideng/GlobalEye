@@ -1,6 +1,7 @@
 'use client';
 
 import React, { Component, ReactNode } from 'react';
+import Link from 'next/link';
 
 interface Props {
   children: ReactNode;
@@ -44,19 +45,24 @@ class ErrorBoundary extends Component<Props, State> {
       return this.props.fallback || (
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
           <div className="text-center p-8">
-            <div className="text-6xl mb-4">⚠️</div>
+            <div className="text-6xl mb-4">📰</div>
             <h1 className="text-2xl font-bold text-gray-900 mb-4">
-              Something went wrong
+              An unexpected error occurred
             </h1>
             <p className="text-gray-600 mb-6">
-              We&apos;re sorry, but something unexpected happened. Please try refreshing the page.
+              Sorry, something went wrong while browsing the news. Please try refreshing the page, go to the homepage, or browse another section.
             </p>
-            <button
-              onClick={this.handleRefresh}
-              className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors"
-            >
-              Refresh Page
-            </button>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center mb-4">
+              <button
+                onClick={this.handleRefresh}
+                className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors font-bold"
+              >
+                Refresh Page
+              </button>
+              <Link href="/" className="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg hover:bg-gray-300 transition-colors font-bold">
+                Go to Homepage
+              </Link>
+            </div>
             {process.env.NODE_ENV === 'development' && this.state.error !== null && (
               <details className="mt-6 text-left">
                 <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700">

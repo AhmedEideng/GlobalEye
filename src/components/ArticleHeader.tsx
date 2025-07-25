@@ -2,21 +2,33 @@ import React from 'react';
 import Head from 'next/head';
 import { NewsArticle } from '@utils/fetchNews';
 import { useAuth } from '@hooks/useAuth';
-import { isFavorite } from '@services/favorites';
+import { addFavorite, removeFavorite, isFavorite } from '@services/favorites';
 import { sanitizeText, sanitizeJsonLd } from '../utils/sanitizeText';
 import SafeText from './SafeText';
 import { getImageUrl } from '@utils/fetchNews';
 import OptimizedImage from './OptimizedImage';
+import { useRouter } from 'next/navigation';
+import { trackEvent } from '@/utils/analytics';
 
-function ArticleTitleSection({ title, description }: { title: string; description: string }) {
+function ArticleTitleSection({ title, description, isFav, onToggleFavorite, favLoading }: { title: string; description: string; isFav: boolean; onToggleFavorite: () => void; favLoading: boolean }) {
   return (
-    <div className="mb-4">
-      <h1 className="article-title text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 text-gray-900 leading-tight break-words text-balance">
+    <div className="mb-4 flex items-start gap-2">
+      <h1 className="article-title text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 text-gray-900 leading-tight break-words text-balance flex-1">
         <SafeText>{title}</SafeText>
       </h1>
-      <p className="article-description text-lg sm:text-xl text-gray-700 mb-6 font-medium break-words text-balance">
-        <SafeText>{description}</SafeText>
-      </p>
+      <button
+        type="button"
+        className="mt-1 bg-white/80 rounded-full p-2 shadow hover:bg-yellow-100 transition"
+        title={isFav ? 'Remove from favorites' : 'Add to favorites'}
+        onClick={onToggleFavorite}
+        disabled={favLoading}
+      >
+        {isFav ? (
+          <span role="img" aria-label="favorite">⭐</span>
+        ) : (
+          <span role="img" aria-label="not favorite">☆</span>
+        )}
+      </button>
     </div>
   );
 }
@@ -60,6 +72,10 @@ function ArticleMetaSection({ formattedDate, author, sourceName }: { formattedDa
 
 export default function ArticleHeader({ article }: { article: NewsArticle }) {
   const { user } = useAuth();
+  const router = useRouter();
+  const [isFav, setIsFav] = React.useState(false);
+  const [favLoading, setFavLoading] = React.useState(false);
+  const [toast, setToast] = React.useState<{ msg: string; key: number } | null>(null);
 
   // Memoize date formatting to avoid creating new Date objects on every render
   const formattedDate = React.useMemo(() => {
@@ -72,20 +88,33 @@ export default function ArticleHeader({ article }: { article: NewsArticle }) {
 
   React.useEffect(() => {
     if (user) {
-      const checkFavorite = async () => {
-        try {
-          await isFavorite(user.id, article.slug);
-        } catch (error) {
-          // Silently handle error for favorite check
-          if (process.env.NODE_ENV === 'development') {
-            // eslint-disable-next-line no-console
-            console.debug('Failed to check favorite status:', error);
-          }
-        }
-      };
-      checkFavorite().catch(() => {});
+      isFavorite(user.id, article.slug).then(setIsFav);
+    } else {
+      setIsFav(false);
     }
-  }, [user, article.slug]);
+    // Track view_article event
+    trackEvent('view_article', { slug: article.slug, title: article.title, category: article.category });
+  }, [user, article.slug, article.category, article.title]);
+
+  const handleToggleFavorite = async () => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+    setFavLoading(true);
+    if (isFav) {
+      await removeFavorite(user.id, article.slug);
+      setIsFav(false);
+      setToast({ msg: 'Removed from favorites', key: Date.now() });
+      trackEvent('remove_from_favorites', { slug: article.slug, title: article.title, category: article.category });
+    } else {
+      await addFavorite(user.id, article.slug);
+      setIsFav(true);
+      setToast({ msg: 'Added to favorites', key: Date.now() });
+      trackEvent('add_to_favorites', { slug: article.slug, title: article.title, category: article.category });
+    }
+    setFavLoading(false);
+  };
 
   // Generate structured data (JSON-LD)
   const jsonLd = {
@@ -110,6 +139,11 @@ export default function ArticleHeader({ article }: { article: NewsArticle }) {
 
   return (
     <>
+      {toast && (
+        <div key={toast.key} className="fixed bottom-6 right-6 bg-gray-900 text-white px-4 py-2 rounded shadow-lg z-50 animate-fade-in">
+          {toast.msg}
+        </div>
+      )}
       <Head>
         {/* skipcq: JS-0440 - Usage of dangerouslySetInnerHTML is required for SEO JSON-LD and is sanitized. */}
         <script
@@ -121,7 +155,7 @@ export default function ArticleHeader({ article }: { article: NewsArticle }) {
       </Head>
       <header className="article-header mb-8">
         <div className="max-w-4xl mx-auto">
-          <ArticleTitleSection title={article.title ?? ''} description={article.description ?? ''} />
+          <ArticleTitleSection title={article.title ?? ''} description={article.description ?? ''} isFav={isFav} onToggleFavorite={handleToggleFavorite} favLoading={favLoading} />
           {article.image_url && article.image_url.trim() && (
             <ArticleImageSection image_url={article.image_url} title={article.title} />
           )}

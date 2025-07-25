@@ -36,7 +36,7 @@ export default function FavoritesPage() {
       try {
         setFavLoading(true);
         const slugs = await getFavorites(user.id);
-        // جلب تفاصيل الأخبار المفضلة حسب slug
+        // Fetch news details based on slug
         const allNews = await fetchNews();
         setArticles(allNews.filter((a: NewsArticle) => slugs.includes(a.slug)));
         sendAnalyticsEvent('favorites_view', { userId: user.id });

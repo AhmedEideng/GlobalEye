@@ -30,6 +30,7 @@ export default function Footer() {
             <Link href="/about" className="hover:text-red-500 transition-colors">About Us</Link>
             <Link href="/about/team" className="hover:text-red-500 transition-colors">Our Editorial Team</Link>
             <Link href="/privacy" className="hover:text-red-500 transition-colors">Privacy Policy</Link>
+            <Link href="/cookies" className="hover:text-red-500 transition-colors">Cookies Policy</Link>
             <Link href="/terms-and-conditions" className="hover:text-red-500 transition-colors">Terms and Conditions</Link>
             <Link href="/contact-us" className="hover:text-red-500 transition-colors">Contact Us</Link>
           </div>

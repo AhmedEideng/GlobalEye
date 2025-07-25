@@ -1,6 +1,7 @@
 "use client";
 import { usePathname } from 'next/navigation';
 import Script from 'next/script';
+import Head from 'next/head';
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
@@ -11,7 +12,7 @@ export default function ClientLangHead() {
   const hrefAr = `https://globaleye.live/ar${pathname.replace(/^\/ar/, '')}`;
 
   return (
-    <>
+    <Head>
       <link rel="alternate" hrefLang="en" href={hrefEn} />
       <link rel="alternate" hrefLang="ar" href={hrefAr} />
       <link rel="canonical" href={canonical} />
@@ -31,6 +32,6 @@ export default function ClientLangHead() {
           </Script>
         </>
       )}
-    </>
+    </Head>
   );
 } 

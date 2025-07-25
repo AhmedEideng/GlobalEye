@@ -145,7 +145,7 @@ export async function GET(req: NextRequest) {
       status: 200,
       headers: {
         'Content-Type': outContentType,
-        'Cache-Control': 'public, max-age=86400',
+        'Cache-Control': 'public, max-age=604800, immutable',
         'X-Content-Type-Options': 'nosniff',
         'X-Frame-Options': 'DENY',
       },

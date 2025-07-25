@@ -45,7 +45,7 @@ const newsCache = new LRUCache<string, NewsArticle[]>({
 
 /**
  * تحديث يدوي للأخبار (تفريغ الكاش وجلب جديد)
- * @param category - الفئة (افتراضي: 'general')
+ * @param category - the category (default: 'general')
  * @returns Promise<NewsArticle[]>
  */
 export async function forceRefreshNews(category = 'general') {
@@ -55,9 +55,9 @@ export async function forceRefreshNews(category = 'general') {
 
 /**
  * جلب الأخبار من قاعدة البيانات حسب الفئة
- * @param category - الفئة (افتراضي: 'general')
- * @param limit - عدد المقالات (افتراضي: 50)
- * @param offset - عدد المقالات اللي هتتخطاها (افتراضي: 0)
+ * @param category - the category (default: 'general')
+ * @param limit - number of articles (default: 50)
+ * @param offset - number of articles to skip (default: 0)
  * @returns Promise<NewsArticle[]>
  */
 export async function fetchNews(category = 'general', limit = 50, offset = 0): Promise<NewsArticle[]> {
@@ -145,8 +145,8 @@ export function detectCategory(article: NewsArticle): string {
 
 /**
  * جلب الأخبار المرتبطة من نفس الفئة
- * @param currentArticle - المقال الحالي
- * @param category - الفئة
+ * @param currentArticle - the current article
+ * @param category - the category
  * @returns Promise<NewsArticle[]>
  */
 export async function fetchRelatedNews(currentArticle: NewsArticle, category = 'general'): Promise<NewsArticle[]> {
@@ -161,41 +161,8 @@ export async function fetchRelatedNews(currentArticle: NewsArticle, category = '
 }
 
 /**
- * دالة تصحيح لفحص محتويات قاعدة البيانات
- */
-export async function debugDatabaseContents() {
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseKey) {
-    throw new Error('SUPABASE_URL or SUPABASE_ANON_KEY is not set');
-  }
-
-  const supabase = createClient(supabaseUrl, supabaseKey);
-
-  try {
-    const { data, error } = await supabase
-      .from('news')
-      .select('title, slug, category')
-      .order('published_at', { ascending: false })
-      .limit(10);
-
-    if (error) {
-      console.error('Debug error:', error.message);
-      return;
-    }
-
-    data?.forEach(article => {
-      console.log('Article:', article);
-    });
-  } catch {
-    console.error('Failed to debug database contents');
-  }
-}
-
-/**
  * جلب مقال بناءً على slug
- * @param slug - معرف المقال
+ * @param slug - article identifier
  * @returns Promise<NewsArticle | null>
  */
 export async function getArticleBySlug(slug: string): Promise<NewsArticle | null> {

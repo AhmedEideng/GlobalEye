@@ -2,12 +2,14 @@
 import Link from 'next/link';
 import { FaNewspaper, FaSync } from 'react-icons/fa';
 import { useBreakingNews, BreakingNewsItem } from '@hooks/useBreakingNews';
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import React from 'react';
 
 export default function BreakingNewsTicker({ showTicker = true }: { showTicker?: boolean }) {
   const { news, loading, error, refreshNews } = useBreakingNews();
   const [scrollPosition, setScrollPosition] = useState(0);
+  const [hasNew, setHasNew] = useState(false);
+  const prevNewsCount = useRef(0);
 
   // Memoize animation speed and max scroll calculation
   const animationConfig = useMemo(() => ({
@@ -31,9 +33,23 @@ export default function BreakingNewsTicker({ showTicker = true }: { showTicker?:
     return () => clearInterval(interval);
   }, [news.length, animationConfig]);
 
+  useEffect(() => {
+    if (news.length > prevNewsCount.current) {
+      setHasNew(true);
+      setTimeout(() => setHasNew(false), 4000);
+    }
+    prevNewsCount.current = news.length;
+  }, [news.length]);
+
   const handleRetry = useCallback(() => {
     refreshNews();
   }, [refreshNews]);
+
+  const handleTickerClick = () => {
+    if (news.length > 0) {
+      window.location.href = news[0].url;
+    }
+  };
 
   // Memoize ticker items to prevent unnecessary re-renders
   const tickerItems = useMemo(() => {
@@ -115,7 +131,11 @@ export default function BreakingNewsTicker({ showTicker = true }: { showTicker?:
   if (!showTicker) return null;
 
   return (
-    <div className="breaking-news-ticker bg-red-800 text-white w-full overflow-hidden fixed left-0 top-12 md:top-16 z-30">
+    <div
+      className={`breaking-news-ticker bg-red-800 text-white w-full overflow-hidden fixed left-0 top-12 md:top-16 z-30 transition-all duration-500 ${hasNew ? 'animate-pulse ring-4 ring-yellow-300' : ''}`}
+      onClick={handleTickerClick}
+      style={{ cursor: news.length > 0 ? 'pointer' : 'default' }}
+    >
       <div className="ticker-container flex items-center py-2 px-4">
         {/* Breaking News Label */}
         <div className="breaking-label flex items-center gap-2 mr-4 flex-shrink-0">
@@ -123,14 +143,20 @@ export default function BreakingNewsTicker({ showTicker = true }: { showTicker?:
           <span className="breaking-label-text font-bold text-sm uppercase tracking-wider">
             Breaking News
           </span>
+          {news.length > 1 && (
+            <span className="ml-2 bg-yellow-300 text-red-800 rounded-full px-2 py-0.5 text-xs font-bold animate-bounce">
+              {news.length}
+            </span>
+          )}
+          {hasNew && (
+            <span className="ml-2 text-yellow-200 font-bold animate-bounce">New Breaking News!</span>
+          )}
         </div>
-
         {/* Ticker Content */}
         <div className="ticker-content flex-1 overflow-hidden">
           {tickerContent}
         </div>
       </div>
-
       {/* Gradient overlay for smooth edges */}
       <div className="absolute top-0 right-0 w-8 h-full bg-gradient-to-l from-red-800 to-transparent pointer-events-none" />
       <div className="absolute top-0 left-0 w-8 h-full bg-gradient-to-r from-red-800 to-transparent pointer-events-none" />

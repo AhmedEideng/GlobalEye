@@ -8,6 +8,10 @@ import HomeFeatured from '@components/HomeFeatured';
 import HomeNewsGrid from '@components/HomeNewsGrid';
 import { NewsArticle, formatDate, getImageUrl } from '@utils/fetchNews';
 import SafeText from '@components/SafeText';
+import { useAuth } from '@hooks/useAuth';
+import { useRouter } from 'next/navigation';
+import { isFavorite, addFavorite, removeFavorite } from '@/services/favorites';
+import { trackEvent } from '@/utils/analytics';
 
 // Professional error logger for category client
 function logCategoryError(...args: unknown[]) {
@@ -25,7 +29,8 @@ interface Article {
   image_url: string | null;
   published_at: string;
   source: { name: string };
-  category?: string;
+  category?: string; // category name/label
+  category_id?: number | null; // category numeric id
   slug: string;
   author?: string | null;
 }
@@ -48,6 +53,69 @@ interface CategoryClientProps {
   initialSuggested?: NewsArticle[];
 }
 
+// Move helpers outside the component
+function toArticle(newsArticle: NewsArticle): Article {
+  const hasCategoryId = (obj: unknown): obj is { category_id: number } =>
+    typeof (obj as { category_id?: unknown }).category_id === 'number';
+  return {
+    title: newsArticle.title,
+    description: newsArticle.description,
+    url: newsArticle.url,
+    image_url: newsArticle.image_url,
+    published_at: newsArticle.published_at,
+    source: { name: newsArticle.source?.name || '' },
+    category: newsArticle.category,
+    category_id: hasCategoryId(newsArticle) ? newsArticle.category_id : null,
+    slug: newsArticle.slug,
+    author: newsArticle.author
+  };
+}
+
+function renderSuggestedArticle(article: Article, idx: number, favStates: Record<string, boolean>, favLoading: string | null, handleToggleFavorite: (slug: string) => void): React.ReactNode {
+  const formattedDate = formatDate(article.published_at);
+  return (
+    <React.Fragment key={article.slug || idx}>
+      <Link
+        href={`/article/${article.slug}`}
+        className="article-card group transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl rounded-xl bg-white shadow-md overflow-hidden relative"
+        onClick={() => trackEvent('view_article', { slug: article.slug, title: article.title, category: article.category })}
+      >
+        <div className="relative w-full h-48 overflow-hidden">
+          <OptimizedImage
+            src={getImageUrl(article.image_url)}
+            alt={article.title}
+            fill
+            className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+          />
+          {/* Favorite button */}
+          <button
+            type="button"
+            className="absolute top-2 right-2 z-10 bg-white/80 rounded-full p-2 shadow hover:bg-yellow-100 transition-opacity opacity-0 group-hover:opacity-100"
+            title={favStates[article.slug] ? 'Remove from favorites' : 'Add to favorites'}
+            onClick={e => { e.preventDefault(); e.stopPropagation(); handleToggleFavorite(article.slug); }}
+            disabled={favLoading === article.slug}
+          >
+            {favStates[article.slug] ? (
+              <span role="img" aria-label="favorite">⭐</span>
+            ) : (
+              <span role="img" aria-label="not favorite">☆</span>
+            )}
+          </button>
+        </div>
+        <div className="p-4">
+          <div className="article-category text-xs font-bold mb-1 bg-red-600 text-white rounded-full px-3 py-1 inline-block"><SafeText fallback="Unknown Source">{article.source?.name}</SafeText></div>
+          <h3 className="article-title text-lg font-bold mb-2 line-clamp-2 group-hover:text-red-700 transition-colors duration-200"><SafeText fallback="Untitled">{article.title}</SafeText></h3>
+          <p className="article-excerpt text-gray-600 text-sm mb-2 line-clamp-2"><SafeText fallback="No description available">{article.description}</SafeText></p>
+          <div className="article-meta text-xs flex flex-wrap gap-2 text-gray-400">
+            <span className="flex items-center gap-1 text-gray-400">{formattedDate}</span>
+            {article.author && <span>by <SafeText fallback="Unknown Author">{article.author}</SafeText></span>}
+          </div>
+        </div>
+      </Link>
+    </React.Fragment>
+  );
+}
+
 export default function CategoryClient({ 
   category, 
   initialFeatured, 
@@ -61,21 +129,14 @@ export default function CategoryClient({
   const [loading, setLoading] = React.useState(false);
   const [timeout, setTimeoutReached] = React.useState(false);
   const [lastRotation, setLastRotation] = React.useState<number>(Date.now());
-
-  // Convert NewsArticle to Article interface
-  function toArticle(newsArticle: NewsArticle): Article {
-    return {
-      title: newsArticle.title,
-      description: newsArticle.description,
-      url: newsArticle.url,
-      image_url: newsArticle.image_url,
-      published_at: newsArticle.published_at,
-      source: { name: newsArticle.source?.name || '' },
-      category: newsArticle.category,
-      slug: newsArticle.slug,
-      author: newsArticle.author
-    };
-  }
+  const [hasNewNews, setHasNewNews] = React.useState(false);
+  const pendingArticlesRef = React.useRef<Article[]>([]);
+  const latestSlugRef = React.useRef<string>(articles[0]?.slug || "");
+  const { user } = useAuth();
+  const router = useRouter();
+  const [favStates, setFavStates] = React.useState<Record<string, boolean>>({});
+  const [favLoading, setFavLoading] = React.useState<string | null>(null);
+  const [toast, setToast] = React.useState<{ msg: string; key: number } | null>(null);
 
   // Function to fetch rotated news
   const fetchRotatedNews = React.useCallback(async () => {
@@ -115,6 +176,39 @@ export default function CategoryClient({
       setLoading(false);
     }
   }, [category]);
+
+  // تحديث تلقائي كل دقيقة (Polling)
+  React.useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        const response = await fetch(`/api/news-rotation?category=${category}`, {
+          cache: 'no-store',
+          headers: { 'Accept': 'application/json' },
+        });
+        if (!response.ok) return;
+        const data = await response.json();
+        if (data.success && data.data) {
+          const newArticles = data.data.mainArticles?.map(toArticle) || [];
+          const newFirstSlug = newArticles[0]?.slug;
+          if (newFirstSlug && latestSlugRef.current && newFirstSlug !== latestSlugRef.current) {
+            pendingArticlesRef.current = newArticles;
+            setHasNewNews(true);
+          }
+        }
+      } catch (error) {
+        // if (process.env.NODE_ENV === 'development') {
+        //   console.error(error);
+        // }
+      }
+    }, 60000);
+    return () => clearInterval(interval);
+  }, [category]);
+
+  const handleShowNewNews = () => {
+    setArticles([...pendingArticlesRef.current]);
+    latestSlugRef.current = pendingArticlesRef.current[0]?.slug || "";
+    setHasNewNews(false);
+  };
 
   React.useEffect(() => {
     const t = setTimeout(() => setTimeoutReached(true), 5000);
@@ -171,37 +265,41 @@ export default function CategoryClient({
   const mainNews = mainArticles.map(toNewsArticle);
   const suggestedNews = suggested.map(toNewsArticle);
 
-  const renderSuggestedArticle = React.useCallback((article: Article, idx: number) => {
-    // Format date outside of the callback to avoid hooks rules violation
-    const formattedDate = formatDate(article.published_at);
+  React.useEffect(() => {
+    if (!user) {
+      setFavStates({});
+      return;
+    }
+    (async () => {
+      const favs: Record<string, boolean> = {};
+      for (const article of [...mainNews, ...suggestedNews]) {
+        favs[article.slug] = await isFavorite(user.id, article.slug);
+      }
+      setFavStates(favs);
+    })();
+    // Track view_category event
+    trackEvent('view_category', { category });
+  }, [user, mainNews, suggestedNews, category]);
 
-    return (
-      <React.Fragment key={article.slug || idx}>
-        <Link
-          href={`/article/${article.slug}`}
-          className="article-card group transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl rounded-xl bg-white shadow-md overflow-hidden"
-        >
-          <div className="relative w-full h-48 overflow-hidden">
-            <OptimizedImage
-              src={getImageUrl(article.image_url)}
-              alt={article.title}
-              fill
-              className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-            />
-          </div>
-          <div className="p-4">
-            <div className="article-category text-xs font-bold mb-1 bg-red-600 text-white rounded-full px-3 py-1 inline-block"><SafeText fallback="Unknown Source">{article.source?.name}</SafeText></div>
-            <h3 className="article-title text-lg font-bold mb-2 line-clamp-2 group-hover:text-red-700 transition-colors duration-200"><SafeText fallback="Untitled">{article.title}</SafeText></h3>
-            <p className="article-excerpt text-gray-600 text-sm mb-2 line-clamp-2"><SafeText fallback="No description available">{article.description}</SafeText></p>
-            <div className="article-meta text-xs flex flex-wrap gap-2 text-gray-400">
-              <span className="flex items-center gap-1 text-gray-400">{formattedDate}</span>
-              {article.author && <span>by <SafeText fallback="Unknown Author">{article.author}</SafeText></span>}
-            </div>
-          </div>
-        </Link>
-      </React.Fragment>
-    );
-  }, []);
+  const handleToggleFavorite = React.useCallback(async (slug: string) => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+    setFavLoading(slug);
+    if (favStates[slug]) {
+      await removeFavorite(user.id, slug);
+      setFavStates((prev) => ({ ...prev, [slug]: false }));
+      setToast({ msg: 'Removed from favorites', key: Date.now() });
+      trackEvent('remove_from_favorites', { slug });
+    } else {
+      await addFavorite(user.id, slug);
+      setFavStates((prev) => ({ ...prev, [slug]: true }));
+      setToast({ msg: 'Added to favorites', key: Date.now() });
+      trackEvent('add_to_favorites', { slug });
+    }
+    setFavLoading(null);
+  }, [user, favStates, router]);
 
   const handleRefresh = React.useCallback(() => {
     window.location.reload();
@@ -246,6 +344,17 @@ export default function CategoryClient({
 
   return (
     <div className="category-page max-w-screen-xl mx-auto px-2 sm:px-4">
+      {toast && (
+        <div key={toast.key} className="fixed bottom-6 right-6 bg-gray-900 text-white px-4 py-2 rounded shadow-lg z-50 animate-fade-in">
+          {toast.msg}
+        </div>
+      )}
+      {hasNewNews && (
+        <div className="bg-yellow-100 border-b border-yellow-300 text-yellow-900 px-4 py-2 text-center cursor-pointer sticky top-0 z-50 flex items-center justify-center gap-2 animate-fade-in">
+          <span>🟡 New articles are available</span>
+          <button onClick={handleShowNewNews} className="bg-yellow-300 hover:bg-yellow-400 text-yellow-900 font-bold px-3 py-1 rounded transition ml-2">Refresh now</button>
+        </div>
+      )}
       <div className="category-header text-center mb-6">
         <h1
           className="category-title text-3xl sm:text-4xl md:text-6xl font-extrabold mb-2 tracking-tight text-red-700 break-words"
@@ -276,7 +385,7 @@ export default function CategoryClient({
             <p className="text-gray-500 text-base border-b pb-2">More news you might like</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {suggestedNews.map(renderSuggestedArticle)}
+            {suggestedNews.map((article, idx) => renderSuggestedArticle(article, idx, favStates, favLoading, handleToggleFavorite))}
           </div>
         </section>
       ) : (

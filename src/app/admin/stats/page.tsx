@@ -16,7 +16,7 @@ interface NewsArticleWithSourceName extends NewsArticle {
   source_name?: string;
 }
 
-// قائمة إيميلات المشرفين المسموح لهم
+// List of authorized admin emails
 const ADMINS = ['nadianow120@gmail.com', 'ahmed3id333@gmail.com'];
 
 export default function AdminStatsPage() {
@@ -49,10 +49,10 @@ export default function AdminStatsPage() {
         return;
       }
 
-      // عدد المقالات المدمجة
+      // Number of merged articles
       const articlesCount = data.length;
       
-      // عدد المصادر المستخدمة
+      // Number of used sources
       const sourcesSet = new Set<string>();
       (data as NewsArticleWithSourceName[]).forEach((article) => {
         let names: string[] = [];
@@ -65,7 +65,7 @@ export default function AdminStatsPage() {
       });
       const sourcesCount = sourcesSet.size;
       
-      // عدد الفقرات المكررة المحذوفة
+      // Number of duplicate paragraphs removed
       let totalParagraphs = 0;
       let totalUniqueParagraphs = 0;
       const categoryCounts: Record<string, number> = {};
@@ -77,10 +77,10 @@ export default function AdminStatsPage() {
         const mainContent = match ? content.slice(0, match.index || 0) : content;
         const paragraphs = mainContent.split(/\n+/).map((p: string) => p.trim()).filter(Boolean);
         totalUniqueParagraphs += paragraphs.length;
-        // نفترض أن كل مقال مدمج كان يحتوي على 2.5 مصدر في المتوسط
+        // We assume each merged article had an average of 2.5 sources
         totalParagraphs += Math.round(paragraphs.length * 2.5);
         
-        // حساب التصنيفات
+        // Calculate categories
         categoryCounts[article.category] = (categoryCounts[article.category] || 0) + 1;
       });
       
@@ -111,7 +111,7 @@ export default function AdminStatsPage() {
   }, [user]);
 
   if (authLoading) {
-    return <div className="max-w-2xl mx-auto py-10 px-4">جاري التحقق من الصلاحيات...</div>;
+    return <div className="max-w-2xl mx-auto py-10 px-4">Checking permissions...</div>;
   }
 
   if (!isAuthorized) {
@@ -120,13 +120,13 @@ export default function AdminStatsPage() {
         <Head>
           <meta name="robots" content="noindex, nofollow" />
         </Head>
-        <div className="text-red-600 font-bold mb-4">غير مصرح لك بالوصول لهذه الصفحة.</div>
+        <div className="text-red-600 font-bold mb-4">You are not authorized to access this page.</div>
         {!user && (
           <button 
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors" 
             onClick={signInWithGoogle}
           >
-            تسجيل الدخول كمشرف
+            Sign in as Admin
           </button>
         )}
       </div>
@@ -138,34 +138,34 @@ export default function AdminStatsPage() {
       <Head>
         <meta name="robots" content="noindex, nofollow" />
       </Head>
-      <h1 className="text-3xl font-bold mb-6">إحصائيات جودة الدمج</h1>
+      <h1 className="text-3xl font-bold mb-6">Merge Quality Statistics</h1>
       
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          <strong>خطأ:</strong> {error}
+          <strong>Error:</strong> {error}
           <button 
             onClick={fetchStats}
             className="ml-4 text-red-800 underline hover:no-underline"
           >
-            إعادة المحاولة
+            Retry
           </button>
         </div>
       )}
       
       {loading ? (
-        <div className="text-center py-8">جاري التحميل...</div>
+        <div className="text-center py-8">Loading...</div>
       ) : !stats ? (
-        <div className="text-center py-8">لا توجد بيانات.</div>
+        <div className="text-center py-8">No data available.</div>
       ) : (
         <div className="space-y-4">
           <div className="bg-white p-4 rounded-lg shadow">
-            <div className="text-lg font-semibold mb-2">عدد المقالات المدمجة: <span className="text-blue-600">{stats.articlesCount}</span></div>
-            <div className="text-lg font-semibold mb-2">عدد المصادر المستخدمة: <span className="text-green-600">{stats.sourcesCount}</span></div>
-            <div className="text-lg font-semibold mb-2">عدد الفقرات المكررة التي تم حذفها (تقديري): <span className="text-orange-600">{stats.removedParagraphs}</span></div>
+            <div className="text-lg font-semibold mb-2">Number of merged articles: <span className="text-blue-600">{stats.articlesCount}</span></div>
+            <div className="text-lg font-semibold mb-2">Number of used sources: <span className="text-green-600">{stats.sourcesCount}</span></div>
+            <div className="text-lg font-semibold mb-2">Number of duplicate paragraphs removed (estimated): <span className="text-orange-600">{stats.removedParagraphs}</span></div>
           </div>
           
           <div className="bg-white p-4 rounded-lg shadow">
-            <h3 className="text-lg font-semibold mb-3">أكثر التصنيفات تكرارًا:</h3>
+            <h3 className="text-lg font-semibold mb-3">Most frequent categories:</h3>
             <ul className="list-disc pl-6 space-y-1">
               {stats.topCategories.map(renderCategory)}
             </ul>

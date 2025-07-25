@@ -1,5 +1,4 @@
 import { fetchNews, NewsArticle } from '@utils/fetchNews';
-// import { logSnagEvent } from '@utils/logsnag'; // تم الحذف لأنه غير مستخدم
 
 // Professional error logger for category server
 function logCategoryServerError(...args: unknown[]) {

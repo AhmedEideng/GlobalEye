@@ -1,19 +1,17 @@
+import { supabase } from '@utils/supabaseClient';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
   const baseUrl = 'https://globaleye.live';
 
-  // Categories
-  const categories = [
-    'world',
-    'politics', 
-    'business',
-    'technology',
-    'sports',
-    'entertainment',
-    'health',
-    'science'
-  ];
+  // Get all categories from database
+  const { data: categories, error } = await supabase
+    .from('categories')
+    .select('slug');
+
+  if (error) {
+    return new NextResponse('Error fetching categories', { status: 500 });
+  }
 
   // Build sitemap index
   const sitemapIndex = `<?xml version="1.0" encoding="UTF-8"?>
@@ -23,17 +21,15 @@ export async function GET() {
         <loc>${baseUrl}/sitemap-static.xml</loc>
         <lastmod>${new Date().toISOString()}</lastmod>
       </sitemap>
-      
       <!-- Category pages sitemap -->
       <sitemap>
         <loc>${baseUrl}/sitemap-categories.xml</loc>
         <lastmod>${new Date().toISOString()}</lastmod>
       </sitemap>
-      
       <!-- Articles sitemaps by category -->
-      ${categories.map(category => `
+      ${(categories as { slug: string }[] | null)?.map(cat => `
         <sitemap>
-          <loc>${baseUrl}/sitemap-articles-${category}.xml</loc>
+          <loc>${baseUrl}/sitemap-articles-${cat.slug}.xml</loc>
           <lastmod>${new Date().toISOString()}</lastmod>
         </sitemap>
       `).join('')}

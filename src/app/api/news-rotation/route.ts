@@ -6,7 +6,32 @@ import { measureAsyncOperation } from '@/utils/performanceMonitor';
 // جعل المسار ديناميكي لتجنب التنفيذ أثناء البناء
 export const dynamic = 'force-dynamic';
 
+// Rate limiting cache
+const rateLimitCache = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
+const MAX_REQUESTS = 60; // Max 60 requests per minute
+
+function checkRateLimit(identifier: string): boolean {
+  const now = Date.now();
+  const record = rateLimitCache.get(identifier);
+  if (!record || now > record.resetTime) {
+    rateLimitCache.set(identifier, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return true;
+  }
+  if (record.count >= MAX_REQUESTS) {
+    return false;
+  }
+  record.count++;
+  return true;
+}
+
 export async function GET(request: NextRequest) {
+  // Rate limiting by IP
+  const clientIP = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+  if (!checkRateLimit(clientIP)) {
+    return NextResponse.json({ error: 'Rate limit exceeded. Please try again later.' }, { status: 429 });
+  }
+
   return measureAsyncOperation(
     'news-rotation-api',
     async () => {
@@ -51,6 +76,10 @@ export async function GET(request: NextRequest) {
           category,
           count: rotatedNews.length,
           timestamp: new Date().toISOString()
+        }, {
+          headers: {
+            'Cache-Control': 'public, max-age=60, stale-while-revalidate=300'
+          }
         });
 
       } catch (error) {

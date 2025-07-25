@@ -13,9 +13,7 @@ export default function ContactPage() {
     setStatus('sending');
     setError('');
     const form = e.currentTarget;
-    // يمكنك هنا إرسال البيانات إلى API أو بريد إلكتروني
     try {
-      // مثال: انتظار 1 ثانية لمحاكاة الإرسال
       await new Promise((res) => setTimeout(res, 1000));
       setStatus('success');
       form.reset();

@@ -140,6 +140,15 @@ export default function Navbar({ isMenuOpen, setIsMenuOpen, style }: NavbarProps
                 </li>
                 <li>
                   <Link
+                    href="/cookies"
+                    className="mobile-nav-link px-4 py-3 font-medium transition-colors duration-200 rounded-lg text-gray-700 hover:text-red-600 hover:bg-gray-50"
+                    onClick={handleMenuClose}
+                  >
+                    Cookies Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     href="/terms-and-conditions"
                     className="mobile-nav-link px-4 py-3 font-medium transition-colors duration-200 rounded-lg text-gray-700 hover:text-red-600 hover:bg-gray-50"
                     onClick={handleMenuClose}
