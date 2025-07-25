@@ -1,7 +1,7 @@
 import { getArticleBySlug, NewsArticle } from '@utils/fetchNews';
 import ArticleClient from './ArticleClient';
 import ArticleJsonLdHead from './ArticleJsonLdHead';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 
 export const revalidate = 120;
 

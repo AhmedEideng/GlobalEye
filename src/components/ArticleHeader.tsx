@@ -10,7 +10,7 @@ import OptimizedImage from './OptimizedImage';
 import { useRouter } from 'next/navigation';
 import { trackEvent } from '@/utils/analytics';
 
-function ArticleTitleSection({ title, description, isFav, onToggleFavorite, favLoading }: { title: string; description: string; isFav: boolean; onToggleFavorite: () => void; favLoading: boolean }) {
+function ArticleTitleSection({ title, description: _description, isFav, onToggleFavorite, favLoading }: { title: string; description: string; isFav: boolean; onToggleFavorite: () => void; favLoading: boolean }) {
   return (
     <div className="mb-4 flex items-start gap-2">
       <h1 className="article-title text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 text-gray-900 leading-tight break-words text-balance flex-1">
@@ -70,7 +70,11 @@ function ArticleMetaSection({ formattedDate, author, sourceName }: { formattedDa
   );
 }
 
-export default function ArticleHeader({ article }: { article: NewsArticle }) {
+export interface ArticleHeaderProps {
+  article: NewsArticle;
+}
+
+export default function ArticleHeader({ article }: ArticleHeaderProps) {
   const { user } = useAuth();
   const router = useRouter();
   const [isFav, setIsFav] = React.useState(false);

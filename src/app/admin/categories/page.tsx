@@ -36,12 +36,12 @@ export default function AdminCategoriesPage() {
     if (user && user.is_admin) fetchCategories();
   }, [user]);
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: number) => {
     if (!window.confirm('Are you sure you want to delete this category?')) return;
     try {
       const { error } = await supabase.from('categories').delete().eq('id', id);
       if (error) throw error;
-      setCategories((prev) => (prev as Category[]).filter((c) => (c as Category).id !== id));
+      setCategories((prev) => prev.filter((c) => c.id !== id));
       setToast({ msg: 'Category deleted successfully!', key: Date.now() });
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -79,12 +79,12 @@ export default function AdminCategoriesPage() {
           </thead>
           <tbody className="bg-white divide-y divide-gray-100">
             {categories.map((cat) => (
-              <tr key={(cat as Category).id}>
-                <td className="px-4 py-3 font-medium text-gray-900 max-w-xs truncate">{(cat as Category).name}</td>
-                <td className="px-4 py-3 text-gray-700">{(cat as Category).slug}</td>
+              <tr key={cat.id}>
+                <td className="px-4 py-3 font-medium text-gray-900 max-w-xs truncate">{cat.name}</td>
+                <td className="px-4 py-3 text-gray-700">{cat.slug}</td>
                 <td className="px-4 py-3 flex gap-2">
-                  <Link href={`/admin/categories/edit/${(cat as Category).id}`} className="bg-yellow-400 hover:bg-yellow-500 text-white font-bold px-3 py-1 rounded transition">Edit</Link>
-                  <button onClick={() => handleDelete((cat as Category).id.toString())} className="bg-red-500 hover:bg-red-600 text-white font-bold px-3 py-1 rounded transition">Delete</button>
+                  <Link href={`/admin/categories/edit/${cat.id}`} className="bg-yellow-400 hover:bg-yellow-500 text-white font-bold px-3 py-1 rounded transition">Edit</Link>
+                  <button onClick={() => handleDelete(cat.id)} className="bg-red-500 hover:bg-red-600 text-white font-bold px-3 py-1 rounded transition">Delete</button>
                 </td>
               </tr>
             ))}

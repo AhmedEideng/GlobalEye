@@ -2,7 +2,7 @@
 import { useAuth } from '@hooks/useAuth';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { fetchNews } from '@/utils/fetchNews';
+
 import Link from 'next/link';
 import { supabase } from '@/utils/supabaseClient';
 
@@ -16,11 +16,12 @@ export interface News {
   published_at?: string | null;
   slug?: string | null;
   author?: string | null;
-  source?: string | null;
+  source_name?: string | null;
   category_id?: number | null;
   is_featured?: boolean | null;
   views_count?: number | null;
   created_at?: string | null;
+  categories?: { name: string };
 }
 
 export default function AdminNewsPage() {
@@ -39,8 +40,17 @@ export default function AdminNewsPage() {
   useEffect(() => {
     const fetchAllNews = async () => {
       setLoadingNews(true);
-      const articles = await fetchNews();
-      setNews(articles);
+      const { data: articles, error } = await supabase
+        .from('news')
+        .select('*, categories(name)')
+        .order('published_at', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching news:', error);
+        setNews([]);
+      } else {
+        setNews(articles || []);
+      }
       setLoadingNews(false);
     };
     if (user && user.is_admin) fetchAllNews();
@@ -51,7 +61,7 @@ export default function AdminNewsPage() {
     try {
       const { error } = await supabase.from('news').delete().eq('slug', slug);
       if (error) throw error;
-      setNews((prev) => (prev as News[]).filter((a) => (a as News).slug !== slug));
+      setNews((prev) => prev.filter((a) => a.slug !== slug));
       setToast({ msg: 'News deleted successfully!', key: Date.now() });
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -90,13 +100,13 @@ export default function AdminNewsPage() {
           </thead>
           <tbody className="bg-white divide-y divide-gray-100">
             {news.map((article) => (
-              <tr key={(article as News).slug}>
-                <td className="px-4 py-3 font-medium text-gray-900 max-w-xs truncate">{(article as News).title}</td>
-                <td className="px-4 py-3 text-gray-700">{(article as News).category_id}</td>
-                <td className="px-4 py-3 text-gray-500">{(article as News).published_at ? new Date((article as News).published_at).toLocaleDateString() : 'N/A'}</td>
+              <tr key={article.slug}>
+                <td className="px-4 py-3 font-medium text-gray-900 max-w-xs truncate">{article.title}</td>
+                <td className="px-4 py-3 text-gray-700">{article.categories?.name || 'N/A'}</td>
+                <td className="px-4 py-3 text-gray-500">{article.published_at ? new Date(article.published_at).toLocaleDateString() : 'N/A'}</td>
                 <td className="px-4 py-3 flex gap-2">
-                  <Link href={`/admin/news/edit/${(article as News).slug}`} className="bg-yellow-400 hover:bg-yellow-500 text-white font-bold px-3 py-1 rounded transition">Edit</Link>
-                  <button onClick={() => handleDelete((article as News).slug!)} className="bg-red-500 hover:bg-red-600 text-white font-bold px-3 py-1 rounded transition">Delete</button>
+                  <Link href={`/admin/news/edit/${article.slug}`} className="bg-yellow-400 hover:bg-yellow-500 text-white font-bold px-3 py-1 rounded transition">Edit</Link>
+                  <button onClick={() => handleDelete(article.slug!)} className="bg-red-500 hover:bg-red-600 text-white font-bold px-3 py-1 rounded transition">Delete</button>
                 </td>
               </tr>
             ))}

@@ -11,6 +11,7 @@ export interface User {
   name?: string | null;
   avatar_url?: string | null;
   created_at?: string | null;
+  is_admin?: boolean;
 }
 
 export default function AdminUsersPage() {
@@ -40,7 +41,7 @@ export default function AdminUsersPage() {
     try {
       const { error } = await supabase.from('users').update({ is_admin: !is_admin }).eq('id', id);
       if (error) throw error;
-      setUsers((prev) => prev.map((u) => (u as User).id === id ? { ...(u as User), is_admin: !is_admin } : u));
+      setUsers((prev) => prev.map((u) => u.id === id ? { ...u, is_admin: !is_admin } : u));
       setToast({ msg: 'Role updated successfully!', key: Date.now() });
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -56,7 +57,7 @@ export default function AdminUsersPage() {
     try {
       const { error } = await supabase.from('users').delete().eq('id', id);
       if (error) throw error;
-      setUsers((prev) => prev.filter((u) => (u as User).id !== id));
+      setUsers((prev) => prev.filter((u) => u.id !== id));
       setToast({ msg: 'User deleted successfully!', key: Date.now() });
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -97,7 +98,7 @@ export default function AdminUsersPage() {
                 <td className="px-4 py-3 text-gray-700">{u.name || '-'}</td>
                 <td className="px-4 py-3 text-gray-700">{u.is_admin ? 'Admin' : 'User'}</td>
                 <td className="px-4 py-3 flex gap-2">
-                  <button onClick={() => handleToggleRole(u.id, u.is_admin)} className="bg-yellow-400 hover:bg-yellow-500 text-white font-bold px-3 py-1 rounded transition">{(u as User).is_admin ? 'Revoke Admin' : 'Make Admin'}</button>
+                  <button onClick={() => handleToggleRole(u.id, u.is_admin || false)} className="bg-yellow-400 hover:bg-yellow-500 text-white font-bold px-3 py-1 rounded transition">{u.is_admin ? 'Revoke Admin' : 'Make Admin'}</button>
                   <button onClick={() => handleDelete(u.id)} className="bg-red-500 hover:bg-red-600 text-white font-bold px-3 py-1 rounded transition">Delete</button>
                 </td>
               </tr>

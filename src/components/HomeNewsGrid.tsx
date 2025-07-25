@@ -44,7 +44,7 @@ const HomeNewsGrid = React.memo(({ articles }: { articles: NewsArticle[] }) => {
     })();
   }, [user, articles]);
 
-  const handleToggleFavorite = async (slug: string) => {
+  const handleToggleFavorite = React.useCallback(async (slug: string) => {
     if (!user) {
       router.push('/login');
       return;
@@ -62,7 +62,7 @@ const HomeNewsGrid = React.memo(({ articles }: { articles: NewsArticle[] }) => {
       trackEvent('add_to_favorites', { slug });
     }
     setLoadingFav(null);
-  };
+  }, [user, router, favorites]);
 
   const renderArticle = React.useCallback((article: NewsArticle, idx: number) => {
     const imageSrc = getImageUrl(article.image_url);

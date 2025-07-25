@@ -168,8 +168,8 @@ export default function CategoryClient({
         // Track category visit when news rotates
         sendAnalyticsEvent('view_category', { category });
       }
-    } catch (error) {
-      logCategoryError('Failed to fetch rotated news:', error);
+    } catch {
+      logCategoryError('Failed to fetch rotated news');
       // Keep existing data if rotation fails
       // لا يوجد fallback لجلب من API خارجي بعد الآن
     } finally {
@@ -195,7 +195,7 @@ export default function CategoryClient({
             setHasNewNews(true);
           }
         }
-      } catch (error) {
+      } catch {
         // if (process.env.NODE_ENV === 'development') {
         //   console.error(error);
         // }

@@ -1,8 +1,4 @@
 {
-  "env": {
-    "browser": true,
-    "node": true
-  },
   "extends": [
     "next/core-web-vitals",
     "eslint:recommended",
@@ -11,7 +7,7 @@
   "rules": {
     "no-console": "warn",
     "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
-    "no-unused-vars": "off" // عطل no-unused-vars لملفات JavaScript
+    "no-unused-vars": "off"
   },
   "overrides": [
     {

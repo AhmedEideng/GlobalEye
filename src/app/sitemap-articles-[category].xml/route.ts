@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import { fetchNews } from '@utils/fetchNews';
 
-export async function GET(request: Request, { params }: { params: { category: string } }) {
+export async function GET(request: Request) {
   const baseUrl = 'https://globaleye.live';
-  const category = params.category;
+  const { searchParams } = new URL(request.url);
+  const category = searchParams.get('category') || '';
 
   try {
     const articles = await fetchNews(category);

@@ -65,9 +65,19 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: '/favicon.ico.jpg',
-    shortcut: '/favicon.ico.jpg',
-    apple: '/favicon.ico.jpg',
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    shortcut: '/favicon.ico',
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+    other: [
+      { rel: 'icon', url: '/android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
+      { rel: 'icon', url: '/android-chrome-512x512.png', sizes: '512x512', type: 'image/png' },
+    ],
   },
   verification: {
     google: 'your-google-verification-code',
@@ -79,7 +89,7 @@ export const metadata: Metadata = {
     'apple-mobile-web-app-title': 'GlobalEye News',
     'application-name': 'GlobalEye News',
     'msapplication-TileColor': '#dc2626',
-    'msapplication-TileImage': '/favicon.ico.jpg',
+    'msapplication-TileImage': '/android-chrome-192x192.png',
     'msapplication-config': '/browserconfig.xml',
   },
 };
@@ -92,7 +102,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/favicon.ico.jpg" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/favicon.ico" />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="theme-color" content="#dc2626" />
         <meta name="msapplication-TileColor" content="#dc2626" />
@@ -100,10 +111,10 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="GlobalEye News" />
-        <link rel="apple-touch-icon" href="/favicon.ico.jpg" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="application-name" content="GlobalEye News" />
-        <meta name="msapplication-TileImage" content="/favicon.ico.jpg" />
+        <meta name="msapplication-TileImage" content="/android-chrome-192x192.png" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
       </head>
       <body className={inter.className}>

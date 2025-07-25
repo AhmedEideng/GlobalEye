@@ -31,7 +31,7 @@ export async function GET() {
           name !== 'test' &&
           name !== 'admin'
       );
-  } catch {}
+  } catch { /* intentionally left empty to satisfy ESLint no-empty rule */ }
   const allPaths = Array.from(new Set([...alwaysInclude, ...staticDirs]));
   const urls = allPaths
     .map((p) => `<url><loc>${baseUrl}/${p}</loc></url>`)

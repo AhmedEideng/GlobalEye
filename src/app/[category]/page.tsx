@@ -1,7 +1,7 @@
 import CategoryClient from './CategoryClient';
 import CategoryServer from './CategoryServer';
 import ArticleCategoryJsonLdHead from './ArticleCategoryJsonLdHead';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 
 const categoryLabels: { [key: string]: string } = {
   'world': 'World News',
@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: { params: { category: string 
   };
 }
 
-export default async function CategoryPage({ params }: { params: { category: string } }) {
+export default async function Page({ params }: { params: { category: string } }) {
   const { category } = params;
   if (category === 'favicon.ico') {
     // يمكنك إرجاع صفحة خطأ أو إعادة توجيه أو null
