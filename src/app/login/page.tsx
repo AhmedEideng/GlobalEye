@@ -201,7 +201,7 @@ export default function LoginPage() {
           <div className="mt-6 text-center">
             {mode === "login" ? (
               <>
-                <span className="text-gray-600">Don't have an account?</span>
+                <span className="text-gray-600">Don&apos;t have an account?</span>
                 <button
                   className="ml-2 text-red-600 hover:underline font-semibold"
                   onClick={() => { setMode("signup"); setError(""); }}
@@ -317,7 +317,7 @@ export default function LoginPage() {
         <div className="mt-6 text-center">
           {mode === "login" ? (
             <>
-              <span className="text-gray-600">Don't have an account?</span>
+              <span className="text-gray-600">Don&apos;t have an account?</span>
               <button
                 className="ml-2 text-red-600 hover:underline font-semibold"
                 onClick={() => { setMode("signup"); setError(""); }}
