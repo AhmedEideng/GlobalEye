@@ -25,8 +25,8 @@ export function useAuth() {
   }, [setTimeoutReached]);
 
   useEffect(() => {
-    // Check if Supabase is configured
-    if (!isSupabaseConfigured()) {
+    // Check if Supabase is configured and available
+    if (!isSupabaseConfigured() || !supabase) {
       setConfigError('Supabase not configured - check environment variables');
       setLoading(false);
       return;
@@ -87,7 +87,7 @@ export function useAuth() {
 
   // Login with Google
   const signInWithGoogle = async () => {
-    if (!isSupabaseConfigured()) {
+    if (!isSupabaseConfigured() || !supabase) {
       setConfigError('Supabase not configured - cannot sign in');
       return;
     }
@@ -115,7 +115,7 @@ export function useAuth() {
 
   // Logout
   const signOut = async () => {
-    if (!isSupabaseConfigured()) {
+    if (!isSupabaseConfigured() || !supabase) {
       setConfigError('Supabase not configured - cannot sign out');
       return;
     }

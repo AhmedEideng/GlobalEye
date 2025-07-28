@@ -9,12 +9,21 @@ if (supabaseUrl === 'https://xernfvwyruihyezuwybi.supabase.co' && supabaseAnonKe
   console.warn('Using fallback Supabase values - consider setting environment variables');
 }
 
-// Create Supabase client - always create it, even with empty values
-// This prevents null reference errors and allows for graceful degradation
-export const supabase = createClient(
-  supabaseUrl || 'https://placeholder.supabase.co',
-  supabaseAnonKey || 'placeholder-key'
-);
+// Create Supabase client only if we have valid configuration
+let supabase: any = null;
+
+if (supabaseUrl && supabaseAnonKey && 
+    supabaseUrl !== 'https://placeholder.supabase.co' && 
+    supabaseAnonKey !== 'placeholder-key') {
+  try {
+    supabase = createClient(supabaseUrl, supabaseAnonKey);
+  } catch (error) {
+    console.error('Failed to create Supabase client:', error);
+  }
+}
+
+// Export a safe supabase instance
+export { supabase };
 
 // Mock authentication for development
 class MockSupabaseAuth {
