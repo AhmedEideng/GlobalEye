@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from 'react';
 import React from 'react';
-import { FaEnvelope, FaInstagram, FaFacebookF, FaTwitter, FaWhatsapp, FaTelegramPlane } from 'react-icons/fa';
+import { FaInstagram, FaFacebookF, FaTwitter, FaWhatsapp, FaTelegramPlane, FaCopy } from 'react-icons/fa';
 
 export default function ShareButtons({ url, title }: { url: string, title: string }) {
   const [fullUrl, setFullUrl] = useState(url);
@@ -32,11 +32,17 @@ export default function ShareButtons({ url, title }: { url: string, title: strin
     window.open('https://instagram.com/', '_blank');
   }, []);
 
-  const handleEmailShare = useCallback(() => {
-    const subject = encodeURIComponent(title);
-    const body = encodeURIComponent(fullUrl);
-    window.open(`mailto:?subject=${subject}&body=${body}`);
-  }, [title, fullUrl]);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(fullUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy link:', err);
+    }
+  }, [fullUrl]);
 
   const handleTelegramShare = useCallback(() => {
     const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(fullUrl)}&text=${encodeURIComponent(title)}`;
@@ -45,12 +51,12 @@ export default function ShareButtons({ url, title }: { url: string, title: strin
 
   const shareButtons = [
     {
-      id: 'email',
-      label: 'Email',
-      icon: <FaEnvelope size={32} />,
-      onClick: handleEmailShare,
-      bg: 'bg-[#1da1f2]', // أزرق فاتح
-      ring: 'ring-[#1da1f2]'
+      id: 'copy',
+      label: 'Copy Link',
+      icon: <FaCopy size={32} />,
+      onClick: handleCopyLink,
+      bg: 'bg-green-600',
+      ring: 'ring-green-600'
     },
     {
       id: 'instagram',
@@ -73,9 +79,9 @@ export default function ShareButtons({ url, title }: { url: string, title: strin
       label: 'X',
       icon: <FaTwitter size={32} />,
       onClick: handleTwitterShare,
-      bg: 'bg-white',
-      ring: 'ring-gray-300',
-      iconColor: 'text-black'
+      bg: 'bg-black',
+      ring: 'ring-black',
+      iconColor: 'text-white'
     },
     {
       id: 'whatsapp',
@@ -107,8 +113,8 @@ export default function ShareButtons({ url, title }: { url: string, title: strin
           style={{ position: 'relative' }}
         >
           <span className={`flex items-center justify-center w-full h-full ${button.iconColor || 'text-white'}`}>{button.icon}</span>
-          {button.id === 'email' && (
-            <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-xs bg-green-600 text-white px-2 py-1 rounded shadow">تم النسخ!</span>
+          {button.id === 'copy' && copied && (
+            <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-xs bg-green-600 text-white px-2 py-1 rounded shadow animate-pulse">Copied!</span>
           )}
         </button>
       ))}

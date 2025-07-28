@@ -4,7 +4,7 @@ import ArticleHeader from '@components/ArticleHeader';
 import ArticleContent from '@components/ArticleContent';
 import ShareButtons from '@components/ShareButtons';
 import { useEffect, useState } from 'react';
-import OptimizedImage from '@components/OptimizedImage';
+import UniversalImage from '@components/UniversalImage';
 import { sendAnalyticsEvent, fetchRelatedNews, formatDate, getImageUrl } from '@utils/fetchNews';
 import Link from 'next/link';
 import React from 'react';
@@ -24,7 +24,7 @@ export default function ArticleClient({ article, slug }: { article: NewsArticle 
           className="article-card group transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl rounded-xl bg-white shadow-md overflow-hidden"
         >
           <div className="relative w-full h-48 overflow-hidden">
-            <OptimizedImage src={getImageUrl(related.image_url)} alt={related.title} fill className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300" />
+            <UniversalImage src={getImageUrl(related.image_url)} alt={related.title} fill className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300" />
           </div>
           <div className="p-4">
             <div className="article-category text-xs font-bold mb-1 bg-red-600 text-white rounded-full px-3 py-1 inline-block"><SafeText fallback="Unknown Source">{related.source?.name}</SafeText></div>

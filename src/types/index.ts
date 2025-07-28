@@ -5,6 +5,7 @@ export interface NewsItem {
   url: string;
   image_url: string | null;
   published_at: string | null;
-  source: string;
+  source_name: string;
   author: string | null;
+  category?: string;
 }

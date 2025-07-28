@@ -46,7 +46,6 @@ export default function AdminNewsPage() {
         .order('published_at', { ascending: false });
       
       if (error) {
-        console.error('Error fetching news:', error);
         setNews([]);
       } else {
         setNews(articles || []);

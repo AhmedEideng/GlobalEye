@@ -1,75 +1,106 @@
-import { fetchNews, NewsArticle } from '@utils/fetchNews';
+import { createClient } from '@supabase/supabase-js';
+import { NewsArticle } from '@/utils/fetchNews';
+import { getOrAddCategoryId } from '@/utils/categoryUtils';
+import Image from 'next/image';
 
-// Professional error logger for category server
-function logCategoryServerError(...args: unknown[]) {
-  if (process.env.NODE_ENV === 'development') {
-    // eslint-disable-next-line no-console
-    console.debug('[CategoryServer]', ...args);
-  }
-  // In production, you can send errors to a monitoring service here
-}
+const supabase = createClient(
+  process.env.SUPABASE_URL || 'https://xernfvwyruihyezuwybi.supabase.co',
+  process.env.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhlcm5mdnd5cnVpaHllenV3eWJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk3NzA3NjEsImV4cCI6MjA2NTM0Njc2MX0.ZmhaLrkfOz9RcTXx8lp_z0wJCmUznXQwNHb0TKhX4mw'
+);
 
-export async function fetchCategoryNews(category: string): Promise<{
-  featured: NewsArticle | null;
-  articles: NewsArticle[];
-  suggestedArticles: NewsArticle[];
-}> {
+async function fetchCategoryNews(category: string): Promise<NewsArticle[]> {
   try {
-    // استخدم عنوان مطلق عند التنفيذ على الخادم
-    const isServer = typeof window === 'undefined';
-    const baseUrl = isServer
-      ? (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3002')
-      : '';
-    const url = `${baseUrl}/api/news-rotation?category=${category}`;
-    const response = await fetch(url, {
-      next: { revalidate: 180 }, // 3 minutes cache
-      headers: {
-        'Accept': 'application/json',
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    // Get category ID first
+    const categoryId = await getOrAddCategoryId(category);
+    
+    if (!categoryId) {
+      console.error('Category not found:', category);
+      return [];
     }
 
-    const data = await response.json();
-    
-    if (data.success && data.data) {
-      return {
-        featured: data.data.featured || null,
-        articles: data.data.mainArticles || [],
-        suggestedArticles: data.data.suggestedArticles || []
-      };
+    const { data, error } = await supabase
+      .from('news')
+      .select('*, categories(name)')
+      .eq('category_id', categoryId)
+      .order('published_at', { ascending: false })
+      .limit(20);
+
+    if (error) {
+      console.error('Error fetching category news:', error);
+      return [];
     }
-    
-    throw new Error('Invalid response format');
+
+    // Transform data to match NewsArticle interface
+    return (data || []).map((article: any) => ({
+      source: { id: null, name: article.source_name || 'Unknown' },
+      author: article.author,
+      title: article.title,
+      description: article.description,
+      url: article.url,
+      image_url: article.image_url,
+      published_at: article.published_at,
+      content: article.content,
+      slug: article.slug,
+      category: article.categories?.name || category,
+    }));
   } catch (error) {
-    logCategoryServerError(`Failed to fetch rotated news for category ${category}:`, error);
-    // Fallback to direct fetch
-    const allArticles: NewsArticle[] = await fetchNews();
-    const categoryArticles = allArticles.filter(article => article.category === category);
-    const sortedArticles = categoryArticles.sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime());
-    const featured = sortedArticles[0] || null;
-    const restArticles = featured ? sortedArticles.filter(a => a.slug !== featured.slug) : sortedArticles;
-    const articles = restArticles.slice(0, 51);
-    const suggestedArticles = restArticles.slice(0, 40);
-    
-    return {
-      featured,
-      articles,
-      suggestedArticles
-    };
+    console.error('Error in fetchCategoryNews:', error);
+    return [];
   }
 }
 
-export default async function CategoryServer({ category }: { category: string }) {
-  // Fetch rotated news with automatic 3-hour rotation for this category
-  const { featured, articles, suggestedArticles } = await fetchCategoryNews(category);
-
-  return {
-    featured,
-    articles,
-    suggestedArticles,
-    category
-  };
+export default async function CategoryServer({ 
+  params 
+}: { 
+  params: { category: string } 
+}) {
+  try {
+    const articles = await fetchCategoryNews(params.category);
+    
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6 capitalize">{params.category}</h1>
+        {articles.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {articles.map((article) => (
+              <div key={article.slug} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                {article.image_url && (
+                  <div className="relative w-full h-48">
+                    <Image 
+                      src={article.image_url} 
+                      alt={article.title}
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                  </div>
+                )}
+                <div className="p-4">
+                  <h2 className="text-xl font-semibold mb-2 text-gray-900 hover:text-red-600 transition-colors">{article.title}</h2>
+                  <p className="text-gray-600 mb-2">{article.description}</p>
+                  <div className="text-sm text-gray-500">
+                    {new Date(article.published_at).toLocaleDateString()}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-gray-600">No articles found for this category.</p>
+          </div>
+        )}
+      </div>
+    );
+  } catch (error) {
+    console.error('Error in CategoryServer:', error);
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Error Loading Category</h1>
+          <p className="text-gray-600">Failed to load articles for {params.category}</p>
+        </div>
+      </div>
+    );
+  }
 } 

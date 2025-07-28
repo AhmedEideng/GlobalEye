@@ -3,12 +3,12 @@ import { supabase } from '@utils/supabaseClient';
 
 export async function GET() {
   try {
-    // تحقق من الاتصال بقاعدة البيانات
+    // Check database connection
     const { error: dbError } = await supabase.from('categories').select('id').limit(1);
-    // تحقق من متغيرات البيئة
+    // Check environment variables
     const envStatus = {
-      supabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL || !!process.env.SUPABASE_URL,
-      supabaseKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || !!process.env.SUPABASE_ANON_KEY || !!process.env.SUPABASE_KEY || !!process.env.supabaseKey,
+      supabaseUrl: !!process.env.SUPABASE_URL,
+      supabaseKey: !!process.env.SUPABASE_KEY,
       refreshNewsToken: !!process.env.REFRESH_NEWS_TOKEN,
     };
     return NextResponse.json({

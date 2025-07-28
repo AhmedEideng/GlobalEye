@@ -4,13 +4,14 @@ import { sanitizeText, sanitizeJsonLd } from '@/utils/sanitizeText';
 
 const categoryLabels: { [key: string]: string } = {
   'world': 'World News',
-  'politics': 'Politics',
   'business': 'Business',
   'technology': 'Technology',
   'sports': 'Sports',
   'entertainment': 'Entertainment',
   'health': 'Health',
-  'science': 'Science'
+  'science': 'Science',
+  'politics': 'Politics',
+  'general': 'General'
 };
 
 export default function ArticleCategoryJsonLdHead({ category }: { category: string }) {

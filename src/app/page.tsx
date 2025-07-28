@@ -1,151 +1,129 @@
 "use client";
-import { useEffect, useState, useRef, Suspense } from "react";
+import { useEffect, useState } from "react";
 import { getCategoriesFromSupabase } from "@/utils/getCategoriesFromSupabase";
-import { fetchNews } from "@/utils/fetchNews";
 import HomeNewsGrid from "@/components/HomeNewsGrid";
+import HomeFeatured from "@/components/HomeFeatured";
 import { Category } from "@/utils/getCategoriesFromSupabase";
 import { NewsArticle } from "@/utils/fetchNews";
 import { PageLoadingSpinner } from "@/components/LoadingSpinner";
+import { logger } from "@/utils/logger";
+import SuggestedArticles from "@/components/SuggestedArticles";
 
-// مكون عرض الأقسام
-function CategoriesSection({ categories, newsByCategory, hasNewNews, onShowNewNews }: {
-  categories: Category[];
-  newsByCategory: Record<string, NewsArticle[]>;
-  hasNewNews: boolean;
-  onShowNewNews: () => void;
-}) {
-  if (categories.length === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-6xl mb-4">📰</div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">GlobalEye News</h1>
-          <p className="text-gray-600">جاري تحميل الأقسام...</p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <main>
-      {hasNewNews && (
-        <div className="bg-yellow-100 border-b border-yellow-300 text-yellow-900 px-4 py-2 text-center cursor-pointer sticky top-0 z-50 flex items-center justify-center gap-2 animate-fade-in">
-          <span>🟡 New articles are available</span>
-          <button onClick={onShowNewNews} className="bg-yellow-300 hover:bg-yellow-400 text-yellow-900 font-bold px-3 py-1 rounded transition ml-2">Refresh now</button>
-        </div>
-      )}
-      {categories.map((cat: Category) => (
-        <section key={cat.id} className="mb-12">
-          <h2 className="text-2xl font-bold mb-4">{cat.name}</h2>
-          <HomeNewsGrid articles={newsByCategory[cat.name] || []} />
-        </section>
-      ))}
-    </main>
-  );
-}
+// Default categories based on new structure
+const DEFAULT_CATEGORIES: Category[] = [
+  { id: '1', name: 'World' },
+  { id: '2', name: 'Business' },
+  { id: '3', name: 'Technology' },
+  { id: '4', name: 'Sports' },
+  { id: '5', name: 'Entertainment' },
+  { id: '6', name: 'Health' },
+  { id: '7', name: 'Science' },
+  { id: '8', name: 'Politics' },
+  { id: '9', name: 'General' }
+];
 
 export default function HomePage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [newsByCategory, setNewsByCategory] = useState<Record<string, NewsArticle[]>>({});
+  const [featuredArticle, setFeaturedArticle] = useState<NewsArticle | null>(null);
   const [loading, setLoading] = useState(true);
-  const [hasNewNews, setHasNewNews] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const latestSlugsRef = useRef<Record<string, string>>({});
-  const pendingNewsRef = useRef<Record<string, NewsArticle[]>>({});
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [timeout, setTimeoutReached] = useState(false);
 
-  // جلب الأقسام مرة واحدة
+  // Fetch categories and news
   useEffect(() => {
-    const loadCategories = async () => {
+    const loadData = async () => {
       try {
-        const cats = await getCategoriesFromSupabase();
-      setCategories(cats);
-      } catch (err) {
-        console.error('Error loading categories:', err);
-        setError('Failed to load categories');
-      }
-    };
-    loadCategories();
-  }, []);
-
-  // جلب الأخبار لكل قسم وتحديثها كل دقيقة
-  useEffect(() => {
-    if (categories.length === 0) return;
-    
-    let cancelled = false;
-    const fetchAllNews = async (showImmediately = false) => {
-      try {
-      setLoading(true);
-      const newsData: Record<string, NewsArticle[]> = {};
+        setLoading(true);
+        setLoadingProgress(0);
+        setError(null);
         
-      for (const cat of categories) {
+        // Set timeout to prevent infinite loading
+        const timeoutId = setTimeout(() => {
+          setTimeoutReached(true);
+          setLoading(false);
+          setError('Loading timeout - please refresh the page');
+        }, 30000); // 30 seconds timeout
+
+        // Fetch categories
+        let cats: Category[] = [];
+        try {
+          logger.info('Fetching categories from Supabase...');
+          cats = await getCategoriesFromSupabase();
+          logger.info('Categories fetched:', cats);
+          setLoadingProgress(30);
+        } catch (err) {
+          logger.error('Error fetching categories:', err);
+          // Use default categories if connection fails
+          cats = DEFAULT_CATEGORIES;
+          logger.info('Using default categories:', cats);
+        }
+        setCategories(cats);
+        setLoadingProgress(50);
+
+        // Fetch news from API
+        const newsData: Record<string, NewsArticle[]> = {};
+        const totalCategories = cats.length;
+        let allArticles: NewsArticle[] = [];
+        
+        for (let i = 0; i < cats.length; i++) {
+          const cat = cats[i];
           try {
-        newsData[cat.name] = await fetchNews(cat.name, 10, 0);
+            logger.info(`Fetching news for category: ${cat.name}`);
+            const response = await fetch(`/api/news-rotation?category=${cat.name.toLowerCase()}&limit=10`);
+            
+            if (response.ok) {
+              const data = await response.json();
+              if (data.success && data.data) {
+                // Try to get articles from different possible structures
+                const articles = data.data.mainArticles || data.data.suggestedArticles || data.data || [];
+                newsData[cat.name] = articles;
+                allArticles = [...allArticles, ...articles];
+                logger.info(`Fetched ${articles.length} articles for category ${cat.name}`);
+              } else {
+                newsData[cat.name] = [];
+                logger.info(`No news for category ${cat.name}`);
+              }
+            } else {
+              logger.error(`API call error for category ${cat.name}:`, response.status);
+              newsData[cat.name] = [];
+            }
           } catch (err) {
-            console.error(`Error fetching news for category ${cat.name}:`, err);
+            logger.error(`Error fetching news for category ${cat.name}:`, err);
             newsData[cat.name] = [];
           }
-      }
-        
-      if (!cancelled) {
-        // مقارنة أحدث slug لكل قسم
-        let foundNew = false;
-        for (const cat of categories) {
-          const newFirst = newsData[cat.name]?.[0]?.slug;
-          const oldFirst = latestSlugsRef.current[cat.name];
-          if (newFirst && oldFirst && newFirst !== oldFirst) {
-            foundNew = true;
-          }
-        }
           
-        if (showImmediately || !hasNewNews) {
-          setNewsByCategory(newsData);
-          // حفظ أحدث slug لكل قسم
-          const newSlugs: Record<string, string> = {};
-          for (const cat of categories) {
-            newSlugs[cat.name] = newsData[cat.name]?.[0]?.slug || "";
-          }
-          latestSlugsRef.current = newSlugs;
-          setHasNewNews(false);
-        } else if (foundNew) {
-          // هناك أخبار جديدة لم تظهر بعد
-          pendingNewsRef.current = newsData;
-          setHasNewNews(true);
+          // Update loading progress
+          const progress = 50 + ((i + 1) / totalCategories) * 50;
+          setLoadingProgress(progress);
         }
+        
+        // Set featured article (first article from World category or first available)
+        if (allArticles.length > 0) {
+          const worldArticles = newsData['World'] || [];
+          const featured = worldArticles.length > 0 ? worldArticles[0] : allArticles[0];
+          setFeaturedArticle(featured);
+        }
+        
+        setNewsByCategory(newsData);
+        setLoading(false);
+        clearTimeout(timeoutId);
+        logger.info('All data loaded successfully');
+      } catch (err) {
+        logger.error('General error loading data:', err);
+        setError('Failed to load data - please refresh the page');
         setLoading(false);
       }
-      } catch (err) {
-        console.error('Error fetching news:', err);
-        if (!cancelled) {
-          setError('Failed to load news');
-          setLoading(false);
-        }
-      }
     };
     
-    fetchAllNews(true); // أول تحميل
-    const interval = setInterval(() => fetchAllNews(false), 60000); // كل 60 ثانية
-    
-    return () => {
-      cancelled = true;
-      clearInterval(interval);
-    };
-  }, [categories, hasNewNews]);
+    loadData();
+  }, []);
 
-  const handleShowNewNews = () => {
-    setNewsByCategory({ ...pendingNewsRef.current });
-    // حفظ أحدث slug لكل قسم
-    const newSlugs: Record<string, string> = {};
-    for (const cat of categories) {
-      newSlugs[cat.name] = pendingNewsRef.current[cat.name]?.[0]?.slug || "";
-    }
-    latestSlugsRef.current = newSlugs;
-    setHasNewNews(false);
-  };
-
-  // عرض رسالة الخطأ
+  // Display error message
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="text-6xl mb-4">⚠️</div>
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Something went wrong</h1>
@@ -161,19 +139,66 @@ export default function HomePage() {
     );
   }
 
-  // عرض شاشة التحميل
-  if (loading && categories.length === 0) {
-    return <PageLoadingSpinner />;
+  // Display loading screen with progress bar
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-red-600 mx-auto mb-6"></div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">GlobalEye News</h2>
+          <p className="text-gray-600 mb-4">Loading news...</p>
+          
+          {/* Progress bar */}
+          <div className="w-64 bg-gray-200 rounded-full h-2 mx-auto">
+            <div 
+              className="bg-red-600 h-2 rounded-full transition-all duration-300"
+              style={{ width: `${loadingProgress}%` }}
+            ></div>
+          </div>
+          <p className="text-sm text-gray-500 mt-2">{Math.round(loadingProgress)}%</p>
+          
+          {timeout && (
+            <p className="text-sm text-red-500 mt-2">Taking longer than expected...</p>
+          )}
+        </div>
+      </div>
+    );
   }
 
+  // Main content
   return (
-    <Suspense fallback={<PageLoadingSpinner />}>
-      <CategoriesSection 
-        categories={categories}
-        newsByCategory={newsByCategory}
-        hasNewNews={hasNewNews}
-        onShowNewNews={handleShowNewNews}
-      />
-    </Suspense>
+    <main className="container mx-auto px-4 py-8">
+      {/* Featured Article Section */}
+      {featuredArticle && (
+        <HomeFeatured article={featuredArticle} />
+      )}
+
+      {/* Categories Sections */}
+      {categories.length === 0 ? (
+        <div className="text-center py-12">
+          <div className="text-6xl mb-4">📰</div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">GlobalEye News</h1>
+          <p className="text-gray-600">No categories available at the moment</p>
+        </div>
+      ) : (
+        categories.map((cat: Category) => {
+          const articles = newsByCategory[cat.name] || [];
+          if (articles.length === 0) return null;
+          
+          return (
+            <section key={cat.id} className="mb-12">
+              <div className="mb-6">
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">{cat.name}</h2>
+                <div className="w-20 h-1 bg-red-600 rounded"></div>
+              </div>
+              <HomeNewsGrid articles={articles} />
+            </section>
+          );
+        })
+      )}
+
+      {/* Suggested Articles Section */}
+      <SuggestedArticles category="world" limit={8} />
+    </main>
   );
 } 

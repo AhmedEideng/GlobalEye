@@ -1,5 +1,5 @@
 export async function fetchNewsFromGEnews(category: string) {
-  const apiKey = process.env.GNEWS_KEY || process.env.NEXT_PUBLIC_GNEWS_API_KEY;
+  const apiKey = process.env.GNEWS_KEY;
   const response = await fetch(`https://gnews.io/api/v4/top-headlines?category=${category}&lang=en&token=${apiKey}`);
   if (!response.ok) throw new Error('Failed to fetch from GNews');
   const data: GNewsResponse = await response.json();
@@ -9,7 +9,7 @@ export async function fetchNewsFromGEnews(category: string) {
     url: article.url,
     urlToImage: article.image || '',
     publishedAt: article.publishedAt,
-    source: { name: 'GNews' },
+    source: { name: article.source?.name || 'GNews' },
     author: undefined,
   }));
 }
@@ -21,5 +21,8 @@ interface GNewsResponse {
     url: string;
     image?: string;
     publishedAt?: string;
+    source?: {
+      name: string;
+    };
   }[];
 }

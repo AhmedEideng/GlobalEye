@@ -27,7 +27,7 @@ export default function BreakingNewsTickerController({ children }: { children: R
   // Hide ticker when mobile menu is open
   const effectiveShowTicker = showTicker && !isMenuOpen;
 
-  // Navbar ثابت دائماً في الأعلى، شريط الأخبار العاجلة يظهر تحته مباشرة
+  // Navbar is always fixed at the top, breaking news ticker appears directly below it
   return (
     <>
       <Navbar isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />

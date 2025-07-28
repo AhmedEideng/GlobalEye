@@ -14,7 +14,6 @@ export default function Footer() {
           <h3 className="text-xl font-bold mb-2">News Categories</h3>
           <div className="flex flex-col gap-1 mt-2">
             <Link href="/world" className="hover:text-red-500 transition-colors">World</Link>
-            <Link href="/politics" className="hover:text-red-500 transition-colors">Politics</Link>
             <Link href="/business" className="hover:text-red-500 transition-colors">Business</Link>
             <Link href="/technology" className="hover:text-red-500 transition-colors">Technology</Link>
             <Link href="/sports" className="hover:text-red-500 transition-colors">Sports</Link>

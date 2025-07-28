@@ -1,11 +1,21 @@
-import Link from "next/link";
+import Link from 'next/link';
 
 export default function NotFound() {
   return (
-    <div style={{padding: 40, textAlign: 'center', color: 'red'}}>
-      <h1 style={{fontSize: 48, marginBottom: 16}}>404 - Page Not Found</h1>
-      <p>The page you are looking for does not exist or has been moved.</p>
-      <Link href="/" style={{color: '#dc2626', textDecoration: 'underline'}}>Back to Home</Link>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="text-center p-8">
+        <div className="text-6xl mb-4">📰</div>
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">404 - Page Not Found</h1>
+        <p className="text-gray-600 mb-6">
+          Sorry, the page you are looking for does not exist.
+        </p>
+        <Link 
+          href="/" 
+          className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors font-bold"
+        >
+          Go to Homepage
+        </Link>
+      </div>
     </div>
   );
 } 

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { NewsArticle } from '@utils/fetchNews';
 import { getImageUrl } from '@utils/fetchNews';
-import OptimizedImage from './OptimizedImage';
+import UniversalImage from './UniversalImage';
 import { useAuth } from '@hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -41,7 +41,7 @@ export default function HomeFeatured({ article }: { article: NewsArticle }) {
   };
 
   if (!article) return null;
-  const imageSrc = getImageUrl(article.image_url);
+  
   return (
     <>
       {toast && (
@@ -51,16 +51,18 @@ export default function HomeFeatured({ article }: { article: NewsArticle }) {
       )}
       <section className="mb-8 sm:mb-10">
         <div className="article-card relative w-full h-[220px] sm:h-[320px] md:h-[420px] lg:h-[500px] rounded-2xl overflow-hidden" style={{ height: 'min(60vw, 420px)', minHeight: '180px' }}>
-          <OptimizedImage
-            src={imageSrc}
+          <UniversalImage
+            src={getImageUrl(article.image_url)}
             alt={article.title}
             fill
+            priority={true}
             className="object-cover w-full h-full"
+            fallbackSrc="/placeholder-news.jpg"
           />
           {/* Favorite button */}
           <button
             type="button"
-            className="absolute top-3 right-3 z-20 bg-white/80 rounded-full p-2 shadow hover:bg-yellow-100 transition"
+            className="absolute top-3 right-3 z-20 bg-white/80 rounded-full p-2 shadow hover:bg-gray-100 transition"
             title={isFav ? 'Remove from favorites' : 'Add to favorites'}
             onClick={handleToggleFavorite}
             disabled={favLoading}

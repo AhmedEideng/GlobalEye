@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
+import './professional-override.css';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import BreakingNewsTickerController from '@/components/BreakingNewsTickerController';
 import ScrollToTopWrapper from '@/components/ScrollToTopWrapper';
@@ -121,7 +122,7 @@ export default function RootLayout({
         <ErrorBoundary>
           <BreakingNewsTickerController>
             <ScrollToTopWrapper>
-              <main className="min-h-screen bg-gray-50 pt-24 md:pt-28">
+              <main className="min-h-screen bg-gray-50 pt-28">
                 {children}
               </main>
               <Footer />

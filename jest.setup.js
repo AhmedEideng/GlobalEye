@@ -1,5 +1,5 @@
-process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://localhost:54321';
-process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-key';
+process.env.SUPABASE_URL = 'http://localhost:54321';
+process.env.SUPABASE_KEY = 'test-key';
 
 /* global jest */
 require('@testing-library/jest-dom')
@@ -29,7 +29,7 @@ jest.mock('@supabase/supabase-js', () => {
   }
 })
 
-// Mock Next.js router
+// Mock Next.js router (Pages Router)
 jest.mock('next/router', () => ({
   useRouter() {
     return {
@@ -50,6 +50,26 @@ jest.mock('next/router', () => ({
       },
       isFallback: false,
     }
+  },
+}))
+
+// Mock Next.js navigation (App Router)
+jest.mock('next/navigation', () => ({
+  useRouter() {
+    return {
+      push: jest.fn(),
+      replace: jest.fn(),
+      prefetch: jest.fn(),
+      back: jest.fn(),
+      forward: jest.fn(),
+      refresh: jest.fn(),
+    }
+  },
+  usePathname() {
+    return '/'
+  },
+  useSearchParams() {
+    return new URLSearchParams()
   },
 }))
 

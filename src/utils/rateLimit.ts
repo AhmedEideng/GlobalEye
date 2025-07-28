@@ -7,7 +7,7 @@ const store: RateLimitStore = {};
 export default function rateLimit(
   key: string,
   limit: number,
-  duration: number = 60000 // مدة القفل بالمللي ثانية (1 دقيقة)
+  duration: number = 60000 // Lock duration in milliseconds (1 minute)
 ): boolean {
   const now = Date.now();
   if (!store[key] || store[key] + duration < now) {

@@ -132,7 +132,7 @@ export default function BreakingNewsTicker({ showTicker = true }: { showTicker?:
 
   return (
     <div
-      className={`breaking-news-ticker bg-red-800 text-white w-full overflow-hidden fixed left-0 top-12 md:top-16 z-30 transition-all duration-500 ${hasNew ? 'animate-pulse ring-4 ring-yellow-300' : ''}`}
+      className={`breaking-news-ticker bg-red-800 text-white w-full overflow-hidden fixed left-0 top-16 md:top-16 z-30 transition-all duration-500 ${hasNew ? 'animate-pulse ring-4 ring-yellow-300' : ''}`}
       onClick={handleTickerClick}
       style={{ cursor: news.length > 0 ? 'pointer' : 'default' }}
     >

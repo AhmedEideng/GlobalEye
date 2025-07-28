@@ -1,12 +1,13 @@
 "use client";
 import Link from "next/link";
-import { NewsArticle } from '@utils/fetchNews';
-import { getImageUrl } from '@utils/fetchNews';
-import { formatDate } from '@utils/fetchNews';
+import { NewsArticle, getImageUrl, formatDate } from '@/utils/fetchNews';
 import React from "react";
 import SafeText from './SafeText';
-import OptimizedImage from './OptimizedImage';
-import { useAuth } from '@hooks/useAuth';
+import SourceNameText from './SourceNameText';
+
+import SimpleSourceName from './SimpleSourceName';
+import UniversalImage from './UniversalImage';
+import { useAuth } from '@/hooks/useAuth';
 import { isFavorite, addFavorite, removeFavorite } from '@/services/favorites';
 import { useRouter } from 'next/navigation';
 import { trackEvent } from '@/utils/analytics';
@@ -66,28 +67,28 @@ const HomeNewsGrid = React.memo(({ articles }: { articles: NewsArticle[] }) => {
 
   const renderArticle = React.useCallback((article: NewsArticle, idx: number) => {
     const imageSrc = getImageUrl(article.image_url);
-    // Format date outside of the callback to avoid hooks rules violation
     const formattedDate = formatDate(article.published_at);
+    
     return (
       <Link
         key={article.slug || idx}
         href={`/article/${article.slug}`}
-        className="article-card group relative"
+        className="article-card group relative bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
         onClick={() => trackEvent('view_article', { slug: article.slug, title: article.title, category: article.category })}
       >
         <div className="relative w-full h-48 overflow-hidden">
-          {imageSrc && (
-            <OptimizedImage
-              src={imageSrc}
-              alt={article.title}
-              fill
-              className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-            />
-          )}
+          <UniversalImage
+            src={imageSrc}
+            alt={article.title}
+            fill
+            priority={idx < 4} // Prioritize first 4 images
+            className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+            fallbackSrc="/placeholder-news.jpg"
+          />
           {/* Favorite button */}
           <button
             type="button"
-            className="absolute top-2 right-2 z-10 bg-white/80 rounded-full p-2 shadow hover:bg-yellow-100 transition-opacity opacity-0 group-hover:opacity-100"
+            className="absolute top-2 right-2 z-10 bg-white/80 rounded-full p-2 shadow hover:bg-gray-100 transition-opacity opacity-0 group-hover:opacity-100"
             title={favorites[article.slug] ? 'Remove from favorites' : 'Add to favorites'}
             onClick={e => { e.preventDefault(); e.stopPropagation(); handleToggleFavorite(article.slug); }}
             disabled={loadingFav === article.slug}
@@ -100,10 +101,10 @@ const HomeNewsGrid = React.memo(({ articles }: { articles: NewsArticle[] }) => {
           </button>
         </div>
         <div className="p-4">
-          <div className="article-category text-xs font-bold mb-1 bg-red-600 text-white rounded-full px-3 py-1 inline-block">
-            <SafeText fallback="Unknown Source">{article.source?.name}</SafeText>
-          </div>
-          <h3 className="article-title text-lg font-bold mb-2 line-clamp-2">
+
+          
+          {/* Removed red category badge */}
+          <h3 className="article-title text-lg font-bold mb-2 line-clamp-2 text-gray-900 group-hover:text-red-600 transition-colors">
             <SafeText fallback="Untitled">{article.title}</SafeText>
           </h3>
           <p className="article-excerpt text-gray-600 text-sm mb-2 line-clamp-2">
@@ -123,20 +124,9 @@ const HomeNewsGrid = React.memo(({ articles }: { articles: NewsArticle[] }) => {
   if (!articles?.length) {
     // Skeleton loading
     return (
-      <section className="mt-8 bg-gradient-to-br from-gray-100 via-white to-gray-50 rounded-2xl p-3 sm:p-6 shadow-lg">
-        <div className="mb-3 sm:mb-4">
-          <h2 className="text-xl sm:text-3xl font-extrabold mb-2 text-red-800 flex items-center gap-2">
-            <span role="img" aria-label="newspaper">📰</span>
-            Latest News
-          </h2>
-          <p className="text-sm sm:text-base border-b pb-2">
-            Stay updated with the latest breaking news from around the world
-          </p>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-8">
-          {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
-        </div>
-      </section>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+        {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
+      </div>
     );
   }
 
@@ -147,20 +137,9 @@ const HomeNewsGrid = React.memo(({ articles }: { articles: NewsArticle[] }) => {
           {toast.msg}
         </div>
       )}
-      <section className="mt-8 bg-gradient-to-br from-gray-100 via-white to-gray-50 rounded-2xl p-3 sm:p-6 shadow-lg">
-        <div className="mb-3 sm:mb-4">
-          <h2 className="text-xl sm:text-3xl font-extrabold mb-2 text-red-800 flex items-center gap-2">
-            <span role="img" aria-label="newspaper">📰</span>
-            Latest News
-          </h2>
-          <p className="text-sm sm:text-base border-b pb-2">
-            Stay updated with the latest breaking news from around the world
-          </p>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-8">
-          {articles.map(renderArticle)}
-        </div>
-      </section>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+        {articles.map(renderArticle)}
+      </div>
     </>
   );
 });

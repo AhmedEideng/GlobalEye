@@ -1,4 +1,10 @@
-import { supabase } from '@utils/supabaseClient';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.SUPABASE_URL || '';
+const supabaseAnonKey = process.env.SUPABASE_KEY || '';
+
+// Create Supabase client
+const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
 
 /**
  * Fetch a category by slug from the categories table
@@ -6,6 +12,11 @@ import { supabase } from '@utils/supabaseClient';
  * @returns Category data or null
  */
 export async function getCategoryBySlug(slug: string) {
+  if (!supabase) {
+    console.error('Supabase client not available');
+    return null;
+  }
+  
   const { data, error } = await supabase
     .from('categories')
     .select('*')
@@ -22,6 +33,11 @@ export async function getCategoryBySlug(slug: string) {
  * @returns Category data after adding
  */
 export async function addCategoryIfNotExists(slug: string, name?: string) {
+  if (!supabase) {
+    console.error('Supabase client not available');
+    return null;
+  }
+  
   // Try to fetch the category first
   const category = await getCategoryBySlug(slug);
   if (category) return category;
@@ -51,6 +67,11 @@ export async function getOrAddCategoryId(slug: string, name?: string): Promise<n
  * @returns Array of categories or []
  */
 export async function fetchAllCategories() {
+  if (!supabase) {
+    console.error('Supabase client not available');
+    return [];
+  }
+  
   const { data, error } = await supabase
     .from('categories')
     .select('*');

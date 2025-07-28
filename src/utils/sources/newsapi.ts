@@ -1,5 +1,5 @@
 export async function fetchNewsFromNewsAPI(category: string) {
-  const apiKey = process.env.NEWSAPI_KEY || process.env.NEXT_PUBLIC_NEWS_API_KEY;
+  const apiKey = process.env.NEWSAPI_KEY;
   const response = await fetch(`https://newsapi.org/v2/top-headlines?category=${category}&language=en&apiKey=${apiKey}`);
   if (!response.ok) throw new Error('Failed to fetch from NewsAPI');
   const data: NewsAPIResponse = await response.json();
@@ -9,7 +9,7 @@ export async function fetchNewsFromNewsAPI(category: string) {
     url: article.url,
     urlToImage: article.urlToImage || '',
     publishedAt: article.publishedAt,
-    source: { name: 'NewsAPI' },
+    source: { name: article.source?.name || 'NewsAPI' },
     author: undefined,
   }));
 }
@@ -21,5 +21,8 @@ interface NewsAPIResponse {
     url: string;
     urlToImage?: string;
     publishedAt?: string;
+    source?: {
+      name: string;
+    };
   }[];
 }

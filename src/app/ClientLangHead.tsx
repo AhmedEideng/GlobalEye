@@ -3,7 +3,7 @@ import { usePathname } from 'next/navigation';
 import Script from 'next/script';
 import Head from 'next/head';
 
-const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+const GA_MEASUREMENT_ID = process.env.GA_MEASUREMENT_ID || 'G-8TWG1CQZNL';
 
 export default function ClientLangHead() {
   const pathname = usePathname() || '/';
